@@ -12,7 +12,7 @@ The project was scaffolded by the OpenAI "Sites" starter (`site-creator-vinext-s
 | Dev server | `npm run dev` | http://127.0.0.1:5173/ . Long-running: start with `run_in_background`. Uses local D1 in `.wrangler/state`. |
 | Typecheck | `npm run typecheck` | ~10s. Passes clean. **Primary verification step.** |
 | Unit tests | `npm run test:unit` | ~1s. `node:test` on TypeScript via `--experimental-strip-types`; files `tests/unit/*.test.ts`. For pure logic in `lib/` (no `cloudflare:workers` imports). Test files import with `.ts` extensions; `tests/unit/register.mjs` resolves extensionless imports inside `lib/`. |
-| Smoke test | `npm run smoke` | Needs `npm run dev` running. 59 API checks (CRUD, validation, rename cascade, origin check). Uses unique `Smoke ...` names and cleans up. Run after any change to `app/api/` or `lib/`. |
+| Smoke test | `npm run smoke` | Needs `npm run dev` running. 60 API checks (CRUD, validation, rename cascade, origin check). Uses unique `Smoke ...` names and cleans up. Run after any change to `app/api/` or `lib/`. |
 | Lint | `npm run lint` | ~60s. Clean (0 errors); keep it that way. The React Compiler rule forbids synchronous setState inside effects: set state only after an `await`. |
 | Build | `npm run build` | Outputs `dist/` (Worker + client). |
 | Run built app | `npm start` | wrangler dev against `dist/server/wrangler.json`. |
@@ -109,6 +109,7 @@ Data access uses **raw D1 prepared statements** (`database().prepare(...).bind(.
 - Icons from `lucide-react`; dialogs/selects/tabs/tables from `@/components/ui/*` (shadcn on Radix).
 - `recharts` is installed but unused; the donut is a CSS `conic-gradient` and the bar chart is plain divs.
 - The second `useEffect` registers a `read_expenses` tool on `document.modelContext` (WebMCP). Keep it in sync if the Expense shape changes.
+- Transient feedback uses `sonner` toasts (`toast()` from 'sonner', `<Toaster>` mounted once in tracker with `mobileOffset` to clear the floating Add button). Form/dialog errors stay inline.
 - Accessibility patterns in use: `aria-label` on icon buttons, `role="status"` sr-only notice, `role="alert"` errors. Keep them.
 
 ## Code style
