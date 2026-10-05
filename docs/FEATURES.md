@@ -12,6 +12,7 @@ Keep this file current: move an idea to "Implemented" when it ships.
 | Edit expense | Pencil button on any expense row reopens the dialog pre-filled. | `PUT /api/expenses` |
 | Delete with undo | Trash button on every expense row (Overview and Expenses). Deletes immediately and shows a toast with Undo for 7 seconds; Undo re-creates the identical expense. If the delete fails, the row comes back with an error toast. | `remove()`, `undo()`; `DELETE`/`POST /api/expenses` |
 | Payment method | Optional "Paid with" on each expense (free text up to 30 chars, suggestions: Cash, bKash, Nagad, Card, Bank transfer and past methods). New entries default to the most recently used method. Shown on rows, searchable, filterable (Paid with), in the all-expenses CSV and backups. | `method` column; `lib/expenses.ts` |
+| Quick add | The add dialog shows up to 5 chips for your most frequent expenses of the last 60 days (same category, amount and note), most used first. Tapping one fills amount, category, payment method and note; date stays today. Not shown when editing. | `lib/quick.ts` (unit tested) |
 | Smart defaults | New entries default to the Groceries category and to today (Asia/Dhaka) when viewing the current month, otherwise the 1st of the viewed month. After saving, the view jumps to the expense's month. | `start()`, `today()` |
 | Server validation | Positive amount, at most 2 decimals and 9 digits; real calendar date from 1900 onward; category must exist; note trimmed. Friendly error messages shown in the form. | `lib/expenses.ts` `validateExpense()` |
 
@@ -68,7 +69,6 @@ Proposed, not yet prioritised. Size: S = under an hour, M = a few hours, L = a d
 
 | # | Idea | Why | Size |
 |---|---|---|---|
-| 9 | **Quick add**: repeat last expense, or favourite presets | One tap for frequent entries like Milk or Transport | S |
 | 10 | **Dark mode** | Comfort at night; tokens already exist in `globals.css` | S |
 | 11 | **Category colours and icons** chosen by the user | Readable donut beyond 6 categories | M |
 | 12 | **Yearly report view** (top categories, biggest months, average per month) | Year-end review and tax prep (there is a Tax category) | M |

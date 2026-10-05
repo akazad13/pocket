@@ -52,6 +52,7 @@ lib/backup.ts              Backup type, prepareImport() validation/category mapp
 lib/recurring.ts           Rule type, applyRecurring() generator, validateRule(), dhakaToday().
 lib/income.ts              Income type, defaultSources, validateIncome().
 lib/compare.ts             Pure month-over-month comparison (totals and per category).
+lib/quick.ts               Pure quick-add suggestions (frequent recent expenses).
 lib/filter.ts              Pure expense filtering (text, category, date range, amount range).
 lib/months.ts              Pure month helpers (nextMonth, occurrenceDate) safe for client and server.
 lib/database.ts            database(): returns raw env.DB (D1Database); jsonChunks() for bulk json_each inserts.
@@ -133,5 +134,6 @@ Data access uses **raw D1 prepared statements** (`database().prepare(...).bind(.
 - If the browser reports `module ... does not provide an export named X` after a file was rewritten, the Vite dev cache is stale: restart `npm run dev` (stop the Node process listening on 5173, not just the shell task).
 - Route handlers are written as `mutate(request,method)` where `method` is the HTTP verb. Never destructure a field named `method` (the expense payment method) in that scope; alias it (`method:paidWith`).
 - When scripting edits with Python, use raw strings (or a quoted heredoc) for regex text; `" "` in a normal string writes a real NUL byte into the source.
+- In UI tests, wait for a row of your seeded data (not just a panel) before interacting: Overview panels render before `load()` finishes.
 - Playwright MCP's `run_code` sandbox has no `require` or `Buffer`; read downloads with `download.createReadStream()` and upload files by path from `.playwright-mcp/`.
 - Org policy: do not use em-dashes in written text.
