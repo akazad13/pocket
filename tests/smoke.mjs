@@ -13,6 +13,7 @@ const importIds = [1, 2, 3, 4, 5].map((n) => `${expenseId}-imp${n}`);
 const recCat = `${tag} rec`;
 const recRenamed = `${tag} rec2`;
 const ruleId = `smoke-rule-${Date.now().toString(36)}`;
+const incomeIds = [1, 2].map((n) => `${expenseId}-inc${n}`);
 const dhakaToday = new Intl.DateTimeFormat("en-CA", { timeZone: "Asia/Dhaka" }).format(new Date());
 
 let passed = 0;
@@ -140,6 +141,41 @@ async function run() {
 
   await backupChecks();
   await recurringChecks();
+  await incomeChecks();
+}
+
+async function incomeChecks() {
+  const [id, restoredId] = incomeIds;
+  const entry = { id, source: "  Salary   Oct ", amount: "85000.50", date: "2026-10-01", note: " pay " };
+  for (const [label, patch] of [["empty source", { source: "  " }], ["long source", { source: "x".repeat(51) }], ["zero amount", { amount: "0" }], ["bad date", { date: "2026-02-30" }], ["long note", { note: "n".repeat(201) }]]) {
+    const r = await call("POST", "/api/income", { ...entry, ...patch });
+    check(`POST income with ${label} is rejected (400)`, r.status === 400, r);
+  }
+  let r = await call("POST", "/api/income", entry, { Origin: "http://evil.example" });
+  check("POST income from a foreign origin is rejected (403)", r.status === 403, r);
+
+  r = await call("POST", "/api/income", entry);
+  check("POST income creates it, normalising source and note", r.status === 201 && r.json?.income?.cents === 8500050 && r.json.income.source === "Salary Oct" && r.json.income.note === "pay", r);
+  r = await call("POST", "/api/income", entry);
+  check("POST duplicate income id is rejected (409)", r.status === 409, r);
+
+  r = await call("GET", "/api/income");
+  check("GET income lists it", r.status === 200 && r.json?.income?.some((x) => x.id === id), r.status);
+
+  r = await call("PUT", "/api/income", { ...entry, amount: "90000", source: "Bonus" });
+  check("PUT income updates it", r.status === 200 && r.json?.income?.cents === 9000000 && r.json.income.source === "Bonus", r);
+  r = await call("PUT", "/api/income", { ...entry, id: `${id}-missing` });
+  check("PUT missing income returns 404", r.status === 404, r);
+
+  const backup = await (await fetch(base + "/api/backup")).json();
+  check("Backup includes income", backup.income?.some((x) => x.id === id));
+  r = await call("POST", "/api/backup", { app: "pocket", version: 1, exportedAt: "", categories: [], budgets: {}, expenses: [], income: [{ id: restoredId, source: "Gift", cents: 500, date: "2026-10-02", note: "" }, backup.income.find((x) => x.id === id)] });
+  check("Restore adds missing income and skips existing", r.status === 200 && r.json?.incomeAdded === 1, r);
+
+  r = await call("DELETE", "/api/income", { id });
+  check("DELETE income succeeds", r.status === 200, r);
+  r = await call("GET", "/api/income");
+  check("Deleted income is gone", !r.json.income.some((x) => x.id === id));
 }
 
 async function generated() {
@@ -247,6 +283,7 @@ async function backupChecks() {
 async function cleanup() {
   // Best effort: remove anything left behind if a step failed midway.
   await call("DELETE", "/api/recurring", { id: ruleId }).catch(() => {});
+  for (const id of incomeIds) await call("DELETE", "/api/income", { id }).catch(() => {});
   const leftovers = await generated().catch(() => []);
   for (const id of [expenseId, ...importIds, ...leftovers.map((e) => e.id)]) await call("DELETE", "/api/expenses", { id }).catch(() => {});
   for (const name of [category, renamed, baseCat, importedCat, recCat, recRenamed]) await call("DELETE", "/api/categories", { name }).catch(() => {});

@@ -14,6 +14,12 @@ Keep this file current: move an idea to "Implemented" when it ships.
 | Smart defaults | New entries default to the Groceries category and to today (Asia/Dhaka) when viewing the current month, otherwise the 1st of the viewed month. After saving, the view jumps to the expense's month. | `start()`, `today()` |
 | Server validation | Positive amount, at most 2 decimals and 9 digits; real calendar date from 1900 onward; category must exist; note trimmed. Friendly error messages shown in the form. | `lib/expenses.ts` `validateExpense()` |
 
+### Income
+| Feature | Details | Code |
+|---|---|---|
+| Income entries | "Income & savings" panel on Overview: add, edit and delete (with Undo) income with amount, source (suggestions from defaults and past sources), date and note. | `app/income.tsx`; `/api/income` |
+| Net savings | Panel shows the month's income, spent, saved or overspent, and savings rate. Monthly table and CSV export add Income and Net rows when any income exists. Included in backups. | `lib/income.ts` |
+
 ### Categories
 | Feature | Details | Code |
 |---|---|---|
@@ -49,7 +55,7 @@ Keep this file current: move an idea to "Implemented" when it ships.
 
 ## Known limitations
 These are the gaps the ideas below address.
-- Expenses only; no income or balances.
+- No account balances (cash in hand, bank) yet; income and expenses are tracked as flows only.
 - Restore cannot import CSV files from other apps or banks (JSON backups only).
 - All expenses are loaded on every page load (no pagination); fine for years of personal data, but unbounded.
 - Backups are manual; nothing is backed up automatically.
@@ -61,7 +67,6 @@ Proposed, not yet prioritised. Size: S = under an hour, M = a few hours, L = a d
 
 | # | Idea | Why | Size |
 |---|---|---|---|
-| 7 | **Income tracking** and net savings per month | Complete picture of cash flow | L |
 | 8 | **Payment method / account** field (cash, bKash, card, bank) | Matches the Credit Card Fee / Bank Fee categories; reconcile by account | M |
 | 9 | **Quick add**: repeat last expense, or favourite presets | One tap for frequent entries like Milk or Transport | S |
 | 10 | **Dark mode** | Comfort at night; tokens already exist in `globals.css` | S |

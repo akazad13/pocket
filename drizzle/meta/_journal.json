@@ -36,6 +36,13 @@
       "when": 1791233369564,
       "tag": "0004_plain_stingray",
       "breakpoints": true
+    },
+    {
+      "idx": 5,
+      "version": "6",
+      "when": 1791234171276,
+      "tag": "0005_tired_newton_destine",
+      "breakpoints": true
     }
   ]
 }

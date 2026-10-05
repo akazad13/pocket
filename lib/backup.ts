@@ -1,9 +1,10 @@
 import {validateExpense,type Expense} from './expenses';
 import {categoryName} from './categories';
 import {validateRule,type Rule} from './recurring';
+import {validateIncome,type Income} from './income';
 export const BACKUP_VERSION=1;
 export const MAX_IMPORT_EXPENSES=20000;
-export type Backup={app:'pocket';version:number;exportedAt:string;categories:string[];budgets:Record<string,number>;expenses:Expense[];recurring?:Rule[]};
+export type Backup={app:'pocket';version:number;exportedAt:string;categories:string[];budgets:Record<string,number>;expenses:Expense[];recurring?:Rule[];income?:Income[]};
 const validCents=(v:unknown):v is number=>Number.isInteger(v)&&(v as number)>0&&(v as number)<=99999999999;
 // Validates a parsed backup and maps its category names onto existing ones (case-insensitive).
 // Throws Error with a user-facing message on the first problem; nothing is written on failure.
@@ -27,5 +28,11 @@ export function prepareImport(raw:unknown,existing:string[]){
   if(r.lastMonth!==null&&(typeof r.lastMonth!=='string'||! /^\d{4}-(0[1-9]|1[0-2])$/.test(r.lastMonth)))throw Error('Invalid progress month.');
   return {...validateRule({...r,category:resolve(r.category),amount:(r.cents/100).toFixed(2)},[...byKey.values()]),lastMonth:r.lastMonth};
  }catch(err){throw Error(`Recurring expense ${i+1}: ${(err as Error).message}`);}});
- return {newCategories,expenses,budgets,recurring};
+ if(b.income!==undefined&&!Array.isArray(b.income))throw Error('This backup is incomplete.');
+ const income=(b.income??[]).map((x,i)=>{try{
+  if(!x||typeof x!=='object'||!validCents(x.cents))throw Error('Invalid amount.');
+  return validateIncome({...x,amount:(x.cents/100).toFixed(2),note:x.note??''});
+ }catch(err){throw Error(`Income ${i+1}: ${(err as Error).message}`);}});
+ if(expenses.length+income.length>MAX_IMPORT_EXPENSES)throw Error(`Backups can contain at most ${MAX_IMPORT_EXPENSES} entries.`);
+ return {newCategories,expenses,budgets,recurring,income};
 }

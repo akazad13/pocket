@@ -12,7 +12,7 @@ The project was scaffolded by the OpenAI "Sites" starter (`site-creator-vinext-s
 | Dev server | `npm run dev` | http://127.0.0.1:5173/ . Long-running: start with `run_in_background`. Uses local D1 in `.wrangler/state`. |
 | Typecheck | `npm run typecheck` | ~10s. Passes clean. **Primary verification step.** |
 | Unit tests | `npm run test:unit` | ~1s. `node:test` on TypeScript via `--experimental-strip-types`; files `tests/unit/*.test.ts`. For pure logic in `lib/` (no `cloudflare:workers` imports). Test files import with `.ts` extensions; `tests/unit/register.mjs` resolves extensionless imports inside `lib/`. |
-| Smoke test | `npm run smoke` | Needs `npm run dev` running. 60 API checks (CRUD, validation, rename cascade, origin check). Uses unique `Smoke ...` names and cleans up. Run after any change to `app/api/` or `lib/`. |
+| Smoke test | `npm run smoke` | Needs `npm run dev` running. 75 API checks (CRUD, validation, rename cascade, origin check). Uses unique `Smoke ...` names and cleans up. Run after any change to `app/api/` or `lib/`. |
 | Lint | `npm run lint` | ~60s. Clean (0 errors); keep it that way. The React Compiler rule forbids synchronous setState inside effects: set state only after an `await`. |
 | Build | `npm run build` | Outputs `dist/` (Worker + client). |
 | Run built app | `npm start` | wrangler dev against `dist/server/wrangler.json`. |
@@ -30,6 +30,7 @@ Git: `main` branch, LF line endings enforced by `.gitattributes`. The folder is 
 app/tracker.tsx            Main UI: one "use client" component (~50 very long lines). All state, fetches, charts, dialogs.
 app/budgets.tsx            Budgets panel + edit dialog (self-contained, fetches /api/budgets).
 app/recurring.tsx          Recurring rules dialog (list/add/edit/stop).
+app/income.tsx             Income & savings panel with its own add/edit dialog; income state lives in tracker.
 app/comparison.tsx         "Compared with last month" panel; changeText()/ChangeIcon reused by the total card.
 app/backup.tsx             Backup & restore dialog (JSON download, all-expenses CSV, restore upload).
 app/page.tsx               Re-exports tracker.
@@ -40,20 +41,22 @@ app/api/expenses/route.ts  GET list, POST create, PUT update, DELETE {id}.
 app/api/categories/route.ts GET list, POST add, PUT rename {name, previous}, DELETE {name}.
 app/api/budgets/route.ts   GET {budgets:{name:cents}}, PUT {budgets:{name:amount|''}} bulk set/remove in one batch.
 app/api/backup/route.ts    GET full JSON backup (attachment); POST merge-only restore.
+app/api/income/route.ts    GET, POST, PUT, DELETE {id}; same pattern as expenses (no category).
 app/api/recurring/route.ts GET rules, POST create, PUT edit (not start month), DELETE {id}.
-lib/expenses.ts            Default 26 category names, Expense type, validateExpense().
+lib/expenses.ts            Default 26 category names, Expense type, validateExpense(), shared isAmount()/isDate() validators.
 lib/categories.ts          getCategories() (lazy-seeds defaults once), categoryName() validator.
 lib/budgets.ts             getBudgets(), budgetCents() validator.
 lib/format.ts              money() BDT formatter shared by components.
 lib/csv.ts                 toCsv() (formula-injection safe) and download() helpers.
 lib/backup.ts              Backup type, prepareImport() validation/category mapping.
 lib/recurring.ts           Rule type, applyRecurring() generator, validateRule(), dhakaToday().
+lib/income.ts              Income type, defaultSources, validateIncome().
 lib/compare.ts             Pure month-over-month comparison (totals and per category).
 lib/filter.ts              Pure expense filtering (text, category, date range, amount range).
 lib/months.ts              Pure month helpers (nextMonth, occurrenceDate) safe for client and server.
 lib/database.ts            database(): returns raw env.DB (D1Database); jsonChunks() for bulk json_each inserts.
 db/schema.ts               Drizzle table definitions (source of truth for migrations only).
-drizzle/*.sql              Generated migrations 0000..0004.
+drizzle/*.sql              Generated migrations 0000..0005.
 docs/FEATURES.md           Implemented features, known limitations, feature ideas backlog. Read before planning new work; update when a feature ships.
 tests/smoke.mjs            API smoke test (plain Node fetch, no dependencies).
 tests/unit/*.test.ts       Unit tests for pure lib/ modules.
@@ -70,6 +73,7 @@ Tables (SQLite/D1):
 - `custom_categories(key text pk = lower(name), name text)`
 - `app_state(key text pk)`: flag row `categories_initialized` marks that default categories were seeded.
 - `budgets(category text pk, cents integer)`: monthly budget per category display name.
+- `income(id text pk, source text, cents integer, date text, note text)`: money in; independent of categories.
 - `recurring(id text pk, category, cents, day 1-31, note, start_month 'YYYY-MM', last_month nullable)`: monthly rules. `last_month` is the last month generated.
 
 Rules to preserve:
@@ -126,5 +130,6 @@ Data access uses **raw D1 prepared statements** (`database().prepare(...).bind(.
 - README's local-setup note says a fresh checkout needs a local Wrangler config; that is `.sites-runtime/local.json`, which is gitignored.
 - Deployment: registered as a private OpenAI Site but never published. Production needs the D1 migrations applied.
 - Inside `.expense-dialog`, the generic `input` rule overrides `sr-only`; hidden inputs there need a more specific rule (see `.backup-option input[type=file]`).
+- If the browser reports `module ... does not provide an export named X` after a file was rewritten, the Vite dev cache is stale: restart `npm run dev` (stop the Node process listening on 5173, not just the shell task).
 - Playwright MCP's `run_code` sandbox has no `require` or `Buffer`; read downloads with `download.createReadStream()` and upload files by path from `.playwright-mcp/`.
 - Org policy: do not use em-dashes in written text.
