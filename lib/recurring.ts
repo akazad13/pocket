@@ -8,7 +8,7 @@ export const dhakaToday=()=>new Intl.DateTimeFormat('en-CA',{timeZone:'Asia/Dhak
 // Expenses a rule owes up to and including today. IDs are deterministic so generation is idempotent.
 export function dueOccurrences(rule:Rule,today:string){
  const expenses:Expense[]=[];let last=rule.lastMonth,m=rule.lastMonth?nextMonth(rule.lastMonth):rule.startMonth;
- while(m<=today.slice(0,7)&&expenses.length<MAX_CATCH_UP){const date=occurrenceDate(m,rule.day);if(date>today)break;expenses.push({id:`rec-${rule.id}-${m}`,category:rule.category,cents:rule.cents,date,note:rule.note});last=m;m=nextMonth(m);}
+ while(m<=today.slice(0,7)&&expenses.length<MAX_CATCH_UP){const date=occurrenceDate(m,rule.day);if(date>today)break;expenses.push({id:`rec-${rule.id}-${m}`,category:rule.category,cents:rule.cents,date,note:rule.note,method:''});last=m;m=nextMonth(m);}
  return {expenses,last};
 }
 // Inserts every due occurrence and advances each rule's last_month. Called before expenses are read.

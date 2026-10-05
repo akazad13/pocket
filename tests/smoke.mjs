@@ -71,6 +71,22 @@ async function run() {
 
   const created = await findExpense();
   check("Created expense is persisted", created?.cents === 12345 && created?.category === category, created);
+  check("Payment method defaults to empty when omitted", created?.method === "", created);
+
+  r = await call("POST", "/api/expenses", { id: `${expenseId}-m`, category, amount: "1", date: "2026-01-15", note: "", method: "  bKash   app " });
+  check("POST expense normalises payment method", r.status === 201 && r.json?.expense?.method === "bKash app", r);
+  r = await call("PUT", "/api/expenses", { id: `${expenseId}-m`, category, amount: "1", date: "2026-01-15", note: "", method: "Card" });
+  const withMethod = (await call("GET", "/api/expenses")).json.expenses.find((e) => e.id === `${expenseId}-m`);
+  check("PUT expense updates payment method", r.status === 200 && withMethod?.method === "Card", withMethod);
+  const backupWithMethod = await (await fetch(base + "/api/backup")).json();
+  check("Backup includes payment method", backupWithMethod.expenses.find((e) => e.id === `${expenseId}-m`)?.method === "Card");
+  await call("DELETE", "/api/expenses", { id: `${expenseId}-m` });
+  r = await call("POST", "/api/backup", { ...backupWithMethod, categories: [], budgets: {}, recurring: [], income: [], expenses: backupWithMethod.expenses.filter((e) => e.id === `${expenseId}-m`) });
+  const restoredMethod = (await call("GET", "/api/expenses")).json.expenses.find((e) => e.id === `${expenseId}-m`);
+  check("Restore keeps payment method", r.status === 200 && restoredMethod?.method === "Card", restoredMethod);
+  await call("DELETE", "/api/expenses", { id: `${expenseId}-m` });
+  r = await call("POST", "/api/expenses", { id: `${expenseId}-m`, category, amount: "1", date: "2026-01-15", note: "", method: "m".repeat(31) });
+  check("POST overlong payment method is rejected (400)", r.status === 400, r);
 
   for (const [label, amount] of [["negative", "-5"], ["zero", "0"], ["three decimals", "1.234"]]) {
     r = await call("POST", "/api/expenses", { id: `${expenseId}-bad`, category, amount, date: "2026-01-15", note: "" });
@@ -285,7 +301,7 @@ async function cleanup() {
   await call("DELETE", "/api/recurring", { id: ruleId }).catch(() => {});
   for (const id of incomeIds) await call("DELETE", "/api/income", { id }).catch(() => {});
   const leftovers = await generated().catch(() => []);
-  for (const id of [expenseId, ...importIds, ...leftovers.map((e) => e.id)]) await call("DELETE", "/api/expenses", { id }).catch(() => {});
+  for (const id of [expenseId, `${expenseId}-m`, ...importIds, ...leftovers.map((e) => e.id)]) await call("DELETE", "/api/expenses", { id }).catch(() => {});
   for (const name of [category, renamed, baseCat, importedCat, recCat, recRenamed]) await call("DELETE", "/api/categories", { name }).catch(() => {});
 }
 

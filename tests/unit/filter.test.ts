@@ -4,10 +4,10 @@ import {filterExpenses,isFiltered,noFilters} from '../../lib/filter.ts';
 import type {Expense} from '../../lib/expenses.ts';
 
 const items: Expense[] = [
-  {id: 'a', category: 'Food', cents: 15000, date: '2026-01-10', note: 'Lunch with team'},
-  {id: 'b', category: 'Rent', cents: 2500000, date: '2026-02-01', note: ''},
-  {id: 'c', category: 'Food', cents: 999, date: '2026-03-05', note: 'snack'},
-  {id: 'd', category: 'Transport', cents: 25050, date: '2025-12-31', note: 'CNG'},
+  {id: 'a', category: 'Food', cents: 15000, date: '2026-01-10', note: 'Lunch with team', method: 'bKash'},
+  {id: 'b', category: 'Rent', cents: 2500000, date: '2026-02-01', note: '', method: 'Bank transfer'},
+  {id: 'c', category: 'Food', cents: 999, date: '2026-03-05', note: 'snack', method: 'Cash'},
+  {id: 'd', category: 'Transport', cents: 25050, date: '2025-12-31', note: 'CNG', method: ''},
 ];
 const ids = (f: Partial<typeof noFilters>) => filterExpenses(items, {...noFilters, ...f}).map((e) => e.id);
 
@@ -34,6 +34,10 @@ test('amount range compares in cents without float errors', () => {
 });
 test('blank or invalid amounts are ignored', () => {
   assert.deepEqual(ids({min: ' ', max: 'abc'}), ['c', 'b', 'a', 'd']);
+});
+test('method is an exact match and searchable', () => {
+  assert.deepEqual(ids({method: 'Cash'}), ['c']);
+  assert.deepEqual(ids({text: 'bkash'}), ['a']);
 });
 test('filters combine', () => {
   assert.deepEqual(ids({category: 'Food', min: '100', text: 'lunch'}), ['a']);

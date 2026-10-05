@@ -19,7 +19,7 @@ export function prepareImport(raw:unknown,existing:string[]){
  b.categories.forEach((c,i)=>{try{resolve(c);}catch(e){throw Error(`Category ${i+1}: ${(e as Error).message}`);}});
  const expenses=b.expenses.map((e,i)=>{try{
   if(!e||typeof e!=='object'||!validCents(e.cents))throw Error('Invalid amount.');
-  return validateExpense({id:e.id,category:resolve(e.category),amount:(e.cents/100).toFixed(2),date:e.date,note:e.note??''},[...byKey.values()]);
+  return validateExpense({id:e.id,category:resolve(e.category),amount:(e.cents/100).toFixed(2),date:e.date,note:e.note??'',method:e.method},[...byKey.values()]);
  }catch(err){throw Error(`Expense ${i+1}: ${(err as Error).message}`);}});
  const budgets=Object.entries(b.budgets).map(([c,cents])=>{if(!validCents(cents))throw Error(`Budget for ${c}: invalid amount.`);return{category:resolve(c),cents};});
  if(b.recurring!==undefined&&!Array.isArray(b.recurring))throw Error('This backup is incomplete.');

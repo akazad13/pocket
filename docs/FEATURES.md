@@ -11,6 +11,7 @@ Keep this file current: move an idea to "Implemented" when it ships.
 | Add expense | Dialog with amount (BDT, up to 2 decimals), category, date, optional note (max 200 chars). Desktop button in header, floating button on mobile. | `tracker.tsx` `start()`, `save()`; `POST /api/expenses` |
 | Edit expense | Pencil button on any expense row reopens the dialog pre-filled. | `PUT /api/expenses` |
 | Delete with undo | Trash button on every expense row (Overview and Expenses). Deletes immediately and shows a toast with Undo for 7 seconds; Undo re-creates the identical expense. If the delete fails, the row comes back with an error toast. | `remove()`, `undo()`; `DELETE`/`POST /api/expenses` |
+| Payment method | Optional "Paid with" on each expense (free text up to 30 chars, suggestions: Cash, bKash, Nagad, Card, Bank transfer and past methods). New entries default to the most recently used method. Shown on rows, searchable, filterable (Paid with), in the all-expenses CSV and backups. | `method` column; `lib/expenses.ts` |
 | Smart defaults | New entries default to the Groceries category and to today (Asia/Dhaka) when viewing the current month, otherwise the 1st of the viewed month. After saving, the view jumps to the expense's month. | `start()`, `today()` |
 | Server validation | Positive amount, at most 2 decimals and 9 digits; real calendar date from 1900 onward; category must exist; note trimmed. Friendly error messages shown in the form. | `lib/expenses.ts` `validateExpense()` |
 
@@ -67,7 +68,6 @@ Proposed, not yet prioritised. Size: S = under an hour, M = a few hours, L = a d
 
 | # | Idea | Why | Size |
 |---|---|---|---|
-| 8 | **Payment method / account** field (cash, bKash, card, bank) | Matches the Credit Card Fee / Bank Fee categories; reconcile by account | M |
 | 9 | **Quick add**: repeat last expense, or favourite presets | One tap for frequent entries like Milk or Transport | S |
 | 10 | **Dark mode** | Comfort at night; tokens already exist in `globals.css` | S |
 | 11 | **Category colours and icons** chosen by the user | Readable donut beyond 6 categories | M |

@@ -12,7 +12,7 @@ The project was scaffolded by the OpenAI "Sites" starter (`site-creator-vinext-s
 | Dev server | `npm run dev` | http://127.0.0.1:5173/ . Long-running: start with `run_in_background`. Uses local D1 in `.wrangler/state`. |
 | Typecheck | `npm run typecheck` | ~10s. Passes clean. **Primary verification step.** |
 | Unit tests | `npm run test:unit` | ~1s. `node:test` on TypeScript via `--experimental-strip-types`; files `tests/unit/*.test.ts`. For pure logic in `lib/` (no `cloudflare:workers` imports). Test files import with `.ts` extensions; `tests/unit/register.mjs` resolves extensionless imports inside `lib/`. |
-| Smoke test | `npm run smoke` | Needs `npm run dev` running. 75 API checks (CRUD, validation, rename cascade, origin check). Uses unique `Smoke ...` names and cleans up. Run after any change to `app/api/` or `lib/`. |
+| Smoke test | `npm run smoke` | Needs `npm run dev` running. 81 API checks (CRUD, validation, rename cascade, origin check). Uses unique `Smoke ...` names and cleans up. Run after any change to `app/api/` or `lib/`. |
 | Lint | `npm run lint` | ~60s. Clean (0 errors); keep it that way. The React Compiler rule forbids synchronous setState inside effects: set state only after an `await`. |
 | Build | `npm run build` | Outputs `dist/` (Worker + client). |
 | Run built app | `npm start` | wrangler dev against `dist/server/wrangler.json`. |
@@ -56,7 +56,7 @@ lib/filter.ts              Pure expense filtering (text, category, date range, a
 lib/months.ts              Pure month helpers (nextMonth, occurrenceDate) safe for client and server.
 lib/database.ts            database(): returns raw env.DB (D1Database); jsonChunks() for bulk json_each inserts.
 db/schema.ts               Drizzle table definitions (source of truth for migrations only).
-drizzle/*.sql              Generated migrations 0000..0005.
+drizzle/*.sql              Generated migrations 0000..0006.
 docs/FEATURES.md           Implemented features, known limitations, feature ideas backlog. Read before planning new work; update when a feature ships.
 tests/smoke.mjs            API smoke test (plain Node fetch, no dependencies).
 tests/unit/*.test.ts       Unit tests for pure lib/ modules.
@@ -69,7 +69,7 @@ Generated/ignored, never edit or search: `dist/`, `.next/`, `.vinext/`, `.wrangl
 ## Data model and invariants
 
 Tables (SQLite/D1):
-- `expenses(id text pk, category text, cents integer, date text 'YYYY-MM-DD', note text default '')`
+- `expenses(id text pk, category text, cents integer, date text 'YYYY-MM-DD', note text default '', method text default '')`: `method` is the optional payment method ('' = not recorded).
 - `custom_categories(key text pk = lower(name), name text)`
 - `app_state(key text pk)`: flag row `categories_initialized` marks that default categories were seeded.
 - `budgets(category text pk, cents integer)`: monthly budget per category display name.
@@ -131,5 +131,7 @@ Data access uses **raw D1 prepared statements** (`database().prepare(...).bind(.
 - Deployment: registered as a private OpenAI Site but never published. Production needs the D1 migrations applied.
 - Inside `.expense-dialog`, the generic `input` rule overrides `sr-only`; hidden inputs there need a more specific rule (see `.backup-option input[type=file]`).
 - If the browser reports `module ... does not provide an export named X` after a file was rewritten, the Vite dev cache is stale: restart `npm run dev` (stop the Node process listening on 5173, not just the shell task).
+- Route handlers are written as `mutate(request,method)` where `method` is the HTTP verb. Never destructure a field named `method` (the expense payment method) in that scope; alias it (`method:paidWith`).
+- When scripting edits with Python, use raw strings (or a quoted heredoc) for regex text; `" "` in a normal string writes a real NUL byte into the source.
 - Playwright MCP's `run_code` sandbox has no `require` or `Buffer`; read downloads with `download.createReadStream()` and upload files by path from `.playwright-mcp/`.
 - Org policy: do not use em-dashes in written text.

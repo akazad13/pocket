@@ -1,0 +1,1 @@
+ALTER TABLE `expenses` ADD `method` text DEFAULT '' NOT NULL;
