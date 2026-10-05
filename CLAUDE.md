@@ -11,7 +11,7 @@ The project was scaffolded by the OpenAI "Sites" starter (`site-creator-vinext-s
 | Install | `npm run install:ci` | Runs `npm ci` via `scripts/install-ci.mjs`. Never plain `npm install` (rewrites lockfile). |
 | Dev server | `npm run dev` | http://127.0.0.1:5173/ . Long-running: start with `run_in_background`. Uses local D1 in `.wrangler/state`. |
 | Typecheck | `npm run typecheck` | ~10s. Passes clean. **Primary verification step.** |
-| Smoke test | `npm run smoke` | Needs `npm run dev` running. 39 API checks (CRUD, validation, rename cascade, origin check). Uses unique `Smoke ...` names and cleans up. Run after any change to `app/api/` or `lib/`. |
+| Smoke test | `npm run smoke` | Needs `npm run dev` running. 59 API checks (CRUD, validation, rename cascade, origin check). Uses unique `Smoke ...` names and cleans up. Run after any change to `app/api/` or `lib/`. |
 | Lint | `npm run lint` | ~60s. Clean (0 errors); keep it that way. The React Compiler rule forbids synchronous setState inside effects: set state only after an `await`. |
 | Build | `npm run build` | Outputs `dist/` (Worker + client). |
 | Run built app | `npm start` | wrangler dev against `dist/server/wrangler.json`. |
@@ -28,6 +28,7 @@ Git: `main` branch, LF line endings enforced by `.gitattributes`. The folder is 
 ```
 app/tracker.tsx            Main UI: one "use client" component (~50 very long lines). All state, fetches, charts, dialogs.
 app/budgets.tsx            Budgets panel + edit dialog (self-contained, fetches /api/budgets).
+app/recurring.tsx          Recurring rules dialog (list/add/edit/stop).
 app/backup.tsx             Backup & restore dialog (JSON download, all-expenses CSV, restore upload).
 app/page.tsx               Re-exports tracker.
 app/layout.tsx             Metadata, imports globals.css + pocket.css.
@@ -37,15 +38,18 @@ app/api/expenses/route.ts  GET list, POST create, PUT update, DELETE {id}.
 app/api/categories/route.ts GET list, POST add, PUT rename {name, previous}, DELETE {name}.
 app/api/budgets/route.ts   GET {budgets:{name:cents}}, PUT {budgets:{name:amount|''}} bulk set/remove in one batch.
 app/api/backup/route.ts    GET full JSON backup (attachment); POST merge-only restore.
+app/api/recurring/route.ts GET rules, POST create, PUT edit (not start month), DELETE {id}.
 lib/expenses.ts            Default 26 category names, Expense type, validateExpense().
 lib/categories.ts          getCategories() (lazy-seeds defaults once), categoryName() validator.
 lib/budgets.ts             getBudgets(), budgetCents() validator.
 lib/format.ts              money() BDT formatter shared by components.
 lib/csv.ts                 toCsv() (formula-injection safe) and download() helpers.
-lib/backup.ts              Backup type, prepareImport() validation/category mapping, jsonChunks().
-lib/database.ts            database(): returns raw env.DB (D1Database). Used by all routes.
+lib/backup.ts              Backup type, prepareImport() validation/category mapping.
+lib/recurring.ts           Rule type, applyRecurring() generator, validateRule(), dhakaToday().
+lib/months.ts              Pure month helpers (nextMonth, occurrenceDate) safe for client and server.
+lib/database.ts            database(): returns raw env.DB (D1Database); jsonChunks() for bulk json_each inserts.
 db/schema.ts               Drizzle table definitions (source of truth for migrations only).
-drizzle/*.sql              Generated migrations 0000..0003.
+drizzle/*.sql              Generated migrations 0000..0004.
 docs/FEATURES.md           Implemented features, known limitations, feature ideas backlog. Read before planning new work; update when a feature ships.
 tests/smoke.mjs            API smoke test (plain Node fetch, no dependencies).
 .claude/settings.json      Pre-approved safe commands for Claude Code.
@@ -61,14 +65,16 @@ Tables (SQLite/D1):
 - `custom_categories(key text pk = lower(name), name text)`
 - `app_state(key text pk)`: flag row `categories_initialized` marks that default categories were seeded.
 - `budgets(category text pk, cents integer)`: monthly budget per category display name.
+- `recurring(id text pk, category, cents, day 1-31, note, start_month 'YYYY-MM', last_month nullable)`: monthly rules. `last_month` is the last month generated.
 
 Rules to preserve:
 - **Money is integer cents.** API accepts `amount` as a string (`^\d{1,9}(\.\d{1,2})?$`, > 0); server converts with `Math.round(amount*100)`. UI formats with `money()` (Intl `en-BD`, BDT). Never store floats.
-- `expenses.category` and `budgets.category` store the category **display name**, not the key. Renaming a category must update every table that references it in one `db.batch` (see PUT in categories route); deleting a category removes its budget.
+- `expenses.category`, `budgets.category` and `recurring.category` store the category **display name**, not the key. Renaming a category must update every table that references it in one `db.batch` (see PUT in categories route); deleting a category removes its budget and is blocked while expenses or recurring rules use it.
 - Category uniqueness is case-insensitive via `key = name.toLowerCase()`.
 - A category with expenses cannot be deleted (409).
 - Expense IDs are client-generated `crypto.randomUUID()`; server validates `^[a-zA-Z0-9-]{1,64}$`.
 - Dates: validated as real calendar dates >= 1900-01-01. "Today" is computed in Asia/Dhaka in the client.
+- Recurring generation is lazy: `GET /api/expenses` calls `applyRecurring()` first. Generated IDs are `rec-<ruleId>-<YYYY-MM>` (idempotent via ON CONFLICT); `last_month` advancing is what stops deleted occurrences from returning. Lib code imported by client components must not import `lib/database.ts` (it pulls in `cloudflare:workers`); put shared pure logic in files like `lib/months.ts` and use `import type` for server types.
 - Seeding is lazy: `getCategories()` inserts defaults on first call if `categories_initialized` is absent. Deleting all categories will not re-seed.
 
 Bulk writes: D1 limits queries per request (50 on the free plan) and bound parameters per query (100), so insert many rows with one `json_each(?)` statement per ~500KB chunk (see `/api/backup` POST), not one statement per row.

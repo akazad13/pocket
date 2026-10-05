@@ -10,6 +10,10 @@ const expenseId = `smoke-${Date.now().toString(36)}`;
 const baseCat = `${tag} base`;
 const importedCat = `${tag} imported`;
 const importIds = [1, 2, 3, 4, 5].map((n) => `${expenseId}-imp${n}`);
+const recCat = `${tag} rec`;
+const recRenamed = `${tag} rec2`;
+const ruleId = `smoke-rule-${Date.now().toString(36)}`;
+const dhakaToday = new Intl.DateTimeFormat("en-CA", { timeZone: "Asia/Dhaka" }).format(new Date());
 
 let passed = 0;
 const failures = [];
@@ -131,6 +135,70 @@ async function run() {
   check("Deleting a category removes its budget", !(renamed in (r.json?.budgets ?? {})), r.json);
 
   await backupChecks();
+  await recurringChecks();
+}
+
+async function generated() {
+  const { json } = await call("GET", "/api/expenses");
+  return json.expenses.filter((e) => e.id.startsWith(`rec-${ruleId}-`));
+}
+
+async function recurringChecks() {
+  await call("POST", "/api/categories", { name: recCat });
+  const rule = { id: ruleId, category: recCat, amount: "1000", day: 31, note: "rent", startMonth: "2026-01" };
+
+  for (const [label, patch] of [["day 0", { day: 0 }], ["day 32", { day: 32 }], ["month 13", { startMonth: "2026-13" }], ["unknown category", { category: `${tag} nope` }], ["negative amount", { amount: "-1" }]]) {
+    const r = await call("POST", "/api/recurring", { ...rule, ...patch });
+    check(`POST recurring with ${label} is rejected (400)`, r.status === 400, r);
+  }
+  let r = await call("POST", "/api/recurring", rule, { Origin: "http://evil.example" });
+  check("POST recurring from a foreign origin is rejected (403)", r.status === 403, r);
+
+  r = await call("POST", "/api/recurring", rule);
+  check("POST recurring creates it (201)", r.status === 201 && r.json?.rule?.cents === 100000 && r.json.rule.lastMonth === null, r);
+
+  // Expected: one per month from 2026-01, on the 31st clamped to month length, up to today.
+  const expected = [];
+  for (let m = 1; m <= 12; m++) {
+    const month = `2026-${String(m).padStart(2, "0")}`;
+    const last = new Date(Date.UTC(2026, m, 0)).getUTCDate();
+    const date = `${month}-${String(Math.min(31, last)).padStart(2, "0")}`;
+    if (date <= dhakaToday) expected.push(date);
+  }
+  let rows = await generated();
+  check(`Reading expenses generates every due month (${expected.length})`, rows.length === expected.length && expected.every((d) => rows.some((e) => e.date === d)), rows.map((e) => e.date));
+  check("Day 31 clamps to Feb 28 and Apr 30", rows.some((e) => e.date === "2026-02-28") && rows.some((e) => e.date === "2026-04-30"));
+  check("Generated expenses carry amount, category and note", rows.every((e) => e.cents === 100000 && e.category === recCat && e.note === "rent"), rows[0]);
+
+  rows = await generated();
+  check("Generation is idempotent", rows.length === expected.length, rows.length);
+
+  await call("DELETE", "/api/expenses", { id: `rec-${ruleId}-2026-02` });
+  rows = await generated();
+  check("A deleted generated expense is not re-created", !rows.some((e) => e.date === "2026-02-28") && rows.length === expected.length - 1, rows.length);
+
+  const beforeEdit = new Set(rows.map((e) => e.id));
+  r = await call("PUT", "/api/recurring", { ...rule, amount: "1200", day: 5 });
+  check("PUT recurring updates it", r.status === 200 && r.json?.rule?.cents === 120000 && r.json.rule.day === 5, r);
+  rows = await generated();
+  check("Editing a rule does not change past expenses", rows.filter((e) => beforeEdit.has(e.id)).every((e) => e.cents === 100000), rows.map((e) => e.cents));
+  check("Months generated after an edit use the new amount", rows.filter((e) => !beforeEdit.has(e.id)).every((e) => e.cents === 120000 && e.date.endsWith("-05")), rows.filter((e) => !beforeEdit.has(e.id)));
+  const afterEdit = rows.length;
+
+  r = await call("DELETE", "/api/categories", { name: recCat });
+  check("DELETE category used by a rule is rejected (409)", r.status === 409, r);
+
+  r = await call("PUT", "/api/categories", { name: recRenamed, previous: recCat });
+  r = await call("GET", "/api/recurring");
+  check("Category rename cascades to rules", r.json?.rules?.find((x) => x.id === ruleId)?.category === recRenamed, r.json);
+
+  const backup = await (await fetch(base + "/api/backup")).json();
+  check("Backup includes recurring rules", backup.recurring?.some((x) => x.id === ruleId));
+
+  r = await call("DELETE", "/api/recurring", { id: ruleId });
+  check("DELETE recurring succeeds", r.status === 200, r);
+  rows = await generated();
+  check("Deleting a rule keeps generated expenses", rows.length === afterEdit, rows.length);
 }
 
 async function backupChecks() {
@@ -174,8 +242,10 @@ async function backupChecks() {
 
 async function cleanup() {
   // Best effort: remove anything left behind if a step failed midway.
-  for (const id of [expenseId, ...importIds]) await call("DELETE", "/api/expenses", { id }).catch(() => {});
-  for (const name of [category, renamed, baseCat, importedCat]) await call("DELETE", "/api/categories", { name }).catch(() => {});
+  await call("DELETE", "/api/recurring", { id: ruleId }).catch(() => {});
+  const leftovers = await generated().catch(() => []);
+  for (const id of [expenseId, ...importIds, ...leftovers.map((e) => e.id)]) await call("DELETE", "/api/expenses", { id }).catch(() => {});
+  for (const name of [category, renamed, baseCat, importedCat, recCat, recRenamed]) await call("DELETE", "/api/categories", { name }).catch(() => {});
 }
 
 try {

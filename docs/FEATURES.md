@@ -31,7 +31,8 @@ Keep this file current: move an idea to "Implemented" when it ships.
 | Expenses tab | Full list for the selected month, newest first, with search by category or note. |
 | Monthly table tab | Categories down, months across, row and column totals for the selected year. Sticky first column, horizontal scroll on mobile. |
 | CSV export | Downloads `pocket-<year>.csv` with the category-by-month totals table. |
-| Backup and restore | "Backup & restore" dialog: download a full JSON backup (categories, budgets, expenses), export every expense as CSV, and restore from a backup. Restore only adds what is missing (expenses by ID, categories case-insensitively, budgets for categories without one) and never changes or deletes data. The whole file is validated before anything is written. Tested with 6,000 expenses. `app/backup.tsx`, `/api/backup`. |
+| Backup and restore | "Backup & restore" dialog: download a full JSON backup (categories, budgets, recurring rules, expenses), export every expense as CSV, and restore from a backup. Restore only adds what is missing (expenses by ID, categories case-insensitively, budgets for categories without one) and never changes or deletes data. The whole file is validated before anything is written. Tested with 6,000 expenses. `app/backup.tsx`, `/api/backup`. |
+| Recurring expenses | "Recurring" dialog to add, edit and stop monthly rules (category, amount, day 1 to 31, note, start month). Due occurrences are added automatically when expenses load, catching up missed months; day 29 to 31 falls on the last day of shorter months. Generated expenses show a repeat icon and behave like normal expenses; deleting one does not bring it back. Edits apply to months not yet added. Categories used by a rule cannot be deleted. Included in backups. `app/recurring.tsx`, `/api/recurring`, `lib/recurring.ts`. |
 | Monthly budgets | Optional monthly limit per category (same every month). Overview panel shows spent vs budget with a progress bar, amount left or over, and a count of over-budget categories. Edit all budgets in one dialog; blank removes a budget. Budgets follow category renames and are removed with the category. `app/budgets.tsx`, `/api/budgets`. |
 
 ### Platform and quality
@@ -61,7 +62,6 @@ Proposed, not yet prioritised. Size: S = under an hour, M = a few hours, L = a d
 
 | # | Idea | Why | Size |
 |---|---|---|---|
-| 3 | **Recurring expenses** (rent, internet, mobile) auto-added each month | Removes repetitive entry for fixed costs | M |
 | 4 | **Search and filter across all time** (date range, category, amount range) | Find "when did I last pay X" | S |
 | 5 | **Month-over-month comparison** (this month vs last, per category, with % change) | Shows trends at a glance | S |
 | 6 | **Undo delete** via a toast instead of (or after) the confirm dialog | Faster and safer than confirm-only | S |

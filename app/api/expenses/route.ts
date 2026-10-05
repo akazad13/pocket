@@ -1,8 +1,9 @@
 import {database} from '@/lib/database';
 import {validateExpense} from '@/lib/expenses';
 import {getCategories} from '@/lib/categories';
+import {applyRecurring} from '@/lib/recurring';
 const failure=()=>Response.json({error:'Expenses are temporarily unavailable. Please try again.'},{status:503});
-export async function GET(){try{const r=await database().prepare('SELECT id, category, cents, date, note FROM expenses ORDER BY date DESC').all();return Response.json({expenses:r.results},{headers:{'Cache-Control':'no-store'}});}catch(e){console.error(e);return failure();}}
+export async function GET(){try{await applyRecurring();const r=await database().prepare('SELECT id, category, cents, date, note FROM expenses ORDER BY date DESC').all();return Response.json({expenses:r.results},{headers:{'Cache-Control':'no-store'}});}catch(e){console.error(e);return failure();}}
 async function mutate(request:Request,method:string){
  const origin=request.headers.get('origin');if(origin&&origin!==new URL(request.url).origin)return Response.json({error:'Invalid request origin.'},{status:403});
  let p:Record<string,unknown>;try{p=await request.json() as Record<string,unknown>;if(!p||typeof p!=='object')throw Error();}catch{return Response.json({error:'Invalid request.'},{status:400});}

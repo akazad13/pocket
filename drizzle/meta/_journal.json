@@ -29,6 +29,13 @@
       "when": 1791232848434,
       "tag": "0003_large_vengeance",
       "breakpoints": true
+    },
+    {
+      "idx": 4,
+      "version": "6",
+      "when": 1791233369564,
+      "tag": "0004_plain_stingray",
+      "breakpoints": true
     }
   ]
 }

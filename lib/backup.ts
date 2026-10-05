@@ -1,8 +1,9 @@
 import {validateExpense,type Expense} from './expenses';
 import {categoryName} from './categories';
+import {validateRule,type Rule} from './recurring';
 export const BACKUP_VERSION=1;
 export const MAX_IMPORT_EXPENSES=20000;
-export type Backup={app:'pocket';version:number;exportedAt:string;categories:string[];budgets:Record<string,number>;expenses:Expense[]};
+export type Backup={app:'pocket';version:number;exportedAt:string;categories:string[];budgets:Record<string,number>;expenses:Expense[];recurring?:Rule[]};
 const validCents=(v:unknown):v is number=>Number.isInteger(v)&&(v as number)>0&&(v as number)<=99999999999;
 // Validates a parsed backup and maps its category names onto existing ones (case-insensitive).
 // Throws Error with a user-facing message on the first problem; nothing is written on failure.
@@ -20,12 +21,11 @@ export function prepareImport(raw:unknown,existing:string[]){
   return validateExpense({id:e.id,category:resolve(e.category),amount:(e.cents/100).toFixed(2),date:e.date,note:e.note??''},[...byKey.values()]);
  }catch(err){throw Error(`Expense ${i+1}: ${(err as Error).message}`);}});
  const budgets=Object.entries(b.budgets).map(([c,cents])=>{if(!validCents(cents))throw Error(`Budget for ${c}: invalid amount.`);return{category:resolve(c),cents};});
- return {newCategories,expenses,budgets};
-}
-// Split rows into JSON strings small enough for a single bound D1 parameter.
-export function jsonChunks<T>(rows:T[],maxBytes=500000){
- const chunks:string[]=[];let current:T[]=[],size=2;
- for(const row of rows){const len=JSON.stringify(row).length+1;if(current.length&&size+len>maxBytes){chunks.push(JSON.stringify(current));current=[];size=2;}current.push(row);size+=len;}
- if(current.length)chunks.push(JSON.stringify(current));
- return chunks;
+ if(b.recurring!==undefined&&!Array.isArray(b.recurring))throw Error('This backup is incomplete.');
+ const recurring=(b.recurring??[]).map((r,i)=>{try{
+  if(!r||typeof r!=='object'||!validCents(r.cents))throw Error('Invalid amount.');
+  if(r.lastMonth!==null&&(typeof r.lastMonth!=='string'||! /^\d{4}-(0[1-9]|1[0-2])$/.test(r.lastMonth)))throw Error('Invalid progress month.');
+  return {...validateRule({...r,category:resolve(r.category),amount:(r.cents/100).toFixed(2)},[...byKey.values()]),lastMonth:r.lastMonth};
+ }catch(err){throw Error(`Recurring expense ${i+1}: ${(err as Error).message}`);}});
+ return {newCategories,expenses,budgets,recurring};
 }
