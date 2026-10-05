@@ -11,33 +11,37 @@ The project was scaffolded by the OpenAI "Sites" starter (`site-creator-vinext-s
 | Install | `npm run install:ci` | Runs `npm ci` via `scripts/install-ci.mjs`. Never plain `npm install` (rewrites lockfile). |
 | Dev server | `npm run dev` | http://127.0.0.1:5173/ . Long-running: start with `run_in_background`. Uses local D1 in `.wrangler/state`. |
 | Typecheck | `npm run typecheck` | ~10s. Passes clean. **Primary verification step.** |
-| Smoke test | `npm run smoke` | Needs `npm run dev` running. 22 API checks (CRUD, validation, rename cascade, origin check). Uses unique `Smoke ...` names and cleans up. Run after any change to `app/api/` or `lib/`. |
-| Lint | `npx eslint . --ignore-pattern dist --ignore-pattern .next` | ~60s. Baseline: 2 pre-existing errors in `app/tracker.tsx` (setState in effect on line 21, `<a href="/">` on line 34). Do not count these as regressions. |
+| Smoke test | `npm run smoke` | Needs `npm run dev` running. 31 API checks (CRUD, validation, rename cascade, origin check). Uses unique `Smoke ...` names and cleans up. Run after any change to `app/api/` or `lib/`. |
+| Lint | `npm run lint` | ~60s. Clean (0 errors); keep it that way. The React Compiler rule forbids synchronous setState inside effects: set state only after an `await`. |
 | Build | `npm run build` | Outputs `dist/` (Worker + client). |
 | Run built app | `npm start` | wrangler dev against `dist/server/wrangler.json`. |
 | New migration | `npm run db:generate` | drizzle-kit, after editing `db/schema.ts`. |
 
 There are no unit tests. Verify changes with typecheck, then `npm run smoke` for API changes, and Playwright MCP against :5173 for UI changes. Extend `tests/smoke.mjs` when adding or changing API behaviour.
 
-**The local D1 database (`.wrangler/state`) holds the owner's real expense data** (the app is not deployed). Never reset, delete, or run destructive SQL against it without explicit permission. Back it up (copy `.wrangler/state`) before applying migrations.
+**The local D1 database (`.wrangler/state`) holds the owner's real expense data** (the app is not deployed). Never reset, delete, or run destructive SQL against it without explicit permission. Back it up before applying migrations: copy `.wrangler/state` to `../pocket-db-backups/<timestamp>-<reason>/` (outside the repo).
 
 Git: `main` branch, LF line endings enforced by `.gitattributes`. The folder is owned by another Windows account, so it is listed in the global `safe.directory`. Commit only when asked.
 
 ## Where things are (the only files you normally touch)
 
 ```
-app/tracker.tsx            Entire UI: one "use client" component (~50 very long lines). All state, fetches, charts, dialogs.
+app/tracker.tsx            Main UI: one "use client" component (~50 very long lines). All state, fetches, charts, dialogs.
+app/budgets.tsx            Budgets panel + edit dialog (self-contained, fetches /api/budgets).
 app/page.tsx               Re-exports tracker.
 app/layout.tsx             Metadata, imports globals.css + pocket.css.
 app/pocket.css             All app styling (minified-style, plain class names, 3 breakpoints: 1180/800/600px).
 app/globals.css            Tailwind v4 + shadcn theme tokens. pocket.css overrides tokens in :root.
 app/api/expenses/route.ts  GET list, POST create, PUT update, DELETE {id}.
 app/api/categories/route.ts GET list, POST add, PUT rename {name, previous}, DELETE {name}.
+app/api/budgets/route.ts   GET {budgets:{name:cents}}, PUT {budgets:{name:amount|''}} bulk set/remove in one batch.
 lib/expenses.ts            Default 26 category names, Expense type, validateExpense().
 lib/categories.ts          getCategories() (lazy-seeds defaults once), categoryName() validator.
+lib/budgets.ts             getBudgets(), budgetCents() validator.
+lib/format.ts              money() BDT formatter shared by components.
 lib/database.ts            database(): returns raw env.DB (D1Database). Used by all routes.
 db/schema.ts               Drizzle table definitions (source of truth for migrations only).
-drizzle/*.sql              Generated migrations 0000..0002.
+drizzle/*.sql              Generated migrations 0000..0003.
 docs/FEATURES.md           Implemented features, known limitations, feature ideas backlog. Read before planning new work; update when a feature ships.
 tests/smoke.mjs            API smoke test (plain Node fetch, no dependencies).
 .claude/settings.json      Pre-approved safe commands for Claude Code.
@@ -52,10 +56,11 @@ Tables (SQLite/D1):
 - `expenses(id text pk, category text, cents integer, date text 'YYYY-MM-DD', note text default '')`
 - `custom_categories(key text pk = lower(name), name text)`
 - `app_state(key text pk)`: flag row `categories_initialized` marks that default categories were seeded.
+- `budgets(category text pk, cents integer)`: monthly budget per category display name.
 
 Rules to preserve:
 - **Money is integer cents.** API accepts `amount` as a string (`^\d{1,9}(\.\d{1,2})?$`, > 0); server converts with `Math.round(amount*100)`. UI formats with `money()` (Intl `en-BD`, BDT). Never store floats.
-- `expenses.category` stores the category **display name**, not the key. Renaming a category must update both tables in one `db.batch` (see PUT in categories route).
+- `expenses.category` and `budgets.category` store the category **display name**, not the key. Renaming a category must update every table that references it in one `db.batch` (see PUT in categories route); deleting a category removes its budget.
 - Category uniqueness is case-insensitive via `key = name.toLowerCase()`.
 - A category with expenses cannot be deleted (409).
 - Expense IDs are client-generated `crypto.randomUUID()`; server validates `^[a-zA-Z0-9-]{1,64}$`.

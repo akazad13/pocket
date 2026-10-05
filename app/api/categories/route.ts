@@ -11,12 +11,13 @@ async function change(request:Request,method:string){
   if(method==='DELETE'){
    const result=await db.prepare('DELETE FROM custom_categories WHERE key = ? AND NOT EXISTS (SELECT 1 FROM expenses WHERE category = custom_categories.name)').bind(key).run();
    if(!result.meta.changes){const exists=await db.prepare('SELECT name FROM custom_categories WHERE key = ?').bind(key).first();return Response.json({error:exists?'This category has expenses. Move those expenses to another category or delete them first.':'Category no longer exists. Refresh your list.'},{status:exists?409:404});}
+   await db.prepare('DELETE FROM budgets WHERE category NOT IN (SELECT name FROM custom_categories)').run();
    return Response.json({ok:true});
   }
   if(method==='PUT'){
    const old=await db.prepare('SELECT name FROM custom_categories WHERE key = ?').bind(previous.toLowerCase()).first<{name:string}>();
    if(!old)return Response.json({error:'Category no longer exists. Refresh your list.'},{status:404});
-   await db.batch([db.prepare('UPDATE custom_categories SET key = ?,name = ? WHERE key = ?').bind(key,name,previous.toLowerCase()),db.prepare('UPDATE expenses SET category = ? WHERE category = ?').bind(name,old.name)]);
+   await db.batch([db.prepare('UPDATE custom_categories SET key = ?,name = ? WHERE key = ?').bind(key,name,previous.toLowerCase()),db.prepare('UPDATE expenses SET category = ? WHERE category = ?').bind(name,old.name),db.prepare('UPDATE budgets SET category = ? WHERE category = ?').bind(name,old.name)]);
    return Response.json({category:name,previous:old.name});
   }
   const result=await db.prepare('INSERT INTO custom_categories (key,name) VALUES (?,?) ON CONFLICT(key) DO NOTHING').bind(key,name).run();

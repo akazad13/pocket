@@ -31,6 +31,7 @@ Keep this file current: move an idea to "Implemented" when it ships.
 | Expenses tab | Full list for the selected month, newest first, with search by category or note. |
 | Monthly table tab | Categories down, months across, row and column totals for the selected year. Sticky first column, horizontal scroll on mobile. |
 | CSV export | Downloads `pocket-<year>.csv` with the category-by-month totals table. |
+| Monthly budgets | Optional monthly limit per category (same every month). Overview panel shows spent vs budget with a progress bar, amount left or over, and a count of over-budget categories. Edit all budgets in one dialog; blank removes a budget. Budgets follow category renames and are removed with the category. `app/budgets.tsx`, `/api/budgets`. |
 
 ### Platform and quality
 | Feature | Details |
@@ -45,11 +46,10 @@ Keep this file current: move an idea to "Implemented" when it ships.
 
 ## Known limitations
 These are the gaps the ideas below address.
-- Expenses only; no income, budgets, or balances.
+- Expenses only; no income or balances.
 - Search covers the selected month only.
 - CSV export contains yearly totals, not individual entries; there is no import.
 - All expenses are loaded on every page load (no pagination); fine for years of personal data, but unbounded.
-- A failed delete shows the page-level error banner, which also hides totals until Retry.
 - Delete is only available from the Expenses tab, not from Recent expenses on Overview.
 - No backup or restore; the local database is the only copy.
 - Donut uses 6 colours that repeat beyond 6 categories.
@@ -60,7 +60,6 @@ Proposed, not yet prioritised. Size: S = under an hour, M = a few hours, L = a d
 
 | # | Idea | Why | Size |
 |---|---|---|---|
-| 1 | **Monthly budgets per category** with progress bars and over-budget highlight | Turns tracking into control; most-requested feature in expense apps | M |
 | 2 | **Full data export and import** (all entries as CSV/JSON) | Backup safety; the local DB is currently the only copy | M |
 | 3 | **Recurring expenses** (rent, internet, mobile) auto-added each month | Removes repetitive entry for fixed costs | M |
 | 4 | **Search and filter across all time** (date range, category, amount range) | Find "when did I last pay X" | S |

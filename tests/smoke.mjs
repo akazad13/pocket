@@ -84,11 +84,35 @@ async function run() {
   r = await call("PUT", "/api/expenses", { id: `${expenseId}-missing`, category, amount: "1", date: "2026-01-15", note: "" });
   check("PUT missing expense returns 404", r.status === 404, r);
 
+  r = await call("GET", "/api/budgets");
+  check("GET budgets returns a map", r.status === 200 && typeof r.json?.budgets === "object", r);
+
+  r = await call("PUT", "/api/budgets", { budgets: { [category]: "100.50" } });
+  check("PUT budget sets it in cents", r.status === 200 && r.json?.budgets?.[category] === 10050, r);
+
+  r = await call("PUT", "/api/budgets", { budgets: { [category]: "-1" } });
+  check("PUT negative budget is rejected (400)", r.status === 400, r);
+
+  r = await call("PUT", "/api/budgets", { budgets: { [`${tag} missing`]: "10" } });
+  check("PUT budget for unknown category is rejected (400)", r.status === 400, r);
+
+  r = await call("PUT", "/api/budgets", { budgets: { [category]: "5" } }, { Origin: "http://evil.example" });
+  check("PUT budget from a foreign origin is rejected (403)", r.status === 403, r);
+
   r = await call("PUT", "/api/categories", { name: renamed, previous: category });
   check("PUT category renames it", r.status === 200 && r.json?.category === renamed, r);
 
   const moved = await findExpense();
   check("Rename cascades to existing expenses", moved?.category === renamed, moved);
+
+  r = await call("GET", "/api/budgets");
+  check("Rename cascades to the budget", r.json?.budgets?.[renamed] === 10050 && !(category in r.json.budgets), r.json);
+
+  r = await call("PUT", "/api/budgets", { budgets: { [renamed]: "" } });
+  check("PUT empty budget removes it", r.status === 200 && !(renamed in r.json.budgets), r);
+
+  r = await call("PUT", "/api/budgets", { budgets: { [renamed]: "20" } });
+  check("PUT budget again for delete-cascade check", r.status === 200 && r.json?.budgets?.[renamed] === 2000, r);
 
   r = await call("DELETE", "/api/categories", { name: renamed });
   check("DELETE category in use is rejected (409)", r.status === 409, r);
@@ -99,6 +123,9 @@ async function run() {
 
   r = await call("DELETE", "/api/categories", { name: renamed });
   check("DELETE empty category succeeds", r.status === 200, r);
+
+  r = await call("GET", "/api/budgets");
+  check("Deleting a category removes its budget", !(renamed in (r.json?.budgets ?? {})), r.json);
 }
 
 async function cleanup() {
