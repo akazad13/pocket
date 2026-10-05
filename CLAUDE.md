@@ -10,14 +10,18 @@ The project was scaffolded by the OpenAI "Sites" starter (`site-creator-vinext-s
 |---|---|---|
 | Install | `npm run install:ci` | Runs `npm ci` via `scripts/install-ci.mjs`. Never plain `npm install` (rewrites lockfile). |
 | Dev server | `npm run dev` | http://127.0.0.1:5173/ . Long-running: start with `run_in_background`. Uses local D1 in `.wrangler/state`. |
-| Typecheck | `node node_modules/typescript/bin/tsc --noEmit --incremental false` | ~10s. Passes clean. **Primary verification step.** |
+| Typecheck | `npm run typecheck` | ~10s. Passes clean. **Primary verification step.** |
+| Smoke test | `npm run smoke` | Needs `npm run dev` running. 22 API checks (CRUD, validation, rename cascade, origin check). Uses unique `Smoke ...` names and cleans up. Run after any change to `app/api/` or `lib/`. |
 | Lint | `npx eslint . --ignore-pattern dist --ignore-pattern .next` | ~60s. Baseline: 2 pre-existing errors in `app/tracker.tsx` (setState in effect on line 21, `<a href="/">` on line 34). Do not count these as regressions. |
 | Build | `npm run build` | Outputs `dist/` (Worker + client). |
 | Run built app | `npm start` | wrangler dev against `dist/server/wrangler.json`. |
 | New migration | `npm run db:generate` | drizzle-kit, after editing `db/schema.ts`. |
 
-There are **no tests** and no test runner. Verify changes with typecheck, then by exercising the API/UI on the dev server (curl the `/api/*` routes, or Playwright MCP against :5173).
-This directory is **not a git repository**; there is no undo via git, so read before overwriting and keep edits minimal.
+There are no unit tests. Verify changes with typecheck, then `npm run smoke` for API changes, and Playwright MCP against :5173 for UI changes. Extend `tests/smoke.mjs` when adding or changing API behaviour.
+
+**The local D1 database (`.wrangler/state`) holds the owner's real expense data** (the app is not deployed). Never reset, delete, or run destructive SQL against it without explicit permission. Back it up (copy `.wrangler/state`) before applying migrations.
+
+Git: `main` branch, LF line endings enforced by `.gitattributes`. The folder is owned by another Windows account, so it is listed in the global `safe.directory`. Commit only when asked.
 
 ## Where things are (the only files you normally touch)
 
@@ -34,6 +38,8 @@ lib/categories.ts          getCategories() (lazy-seeds defaults once), categoryN
 lib/database.ts            database(): returns raw env.DB (D1Database). Used by all routes.
 db/schema.ts               Drizzle table definitions (source of truth for migrations only).
 drizzle/*.sql              Generated migrations 0000..0002.
+tests/smoke.mjs            API smoke test (plain Node fetch, no dependencies).
+.claude/settings.json      Pre-approved safe commands for Claude Code.
 ```
 
 Starter plumbing, **do not edit** unless the task is specifically about it: `build/`, `scripts/`, `vendor/`, `lib/connector*`, `app/chatgpt-auth.ts` (unused), `db/index.ts` (`getDb()` Drizzle client, unused), `examples/`, `components/ui/*` (vendored shadcn, regenerate rather than hand-edit), `.openai/hosting.json` (keep `project_id`), `vite.config.ts`.
