@@ -11,13 +11,14 @@ The project was scaffolded by the OpenAI "Sites" starter (`site-creator-vinext-s
 | Install | `npm run install:ci` | Runs `npm ci` via `scripts/install-ci.mjs`. Never plain `npm install` (rewrites lockfile). |
 | Dev server | `npm run dev` | http://127.0.0.1:5173/ . Long-running: start with `run_in_background`. Uses local D1 in `.wrangler/state`. |
 | Typecheck | `npm run typecheck` | ~10s. Passes clean. **Primary verification step.** |
+| Unit tests | `npm run test:unit` | ~1s. `node:test` on TypeScript via `--experimental-strip-types`; files `tests/unit/*.test.ts`. For pure logic in `lib/` (no `cloudflare:workers` imports). Imports must use `.ts` extensions. |
 | Smoke test | `npm run smoke` | Needs `npm run dev` running. 59 API checks (CRUD, validation, rename cascade, origin check). Uses unique `Smoke ...` names and cleans up. Run after any change to `app/api/` or `lib/`. |
 | Lint | `npm run lint` | ~60s. Clean (0 errors); keep it that way. The React Compiler rule forbids synchronous setState inside effects: set state only after an `await`. |
 | Build | `npm run build` | Outputs `dist/` (Worker + client). |
 | Run built app | `npm start` | wrangler dev against `dist/server/wrangler.json`. |
 | New migration | `npm run db:generate` | drizzle-kit, after editing `db/schema.ts`. |
 
-There are no unit tests. Verify changes with typecheck, then `npm run smoke` for API changes, and Playwright MCP against :5173 for UI changes. Extend `tests/smoke.mjs` when adding or changing API behaviour.
+Verify changes with typecheck, `npm run test:unit` for pure logic, `npm run smoke` for API changes, and Playwright MCP against :5173 for UI changes. Extend `tests/smoke.mjs` when adding or changing API behaviour.
 
 **The local D1 database (`.wrangler/state`) holds the owner's real expense data** (the app is not deployed). Never reset, delete, or run destructive SQL against it without explicit permission. Back it up before applying migrations: copy `.wrangler/state` to `../pocket-db-backups/<timestamp>-<reason>/` (outside the repo).
 
@@ -46,12 +47,14 @@ lib/format.ts              money() BDT formatter shared by components.
 lib/csv.ts                 toCsv() (formula-injection safe) and download() helpers.
 lib/backup.ts              Backup type, prepareImport() validation/category mapping.
 lib/recurring.ts           Rule type, applyRecurring() generator, validateRule(), dhakaToday().
+lib/filter.ts              Pure expense filtering (text, category, date range, amount range).
 lib/months.ts              Pure month helpers (nextMonth, occurrenceDate) safe for client and server.
 lib/database.ts            database(): returns raw env.DB (D1Database); jsonChunks() for bulk json_each inserts.
 db/schema.ts               Drizzle table definitions (source of truth for migrations only).
 drizzle/*.sql              Generated migrations 0000..0004.
 docs/FEATURES.md           Implemented features, known limitations, feature ideas backlog. Read before planning new work; update when a feature ships.
 tests/smoke.mjs            API smoke test (plain Node fetch, no dependencies).
+tests/unit/*.test.ts       Unit tests for pure lib/ modules.
 .claude/settings.json      Pre-approved safe commands for Claude Code.
 ```
 
