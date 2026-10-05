@@ -38,6 +38,7 @@ lib/categories.ts          getCategories() (lazy-seeds defaults once), categoryN
 lib/database.ts            database(): returns raw env.DB (D1Database). Used by all routes.
 db/schema.ts               Drizzle table definitions (source of truth for migrations only).
 drizzle/*.sql              Generated migrations 0000..0002.
+docs/FEATURES.md           Implemented features, known limitations, feature ideas backlog. Read before planning new work; update when a feature ships.
 tests/smoke.mjs            API smoke test (plain Node fetch, no dependencies).
 .claude/settings.json      Pre-approved safe commands for Claude Code.
 ```
