@@ -10,6 +10,10 @@ export async function getCategories(){
  const rows=await database().prepare('SELECT name FROM custom_categories ORDER BY name COLLATE NOCASE').all<{name:string}>();
  return rows.results.map(row=>row.name);
 }
+export async function getStyles(){
+ const rows=await database().prepare("SELECT name, color, icon FROM custom_categories WHERE color <> '' OR icon <> ''").all<{name:string;color:string;icon:string}>();
+ return Object.fromEntries(rows.results.map(r=>[r.name,{color:r.color,icon:r.icon}]));
+}
 export function categoryName(value:unknown){
  if(typeof value!=='string')throw Error('Enter a category name.');
  const name=value.trim().replace(/\s+/g,' ');

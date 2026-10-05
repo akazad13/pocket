@@ -28,6 +28,7 @@ Keep this file current: move an idea to "Implemented" when it ships.
 | Default categories | 26 categories seeded on first use (Utilities, Food, Rent, Groceries, etc.). | `lib/expenses.ts`, `lib/categories.ts` |
 | Add category | Inline "Add category" inside the expense dialog; new category is selected immediately. Case-insensitive duplicates rejected; 1 to 50 chars. | `addCategory()`; `POST /api/categories` |
 | Rename category | "Manage categories" dialog; renaming updates every existing expense in that category. | `PUT /api/categories` |
+| Colours and icons | In Manage categories, tap a category's swatch to pick one of 12 colours and 20 icons (or reset). Used by the donut, legend and expense rows; unstyled categories get a palette colour by position. Kept on rename; included in backups (restore only styles categories that have none). | `lib/category-style.ts`, `app/category-icon.tsx`, `PUT /api/categories/style` |
 | Delete category | Only allowed when the category has no expenses; confirmation dialog. Shows the expense count per category. | `DELETE /api/categories` |
 
 ### Views and insights
@@ -62,14 +63,13 @@ These are the gaps the ideas below address.
 - Restore cannot import CSV files from other apps or banks (JSON backups only).
 - All expenses are loaded on every page load (no pagination); fine for years of personal data, but unbounded.
 - Backups are manual; nothing is backed up automatically.
-- Donut uses 6 colours that repeat beyond 6 categories.
+- Unstyled categories share a 12-colour palette by position, so two can look alike until you pick colours.
 
 ## Feature ideas
 Proposed, not yet prioritised. Size: S = under an hour, M = a few hours, L = a day or more.
 
 | # | Idea | Why | Size |
 |---|---|---|---|
-| 11 | **Category colours and icons** chosen by the user | Readable donut beyond 6 categories | M |
 | 12 | **Yearly report view** (top categories, biggest months, average per month) | Year-end review and tax prep (there is a Tax category) | M |
 | 13 | **Receipt photo attachment** stored in R2 | Proof for medical, tax, and business expenses | L |
 | 14 | **Installable PWA** with offline entry queued until online | Feels like a native phone app | L |

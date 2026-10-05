@@ -1,5 +1,5 @@
 import {database,jsonChunks} from '@/lib/database';
-import {getCategories} from '@/lib/categories';
+import {getCategories,getStyles} from '@/lib/categories';
 import {getBudgets} from '@/lib/budgets';
 import {RULE_SELECT,dhakaToday,type Rule} from '@/lib/recurring';
 import type {Income} from '@/lib/income';
@@ -7,8 +7,8 @@ import {BACKUP_VERSION,prepareImport,type Backup} from '@/lib/backup';
 const failure=()=>Response.json({error:'Backup is temporarily unavailable. Please try again.'},{status:503});
 export async function GET(){
  try{
-  const [categories,budgets,rules,incomeRows,rows]=await Promise.all([getCategories(),getBudgets(),database().prepare(RULE_SELECT+' ORDER BY id').all<Rule>(),database().prepare('SELECT id, source, cents, date, note FROM income ORDER BY date, id').all<Income>(),database().prepare('SELECT id, category, cents, date, note, method FROM expenses ORDER BY date, id').all<Backup['expenses'][number]>()]);
-  const exportedAt=new Date().toISOString(),backup:Backup={app:'pocket',version:BACKUP_VERSION,exportedAt,categories,budgets,expenses:rows.results,recurring:rules.results,income:incomeRows.results};
+  const [categories,styles,budgets,rules,incomeRows,rows]=await Promise.all([getCategories(),getStyles(),getBudgets(),database().prepare(RULE_SELECT+' ORDER BY id').all<Rule>(),database().prepare('SELECT id, source, cents, date, note FROM income ORDER BY date, id').all<Income>(),database().prepare('SELECT id, category, cents, date, note, method FROM expenses ORDER BY date, id').all<Backup['expenses'][number]>()]);
+  const exportedAt=new Date().toISOString(),backup:Backup={app:'pocket',version:BACKUP_VERSION,exportedAt,categories,budgets,expenses:rows.results,recurring:rules.results,income:incomeRows.results,styles};
   return new Response(JSON.stringify(backup,null,1),{headers:{'Content-Type':'application/json; charset=utf-8','Content-Disposition':`attachment; filename="pocket-backup-${dhakaToday()}.json"`,'Cache-Control':'no-store'}});
  }catch(e){console.error(e);return failure();}
 }
@@ -28,8 +28,10 @@ export async function POST(request:Request){
    {chunks:jsonChunks(plan.income),sql:"INSERT INTO income (id, source, cents, date, note) SELECT json_extract(value,'$.id'), json_extract(value,'$.source'), json_extract(value,'$.cents'), json_extract(value,'$.date'), json_extract(value,'$.note') FROM json_each(?) WHERE true ON CONFLICT(id) DO NOTHING"},
    {chunks:jsonChunks(plan.recurring),sql:"INSERT INTO recurring (id, category, cents, day, note, start_month, last_month) SELECT json_extract(value,'$.id'), json_extract(value,'$.category'), json_extract(value,'$.cents'), json_extract(value,'$.day'), json_extract(value,'$.note'), json_extract(value,'$.startMonth'), json_extract(value,'$.lastMonth') FROM json_each(?) WHERE true ON CONFLICT(id) DO NOTHING"},
   ];
+  // Styles apply only to categories that have none yet (merge-only), after new categories are inserted.
+  const styleChunks=jsonChunks(plan.styles).map(j=>db.prepare("UPDATE custom_categories SET color = (SELECT json_extract(value,'$.color') FROM json_each(?1) WHERE json_extract(value,'$.key') = custom_categories.key), icon = (SELECT json_extract(value,'$.icon') FROM json_each(?1) WHERE json_extract(value,'$.key') = custom_categories.key) WHERE key IN (SELECT json_extract(value,'$.key') FROM json_each(?1)) AND color = '' AND icon = ''").bind(j));
   const statements=groups.flatMap(g=>g.chunks.map(j=>db.prepare(g.sql).bind(j)));
-  const results=statements.length?await db.batch(statements):[];
+  const results=statements.length||styleChunks.length?await db.batch([...statements,...styleChunks]):[];
   let next=0;const counts=groups.map(g=>g.chunks.reduce(s=>s+results[next++].meta.changes,0));
   return Response.json({categoriesAdded:counts[0],expensesAdded:counts[1],expensesSkipped:plan.expenses.length-counts[1],budgetsAdded:counts[2],incomeAdded:counts[3],recurringAdded:counts[4]});
  }catch(e){console.error(e);return failure();}

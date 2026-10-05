@@ -2,9 +2,10 @@ import {validateExpense,type Expense} from './expenses';
 import {categoryName} from './categories';
 import {validateRule,type Rule} from './recurring';
 import {validateIncome,type Income} from './income';
+import {validateStyle,type Styles} from './category-style';
 export const BACKUP_VERSION=1;
 export const MAX_IMPORT_EXPENSES=20000;
-export type Backup={app:'pocket';version:number;exportedAt:string;categories:string[];budgets:Record<string,number>;expenses:Expense[];recurring?:Rule[];income?:Income[]};
+export type Backup={app:'pocket';version:number;exportedAt:string;categories:string[];budgets:Record<string,number>;expenses:Expense[];recurring?:Rule[];income?:Income[];styles?:Styles};
 const validCents=(v:unknown):v is number=>Number.isInteger(v)&&(v as number)>0&&(v as number)<=99999999999;
 // Validates a parsed backup and maps its category names onto existing ones (case-insensitive).
 // Throws Error with a user-facing message on the first problem; nothing is written on failure.
@@ -34,5 +35,7 @@ export function prepareImport(raw:unknown,existing:string[]){
   return validateIncome({...x,amount:(x.cents/100).toFixed(2),note:x.note??''});
  }catch(err){throw Error(`Income ${i+1}: ${(err as Error).message}`);}});
  if(expenses.length+income.length>MAX_IMPORT_EXPENSES)throw Error(`Backups can contain at most ${MAX_IMPORT_EXPENSES} entries.`);
- return {newCategories,expenses,budgets,recurring,income};
+ if(b.styles!==undefined&&(!b.styles||typeof b.styles!=='object'||Array.isArray(b.styles)))throw Error('This backup is incomplete.');
+ const styles=Object.entries(b.styles??{}).map(([c,s])=>{try{return {key:resolve(c).toLowerCase(),...validateStyle(s??{})};}catch(err){throw Error(`Style for ${c}: ${(err as Error).message}`);}});
+ return {newCategories,expenses,budgets,recurring,income,styles};
 }

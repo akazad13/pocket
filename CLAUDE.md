@@ -12,7 +12,7 @@ The project was scaffolded by the OpenAI "Sites" starter (`site-creator-vinext-s
 | Dev server | `npm run dev` | http://127.0.0.1:5173/ . Long-running: start with `run_in_background`. Uses local D1 in `.wrangler/state`. |
 | Typecheck | `npm run typecheck` | ~10s. Passes clean. **Primary verification step.** |
 | Unit tests | `npm run test:unit` | ~1s. `node:test` on TypeScript via `--experimental-strip-types`; files `tests/unit/*.test.ts`. For pure logic in `lib/` (no `cloudflare:workers` imports). Test files import with `.ts` extensions; `tests/unit/register.mjs` resolves extensionless imports inside `lib/`. |
-| Smoke test | `npm run smoke` | Needs `npm run dev` running. 81 API checks (CRUD, validation, rename cascade, origin check). Uses unique `Smoke ...` names and cleans up. Run after any change to `app/api/` or `lib/`. |
+| Smoke test | `npm run smoke` | Needs `npm run dev` running. 90 API checks (CRUD, validation, rename cascade, origin check). Uses unique `Smoke ...` names and cleans up. Run after any change to `app/api/` or `lib/`. |
 | Lint | `npm run lint` | ~60s. Clean (0 errors); keep it that way. The React Compiler rule forbids synchronous setState inside effects: set state only after an `await`. |
 | Build | `npm run build` | Outputs `dist/` (Worker + client). |
 | Run built app | `npm start` | wrangler dev against `dist/server/wrangler.json`. |
@@ -31,6 +31,7 @@ app/tracker.tsx            Main UI: one "use client" component (~50 very long li
 app/budgets.tsx            Budgets panel + edit dialog (self-contained, fetches /api/budgets).
 app/recurring.tsx          Recurring rules dialog (list/add/edit/stop).
 app/income.tsx             Income & savings panel with its own add/edit dialog; income state lives in tracker.
+app/category-icon.tsx      Icon key → lucide component (fallback ReceiptText).
 app/comparison.tsx         "Compared with last month" panel; changeText()/ChangeIcon reused by the total card.
 app/backup.tsx             Backup & restore dialog (JSON download, all-expenses CSV, restore upload).
 app/page.tsx               Re-exports tracker.
@@ -40,7 +41,8 @@ app/theme.tsx              ThemeToggle + useTheme() (useSyncExternalStore over l
 app/pocket.css             All app styling (minified-style, plain class names, 3 breakpoints: 1180/800/600px).
 app/globals.css            Tailwind v4 + shadcn theme tokens. pocket.css overrides tokens in :root.
 app/api/expenses/route.ts  GET list, POST create, PUT update, DELETE {id}.
-app/api/categories/route.ts GET list, POST add, PUT rename {name, previous}, DELETE {name}.
+app/api/categories/route.ts GET {categories, styles}, POST add, PUT rename {name, previous}, DELETE {name}.
+app/api/categories/style/route.ts PUT {name, color, icon} ('' clears).
 app/api/budgets/route.ts   GET {budgets:{name:cents}}, PUT {budgets:{name:amount|''}} bulk set/remove in one batch.
 app/api/backup/route.ts    GET full JSON backup (attachment); POST merge-only restore.
 app/api/income/route.ts    GET, POST, PUT, DELETE {id}; same pattern as expenses (no category).
@@ -55,12 +57,13 @@ lib/recurring.ts           Rule type, applyRecurring() generator, validateRule()
 lib/income.ts              Income type, defaultSources, validateIncome().
 lib/compare.ts             Pure month-over-month comparison (totals and per category).
 lib/theme-script.ts        Inline <head> script that sets data-theme before paint (kept out of the client module so the server layout gets the string).
+lib/category-style.ts      PALETTE, ICONS, validateStyle(), colorFor() fallback colour by position.
 lib/quick.ts               Pure quick-add suggestions (frequent recent expenses).
 lib/filter.ts              Pure expense filtering (text, category, date range, amount range).
 lib/months.ts              Pure month helpers (nextMonth, occurrenceDate) safe for client and server.
 lib/database.ts            database(): returns raw env.DB (D1Database); jsonChunks() for bulk json_each inserts.
 db/schema.ts               Drizzle table definitions (source of truth for migrations only).
-drizzle/*.sql              Generated migrations 0000..0006.
+drizzle/*.sql              Generated migrations 0000..0007.
 docs/FEATURES.md           Implemented features, known limitations, feature ideas backlog. Read before planning new work; update when a feature ships.
 tests/smoke.mjs            API smoke test (plain Node fetch, no dependencies).
 tests/unit/*.test.ts       Unit tests for pure lib/ modules.
@@ -74,7 +77,7 @@ Generated/ignored, never edit or search: `dist/`, `.next/`, `.vinext/`, `.wrangl
 
 Tables (SQLite/D1):
 - `expenses(id text pk, category text, cents integer, date text 'YYYY-MM-DD', note text default '', method text default '')`: `method` is the optional payment method ('' = not recorded).
-- `custom_categories(key text pk = lower(name), name text)`
+- `custom_categories(key text pk = lower(name), name text, color text default '', icon text default '')`: color/icon must be from `PALETTE`/`ICONS` in `lib/category-style.ts`
 - `app_state(key text pk)`: flag row `categories_initialized` marks that default categories were seeded.
 - `budgets(category text pk, cents integer)`: monthly budget per category display name.
 - `income(id text pk, source text, cents integer, date text, note text)`: money in; independent of categories.
@@ -115,6 +118,7 @@ Data access uses **raw D1 prepared statements** (`database().prepare(...).bind(.
 - Everything lives in `app/tracker.tsx` as one component with many `useState`s. State is updated optimistically from API responses (no refetch after mutations).
 - Styling is hand-written CSS classes in `app/pocket.css`, not Tailwind utility classes. **Every new class with a colour, background or border needs a matching `html[data-theme=dark]` rule in `app/pocket-dark.css`**; check both themes in screenshots. Tailwind v4 borders default to currentColor, so shadcn borders (e.g. table rows) may need an explicit colour. Palette: primary `#256a53`, background `#f8f9f6`, text `#22382e`. Mobile layout rules live in `@media(max-width:600px)`; check 390px width after UI changes.
 - Icons from `lucide-react`; dialogs/selects/tabs/tables from `@/components/ui/*` (shadcn on Radix).
+- Flex rows like `.category-row>div{flex:1}` also match new child divs; give full-width children a more specific `flex:0 0 100%` rule.
 - `recharts` is installed but unused; the donut is a CSS `conic-gradient` and the bar chart is plain divs.
 - The second `useEffect` registers a `read_expenses` tool on `document.modelContext` (WebMCP). Keep it in sync if the Expense shape changes.
 - Transient feedback uses `sonner` toasts (`toast()` from 'sonner', `<Toaster>` mounted once in tracker with `mobileOffset` to clear the floating Add button). Form/dialog errors stay inline.

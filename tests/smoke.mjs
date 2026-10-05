@@ -62,6 +62,19 @@ async function run() {
   r = await call("POST", "/api/categories", { name: category.toUpperCase() });
   check("POST duplicate category, any case, is rejected (409)", r.status === 409, r);
 
+  r = await call("PUT", "/api/categories/style", { name: category, color: "#c77868", icon: "cart" });
+  check("PUT category style saves it", r.status === 200 && r.json?.color === "#c77868", r);
+  r = await call("GET", "/api/categories");
+  check("GET categories includes styles", r.json?.styles?.[category]?.icon === "cart", r.json?.styles);
+  r = await call("PUT", "/api/categories/style", { name: category, color: "#123456", icon: "" });
+  check("PUT style with an off-palette colour is rejected (400)", r.status === 400, r);
+  r = await call("PUT", "/api/categories/style", { name: category, color: "", icon: "rocket" });
+  check("PUT style with an unknown icon is rejected (400)", r.status === 400, r);
+  r = await call("PUT", "/api/categories/style", { name: `${tag} nope`, color: "", icon: "" });
+  check("PUT style for unknown category returns 404", r.status === 404, r);
+  r = await call("PUT", "/api/categories/style", { name: category, color: "#c77868", icon: "cart" }, { Origin: "http://evil.example" });
+  check("PUT style from a foreign origin is rejected (403)", r.status === 403, r);
+
   r = await call("POST", "/api/categories", { name: "x".repeat(51) });
   check("POST overlong category name is rejected (400)", r.status === 400, r);
 
@@ -128,6 +141,8 @@ async function run() {
 
   const moved = await findExpense();
   check("Rename cascades to existing expenses", moved?.category === renamed, moved);
+  r = await call("GET", "/api/categories");
+  check("Rename keeps the category style", r.json?.styles?.[renamed]?.color === "#c77868" && !(category in r.json.styles), r.json?.styles);
 
   r = await call("GET", "/api/budgets");
   check("Rename cascades to the budget", r.json?.budgets?.[renamed] === 10050 && !(category in r.json.budgets), r.json);
@@ -267,10 +282,12 @@ async function backupChecks() {
   check("GET backup downloads a Pocket backup", r.status === 200 && backup.app === "pocket" && r.headers.get("content-disposition")?.includes("attachment"), backup.app);
   check("Backup includes expenses and categories", backup.expenses?.some((e) => e.id === dup) && backup.categories?.includes(baseCat));
 
+  await call("PUT", "/api/categories/style", { name: baseCat, color: "#4f8fa8", icon: "" });
   const file = {
     app: "pocket", version: 1, exportedAt: new Date().toISOString(),
     categories: [baseCat.toUpperCase(), importedCat],
     budgets: { [importedCat]: 50000 },
+    styles: { [importedCat]: { color: "#6b7fc7", icon: "plane" }, [baseCat]: { color: "#c9a227", icon: "gift" } },
     expenses: [
       { id: dup, category: baseCat, cents: 1000, date: "2026-03-01", note: "" },
       { id: caseMapped, category: baseCat.toLowerCase(), cents: 2550, date: "2026-03-02", note: "mapped" },
@@ -284,6 +301,9 @@ async function backupChecks() {
   check("Restore maps category names case-insensitively", json.expenses.find((e) => e.id === caseMapped)?.category === baseCat);
   r = await call("GET", "/api/budgets");
   check("Restore adds budgets", r.json?.budgets?.[importedCat] === 50000, r.json);
+  r = await call("GET", "/api/categories");
+  check("Restore styles new categories but keeps existing styles", r.json?.styles?.[importedCat]?.icon === "plane" && r.json?.styles?.[baseCat]?.color === "#4f8fa8", r.json?.styles);
+  check("Backup includes styles", backup.styles !== undefined);
 
   r = await call("POST", "/api/backup", { app: "other" });
   check("Restore rejects a non-Pocket file (400)", r.status === 400, r);

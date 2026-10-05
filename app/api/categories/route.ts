@@ -1,7 +1,7 @@
 import {database} from '@/lib/database';
-import {getCategories,categoryName} from '@/lib/categories';
+import {getCategories,getStyles,categoryName} from '@/lib/categories';
 const unavailable=()=>Response.json({error:'Categories are temporarily unavailable. Please try again.'},{status:503});
-export async function GET(){try{return Response.json({categories:await getCategories()},{headers:{'Cache-Control':'no-store'}});}catch(e){console.error(e);return unavailable();}}
+export async function GET(){try{const categories=await getCategories();return Response.json({categories,styles:await getStyles()},{headers:{'Cache-Control':'no-store'}});}catch(e){console.error(e);return unavailable();}}
 async function change(request:Request,method:string){
  const origin=request.headers.get('origin');if(origin&&origin!==new URL(request.url).origin)return Response.json({error:'Invalid request origin.'},{status:403});
  let name:string,previous='';

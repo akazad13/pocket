@@ -59,3 +59,4 @@ html[data-theme=dark] .theme-toggle{color:#b9c7b0}html[data-theme=dark] .theme-t
 html[data-theme=dark] .matrix :is(thead,tbody,tfoot,tr){border-color:#2a352e}
 html[data-theme=dark] .matrix tfoot td:first-child{background:#212b25}
 html[data-theme=dark] .matrix .income-row td:first-child{background:#1f2a22}html[data-theme=dark] .matrix .net-row td:first-child{background:#1f3326}
+html[data-theme=dark] .swatch[aria-checked=true]{border-color:#e3ebe5;box-shadow:inset 0 0 0 2px #1a221d}html[data-theme=dark] .icon-choice{border-color:#2c3830;color:#9fb894}html[data-theme=dark] .icon-choice[aria-checked=true]{background:#2f7a5c;border-color:#2f7a5c;color:#fff}
