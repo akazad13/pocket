@@ -29,6 +29,7 @@ Keep this file current: move an idea to "Implemented" when it ships.
 | Summary cards | Total spent this month with entry count, active categories (used / total), largest category with its amount. |
 | Overview tab | Donut chart of spending by category with legend, amounts and percentages; 12-month bar chart for the year (click a bar to jump to that month); year total; 5 most recent expenses of the month. |
 | Expenses tab | List for the selected month or all time, newest first. Search by category or note; filter by category, amount range and (all time) date range; live count and total of the results; Clear filters. On mobile the filters collapse behind a Filters button showing how many are active. Logic in `lib/filter.ts` (unit tested). |
+| Month-over-month comparison | Total card shows the % change vs the previous month. "Compared with <month>" panel on Overview lists each category's last month → this month and % change ("New" when there was nothing before), biggest changes first, top 6 with Show all. Increases in warm red, decreases in green. Logic in `lib/compare.ts` (unit tested). |
 | Monthly table tab | Categories down, months across, row and column totals for the selected year. Sticky first column, horizontal scroll on mobile. |
 | CSV export | Downloads `pocket-<year>.csv` with the category-by-month totals table. |
 | Backup and restore | "Backup & restore" dialog: download a full JSON backup (categories, budgets, recurring rules, expenses), export every expense as CSV, and restore from a backup. Restore only adds what is missing (expenses by ID, categories case-insensitively, budgets for categories without one) and never changes or deletes data. The whole file is validated before anything is written. Tested with 6,000 expenses. `app/backup.tsx`, `/api/backup`. |
@@ -61,7 +62,6 @@ Proposed, not yet prioritised. Size: S = under an hour, M = a few hours, L = a d
 
 | # | Idea | Why | Size |
 |---|---|---|---|
-| 5 | **Month-over-month comparison** (this month vs last, per category, with % change) | Shows trends at a glance | S |
 | 6 | **Undo delete** via a toast instead of (or after) the confirm dialog | Faster and safer than confirm-only | S |
 | 7 | **Income tracking** and net savings per month | Complete picture of cash flow | L |
 | 8 | **Payment method / account** field (cash, bKash, card, bank) | Matches the Credit Card Fee / Bank Fee categories; reconcile by account | M |

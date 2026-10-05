@@ -11,7 +11,7 @@ The project was scaffolded by the OpenAI "Sites" starter (`site-creator-vinext-s
 | Install | `npm run install:ci` | Runs `npm ci` via `scripts/install-ci.mjs`. Never plain `npm install` (rewrites lockfile). |
 | Dev server | `npm run dev` | http://127.0.0.1:5173/ . Long-running: start with `run_in_background`. Uses local D1 in `.wrangler/state`. |
 | Typecheck | `npm run typecheck` | ~10s. Passes clean. **Primary verification step.** |
-| Unit tests | `npm run test:unit` | ~1s. `node:test` on TypeScript via `--experimental-strip-types`; files `tests/unit/*.test.ts`. For pure logic in `lib/` (no `cloudflare:workers` imports). Imports must use `.ts` extensions. |
+| Unit tests | `npm run test:unit` | ~1s. `node:test` on TypeScript via `--experimental-strip-types`; files `tests/unit/*.test.ts`. For pure logic in `lib/` (no `cloudflare:workers` imports). Test files import with `.ts` extensions; `tests/unit/register.mjs` resolves extensionless imports inside `lib/`. |
 | Smoke test | `npm run smoke` | Needs `npm run dev` running. 59 API checks (CRUD, validation, rename cascade, origin check). Uses unique `Smoke ...` names and cleans up. Run after any change to `app/api/` or `lib/`. |
 | Lint | `npm run lint` | ~60s. Clean (0 errors); keep it that way. The React Compiler rule forbids synchronous setState inside effects: set state only after an `await`. |
 | Build | `npm run build` | Outputs `dist/` (Worker + client). |
@@ -30,6 +30,7 @@ Git: `main` branch, LF line endings enforced by `.gitattributes`. The folder is 
 app/tracker.tsx            Main UI: one "use client" component (~50 very long lines). All state, fetches, charts, dialogs.
 app/budgets.tsx            Budgets panel + edit dialog (self-contained, fetches /api/budgets).
 app/recurring.tsx          Recurring rules dialog (list/add/edit/stop).
+app/comparison.tsx         "Compared with last month" panel; changeText()/ChangeIcon reused by the total card.
 app/backup.tsx             Backup & restore dialog (JSON download, all-expenses CSV, restore upload).
 app/page.tsx               Re-exports tracker.
 app/layout.tsx             Metadata, imports globals.css + pocket.css.
@@ -47,6 +48,7 @@ lib/format.ts              money() BDT formatter shared by components.
 lib/csv.ts                 toCsv() (formula-injection safe) and download() helpers.
 lib/backup.ts              Backup type, prepareImport() validation/category mapping.
 lib/recurring.ts           Rule type, applyRecurring() generator, validateRule(), dhakaToday().
+lib/compare.ts             Pure month-over-month comparison (totals and per category).
 lib/filter.ts              Pure expense filtering (text, category, date range, amount range).
 lib/months.ts              Pure month helpers (nextMonth, occurrenceDate) safe for client and server.
 lib/database.ts            database(): returns raw env.DB (D1Database); jsonChunks() for bulk json_each inserts.
