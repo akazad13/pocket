@@ -7,6 +7,9 @@ const tag = `Smoke ${Date.now().toString(36)}`;
 const category = `${tag} cat`;
 const renamed = `${tag} renamed`;
 const expenseId = `smoke-${Date.now().toString(36)}`;
+const baseCat = `${tag} base`;
+const importedCat = `${tag} imported`;
+const importIds = [1, 2, 3, 4, 5].map((n) => `${expenseId}-imp${n}`);
 
 let passed = 0;
 const failures = [];
@@ -126,12 +129,53 @@ async function run() {
 
   r = await call("GET", "/api/budgets");
   check("Deleting a category removes its budget", !(renamed in (r.json?.budgets ?? {})), r.json);
+
+  await backupChecks();
+}
+
+async function backupChecks() {
+  const [dup, caseMapped, inNewCat, invalid, partial] = importIds;
+  await call("POST", "/api/categories", { name: baseCat });
+  await call("POST", "/api/expenses", { id: dup, category: baseCat, amount: "10", date: "2026-03-01", note: "" });
+
+  let r = await fetch(base + "/api/backup");
+  const backup = await r.json();
+  check("GET backup downloads a Pocket backup", r.status === 200 && backup.app === "pocket" && r.headers.get("content-disposition")?.includes("attachment"), backup.app);
+  check("Backup includes expenses and categories", backup.expenses?.some((e) => e.id === dup) && backup.categories?.includes(baseCat));
+
+  const file = {
+    app: "pocket", version: 1, exportedAt: new Date().toISOString(),
+    categories: [baseCat.toUpperCase(), importedCat],
+    budgets: { [importedCat]: 50000 },
+    expenses: [
+      { id: dup, category: baseCat, cents: 1000, date: "2026-03-01", note: "" },
+      { id: caseMapped, category: baseCat.toLowerCase(), cents: 2550, date: "2026-03-02", note: "mapped" },
+      { id: inNewCat, category: importedCat, cents: 99, date: "2026-03-03", note: "" },
+    ],
+  };
+  r = await call("POST", "/api/backup", file);
+  check("Restore merges new data and skips existing", r.status === 200 && r.json?.categoriesAdded === 1 && r.json?.expensesAdded === 2 && r.json?.expensesSkipped === 1 && r.json?.budgetsAdded === 1, r);
+
+  const { json } = await call("GET", "/api/expenses");
+  check("Restore maps category names case-insensitively", json.expenses.find((e) => e.id === caseMapped)?.category === baseCat);
+  r = await call("GET", "/api/budgets");
+  check("Restore adds budgets", r.json?.budgets?.[importedCat] === 50000, r.json);
+
+  r = await call("POST", "/api/backup", { app: "other" });
+  check("Restore rejects a non-Pocket file (400)", r.status === 400, r);
+
+  r = await call("POST", "/api/backup", { ...file, expenses: [{ id: partial, category: importedCat, cents: 100, date: "2026-03-04", note: "" }, { id: invalid, category: importedCat, cents: -5, date: "2026-03-04", note: "" }] });
+  const after = (await call("GET", "/api/expenses")).json.expenses;
+  check("Restore with one bad expense writes nothing (400)", r.status === 400 && !after.some((e) => e.id === partial), r);
+
+  r = await call("POST", "/api/backup", file, { Origin: "http://evil.example" });
+  check("Restore from a foreign origin is rejected (403)", r.status === 403, r);
 }
 
 async function cleanup() {
   // Best effort: remove anything left behind if a step failed midway.
-  await call("DELETE", "/api/expenses", { id: expenseId }).catch(() => {});
-  for (const name of [category, renamed]) await call("DELETE", "/api/categories", { name }).catch(() => {});
+  for (const id of [expenseId, ...importIds]) await call("DELETE", "/api/expenses", { id }).catch(() => {});
+  for (const name of [category, renamed, baseCat, importedCat]) await call("DELETE", "/api/categories", { name }).catch(() => {});
 }
 
 try {

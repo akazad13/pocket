@@ -11,7 +11,7 @@ The project was scaffolded by the OpenAI "Sites" starter (`site-creator-vinext-s
 | Install | `npm run install:ci` | Runs `npm ci` via `scripts/install-ci.mjs`. Never plain `npm install` (rewrites lockfile). |
 | Dev server | `npm run dev` | http://127.0.0.1:5173/ . Long-running: start with `run_in_background`. Uses local D1 in `.wrangler/state`. |
 | Typecheck | `npm run typecheck` | ~10s. Passes clean. **Primary verification step.** |
-| Smoke test | `npm run smoke` | Needs `npm run dev` running. 31 API checks (CRUD, validation, rename cascade, origin check). Uses unique `Smoke ...` names and cleans up. Run after any change to `app/api/` or `lib/`. |
+| Smoke test | `npm run smoke` | Needs `npm run dev` running. 39 API checks (CRUD, validation, rename cascade, origin check). Uses unique `Smoke ...` names and cleans up. Run after any change to `app/api/` or `lib/`. |
 | Lint | `npm run lint` | ~60s. Clean (0 errors); keep it that way. The React Compiler rule forbids synchronous setState inside effects: set state only after an `await`. |
 | Build | `npm run build` | Outputs `dist/` (Worker + client). |
 | Run built app | `npm start` | wrangler dev against `dist/server/wrangler.json`. |
@@ -28,6 +28,7 @@ Git: `main` branch, LF line endings enforced by `.gitattributes`. The folder is 
 ```
 app/tracker.tsx            Main UI: one "use client" component (~50 very long lines). All state, fetches, charts, dialogs.
 app/budgets.tsx            Budgets panel + edit dialog (self-contained, fetches /api/budgets).
+app/backup.tsx             Backup & restore dialog (JSON download, all-expenses CSV, restore upload).
 app/page.tsx               Re-exports tracker.
 app/layout.tsx             Metadata, imports globals.css + pocket.css.
 app/pocket.css             All app styling (minified-style, plain class names, 3 breakpoints: 1180/800/600px).
@@ -35,10 +36,13 @@ app/globals.css            Tailwind v4 + shadcn theme tokens. pocket.css overrid
 app/api/expenses/route.ts  GET list, POST create, PUT update, DELETE {id}.
 app/api/categories/route.ts GET list, POST add, PUT rename {name, previous}, DELETE {name}.
 app/api/budgets/route.ts   GET {budgets:{name:cents}}, PUT {budgets:{name:amount|''}} bulk set/remove in one batch.
+app/api/backup/route.ts    GET full JSON backup (attachment); POST merge-only restore.
 lib/expenses.ts            Default 26 category names, Expense type, validateExpense().
 lib/categories.ts          getCategories() (lazy-seeds defaults once), categoryName() validator.
 lib/budgets.ts             getBudgets(), budgetCents() validator.
 lib/format.ts              money() BDT formatter shared by components.
+lib/csv.ts                 toCsv() (formula-injection safe) and download() helpers.
+lib/backup.ts              Backup type, prepareImport() validation/category mapping, jsonChunks().
 lib/database.ts            database(): returns raw env.DB (D1Database). Used by all routes.
 db/schema.ts               Drizzle table definitions (source of truth for migrations only).
 drizzle/*.sql              Generated migrations 0000..0003.
@@ -66,6 +70,8 @@ Rules to preserve:
 - Expense IDs are client-generated `crypto.randomUUID()`; server validates `^[a-zA-Z0-9-]{1,64}$`.
 - Dates: validated as real calendar dates >= 1900-01-01. "Today" is computed in Asia/Dhaka in the client.
 - Seeding is lazy: `getCategories()` inserts defaults on first call if `categories_initialized` is absent. Deleting all categories will not re-seed.
+
+Bulk writes: D1 limits queries per request (50 on the free plan) and bound parameters per query (100), so insert many rows with one `json_each(?)` statement per ~500KB chunk (see `/api/backup` POST), not one statement per row.
 
 Data access uses **raw D1 prepared statements** (`database().prepare(...).bind(...)`) with `?` placeholders, not the Drizzle query builder. Follow that pattern; always bind parameters, never interpolate.
 
@@ -107,4 +113,6 @@ Data access uses **raw D1 prepared statements** (`database().prepare(...).bind(.
 - `tracker.tsx` lines are thousands of characters long. Read it in full (it is only ~50 lines) and use precise `Edit` old_strings; grep with `-o` to locate fragments.
 - README's local-setup note says a fresh checkout needs a local Wrangler config; that is `.sites-runtime/local.json`, which is gitignored.
 - Deployment: registered as a private OpenAI Site but never published. Production needs the D1 migrations applied.
+- Inside `.expense-dialog`, the generic `input` rule overrides `sr-only`; hidden inputs there need a more specific rule (see `.backup-option input[type=file]`).
+- Playwright MCP's `run_code` sandbox has no `require` or `Buffer`; read downloads with `download.createReadStream()` and upload files by path from `.playwright-mcp/`.
 - Org policy: do not use em-dashes in written text.

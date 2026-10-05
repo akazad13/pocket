@@ -31,6 +31,7 @@ Keep this file current: move an idea to "Implemented" when it ships.
 | Expenses tab | Full list for the selected month, newest first, with search by category or note. |
 | Monthly table tab | Categories down, months across, row and column totals for the selected year. Sticky first column, horizontal scroll on mobile. |
 | CSV export | Downloads `pocket-<year>.csv` with the category-by-month totals table. |
+| Backup and restore | "Backup & restore" dialog: download a full JSON backup (categories, budgets, expenses), export every expense as CSV, and restore from a backup. Restore only adds what is missing (expenses by ID, categories case-insensitively, budgets for categories without one) and never changes or deletes data. The whole file is validated before anything is written. Tested with 6,000 expenses. `app/backup.tsx`, `/api/backup`. |
 | Monthly budgets | Optional monthly limit per category (same every month). Overview panel shows spent vs budget with a progress bar, amount left or over, and a count of over-budget categories. Edit all budgets in one dialog; blank removes a budget. Budgets follow category renames and are removed with the category. `app/budgets.tsx`, `/api/budgets`. |
 
 ### Platform and quality
@@ -48,10 +49,10 @@ Keep this file current: move an idea to "Implemented" when it ships.
 These are the gaps the ideas below address.
 - Expenses only; no income or balances.
 - Search covers the selected month only.
-- CSV export contains yearly totals, not individual entries; there is no import.
+- Restore cannot import CSV files from other apps or banks (JSON backups only).
 - All expenses are loaded on every page load (no pagination); fine for years of personal data, but unbounded.
 - Delete is only available from the Expenses tab, not from Recent expenses on Overview.
-- No backup or restore; the local database is the only copy.
+- Backups are manual; nothing is backed up automatically.
 - Donut uses 6 colours that repeat beyond 6 categories.
 - No dark mode.
 
@@ -60,7 +61,6 @@ Proposed, not yet prioritised. Size: S = under an hour, M = a few hours, L = a d
 
 | # | Idea | Why | Size |
 |---|---|---|---|
-| 2 | **Full data export and import** (all entries as CSV/JSON) | Backup safety; the local DB is currently the only copy | M |
 | 3 | **Recurring expenses** (rent, internet, mobile) auto-added each month | Removes repetitive entry for fixed costs | M |
 | 4 | **Search and filter across all time** (date range, category, amount range) | Find "when did I last pay X" | S |
 | 5 | **Month-over-month comparison** (this month vs last, per category, with % change) | Shows trends at a glance | S |

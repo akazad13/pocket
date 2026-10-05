@@ -3,12 +3,12 @@ import {useEffect,useState} from 'react';
 import {Target} from 'lucide-react';
 import {Dialog,DialogContent,DialogTitle,DialogDescription} from '@/components/ui/dialog';
 import {money} from '@/lib/format';
-type Props={categories:string[];spent:Record<string,number>;monthLabel:string;onNotice:(text:string)=>void};
-export default function Budgets({categories,spent,monthLabel,onNotice}:Props){
+type Props={version:number;categories:string[];spent:Record<string,number>;monthLabel:string;onNotice:(text:string)=>void};
+export default function Budgets({version,categories,spent,monthLabel,onNotice}:Props){
  const[budgets,setBudgets]=useState<Record<string,number>>({}),[failed,setFailed]=useState(false),[open,setOpen]=useState(false),[draft,setDraft]=useState<Record<string,string>>({}),[saving,setSaving]=useState(false),[formError,setFormError]=useState('');
- // Refetch when the category list changes so renamed or deleted categories stay in sync.
+ // Refetch when categories change (renames, deletes) or version bumps (after a restore).
  const categoriesKey=categories.join('\n');
- useEffect(()=>{let live=true;fetch('/api/budgets').then(async r=>{const j=await r.json() as {budgets:Record<string,number>};if(!r.ok)throw Error();if(live){setBudgets(j.budgets);setFailed(false);}}).catch(()=>{if(live)setFailed(true);});return()=>{live=false;};},[categoriesKey]);
+ useEffect(()=>{let live=true;fetch('/api/budgets').then(async r=>{const j=await r.json() as {budgets:Record<string,number>};if(!r.ok)throw Error();if(live){setBudgets(j.budgets);setFailed(false);}}).catch(()=>{if(live)setFailed(true);});return()=>{live=false;};},[categoriesKey,version]);
  const rows=categories.filter(c=>budgets[c]).map(c=>({name:c,budget:budgets[c],spent:spent[c]||0})).map(r=>({...r,pct:r.spent/r.budget*100})).sort((a,b)=>b.pct-a.pct);
  const totalBudget=rows.reduce((s,r)=>s+r.budget,0),totalSpent=rows.reduce((s,r)=>s+r.spent,0),over=rows.filter(r=>r.spent>r.budget).length;
  function edit(){setDraft(Object.fromEntries(categories.map(c=>[c,budgets[c]?String(budgets[c]/100):''])));setFormError('');setOpen(true);}
