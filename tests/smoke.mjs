@@ -128,6 +128,10 @@ async function run() {
   check("DELETE expense succeeds", r.status === 200, r);
   check("Deleted expense is gone", !(await findExpense()));
 
+  r = await call("POST", "/api/expenses", { id: expenseId, category: renamed, amount: "50.00", date: "2026-01-16", note: "edited" });
+  check("Undo: re-creating a deleted expense with the same id works", r.status === 201 && (await findExpense())?.cents === 5000, r);
+  r = await call("DELETE", "/api/expenses", { id: expenseId });
+
   r = await call("DELETE", "/api/categories", { name: renamed });
   check("DELETE empty category succeeds", r.status === 200, r);
 
