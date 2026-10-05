@@ -35,6 +35,8 @@ app/comparison.tsx         "Compared with last month" panel; changeText()/Change
 app/backup.tsx             Backup & restore dialog (JSON download, all-expenses CSV, restore upload).
 app/page.tsx               Re-exports tracker.
 app/layout.tsx             Metadata, imports globals.css + pocket.css.
+app/pocket-dark.css        Dark theme overrides (html[data-theme=dark]); shadcn tokens + every hardcoded app colour.
+app/theme.tsx              ThemeToggle + useTheme() (useSyncExternalStore over localStorage 'pocket-theme').
 app/pocket.css             All app styling (minified-style, plain class names, 3 breakpoints: 1180/800/600px).
 app/globals.css            Tailwind v4 + shadcn theme tokens. pocket.css overrides tokens in :root.
 app/api/expenses/route.ts  GET list, POST create, PUT update, DELETE {id}.
@@ -52,6 +54,7 @@ lib/backup.ts              Backup type, prepareImport() validation/category mapp
 lib/recurring.ts           Rule type, applyRecurring() generator, validateRule(), dhakaToday().
 lib/income.ts              Income type, defaultSources, validateIncome().
 lib/compare.ts             Pure month-over-month comparison (totals and per category).
+lib/theme-script.ts        Inline <head> script that sets data-theme before paint (kept out of the client module so the server layout gets the string).
 lib/quick.ts               Pure quick-add suggestions (frequent recent expenses).
 lib/filter.ts              Pure expense filtering (text, category, date range, amount range).
 lib/months.ts              Pure month helpers (nextMonth, occurrenceDate) safe for client and server.
@@ -110,7 +113,7 @@ Data access uses **raw D1 prepared statements** (`database().prepare(...).bind(.
 ## UI conventions
 
 - Everything lives in `app/tracker.tsx` as one component with many `useState`s. State is updated optimistically from API responses (no refetch after mutations).
-- Styling is hand-written CSS classes in `app/pocket.css`, not Tailwind utility classes. Palette: primary `#256a53`, background `#f8f9f6`, text `#22382e`. Mobile layout rules live in `@media(max-width:600px)`; check 390px width after UI changes.
+- Styling is hand-written CSS classes in `app/pocket.css`, not Tailwind utility classes. **Every new class with a colour, background or border needs a matching `html[data-theme=dark]` rule in `app/pocket-dark.css`**; check both themes in screenshots. Tailwind v4 borders default to currentColor, so shadcn borders (e.g. table rows) may need an explicit colour. Palette: primary `#256a53`, background `#f8f9f6`, text `#22382e`. Mobile layout rules live in `@media(max-width:600px)`; check 390px width after UI changes.
 - Icons from `lucide-react`; dialogs/selects/tabs/tables from `@/components/ui/*` (shadcn on Radix).
 - `recharts` is installed but unused; the donut is a CSS `conic-gradient` and the bar chart is plain divs.
 - The second `useEffect` registers a `read_expenses` tool on `document.modelContext` (WebMCP). Keep it in sync if the Expense shape changes.
@@ -131,6 +134,7 @@ Data access uses **raw D1 prepared statements** (`database().prepare(...).bind(.
 - README's local-setup note says a fresh checkout needs a local Wrangler config; that is `.sites-runtime/local.json`, which is gitignored.
 - Deployment: registered as a private OpenAI Site but never published. Production needs the D1 migrations applied.
 - Inside `.expense-dialog`, the generic `input` rule overrides `sr-only`; hidden inputs there need a more specific rule (see `.backup-option input[type=file]`).
+- A Vite `Failed to load url ./x.css ... Does the file exist?` after adding an import means the import landed before the file; `touch` the importing file.
 - If the browser reports `module ... does not provide an export named X` after a file was rewritten, the Vite dev cache is stale: restart `npm run dev` (stop the Node process listening on 5173, not just the shell task).
 - Route handlers are written as `mutate(request,method)` where `method` is the HTTP verb. Never destructure a field named `method` (the expense payment method) in that scope; alias it (`method:paidWith`).
 - When scripting edits with Python, use raw strings (or a quoted heredoc) for regex text; `" "` in a normal string writes a real NUL byte into the source.

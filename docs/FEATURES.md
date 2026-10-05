@@ -48,6 +48,7 @@ Keep this file current: move an idea to "Implemented" when it ships.
 | Feature | Details |
 |---|---|
 | Storage | Cloudflare D1 (SQLite); amounts stored as integer cents. Local dev persists in `.wrangler/state`. |
+| Dark mode | Theme switch in the top bar cycles System, Light and Dark (saved per browser). System follows the OS live. Applied before first paint, so no flash. Toasts follow the theme. | `app/theme.tsx`, `app/pocket-dark.css`, `lib/theme-script.ts` |
 | Mobile-first layout | Responsive at 1180 / 800 / 600px breakpoints; checked at 390px. |
 | Accessibility | Labelled icon buttons, screen-reader status announcements, alert roles for errors, focus outlines. |
 | Error handling | Load failure shows a banner with Retry; API failures return friendly messages; buttons disable while saving. |
@@ -62,14 +63,12 @@ These are the gaps the ideas below address.
 - All expenses are loaded on every page load (no pagination); fine for years of personal data, but unbounded.
 - Backups are manual; nothing is backed up automatically.
 - Donut uses 6 colours that repeat beyond 6 categories.
-- No dark mode.
 
 ## Feature ideas
 Proposed, not yet prioritised. Size: S = under an hour, M = a few hours, L = a day or more.
 
 | # | Idea | Why | Size |
 |---|---|---|---|
-| 10 | **Dark mode** | Comfort at night; tokens already exist in `globals.css` | S |
 | 11 | **Category colours and icons** chosen by the user | Readable donut beyond 6 categories | M |
 | 12 | **Yearly report view** (top categories, biggest months, average per month) | Year-end review and tax prep (there is a Tax category) | M |
 | 13 | **Receipt photo attachment** stored in R2 | Proof for medical, tax, and business expenses | L |

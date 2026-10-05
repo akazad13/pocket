@@ -1,0 +1,61 @@
+/* Dark theme. Active when <html data-theme="dark"> (set by the head script / ThemeToggle).
+   pocket.css hardcodes light colours, so each surface is overridden here. Keep this in sync when adding classes. */
+html[data-theme=dark]{color-scheme:dark;--background:#121814;--foreground:#e3ebe5;--primary:#4f9a7a;--primary-foreground:#fff;--card:#1a221d;--card-foreground:#e3ebe5;--muted:#212b25;--muted-foreground:#9aa79e;--border:#2c3830;--input:#34423a;--ring:#5fae8a;--accent:#24302a;--accent-foreground:#a8d4bb;--popover:#1a221d;--popover-foreground:#e3ebe5;--secondary:#212b25;--secondary-foreground:#e3ebe5}
+html[data-theme=dark] body{background:#121814;color:#e3ebe5}
+html[data-theme=dark] :is(button,a,input,select):focus-visible{outline-color:#6cc196}
+html[data-theme=dark] .topbar{background:#171f1a;border-color:#26312b}
+html[data-theme=dark] .brand-icon{background:#2f7a5c}
+html[data-theme=dark] .top-note,html[data-theme=dark] .page-heading p{color:#8d9a91}
+html[data-theme=dark] .profile{background:#2a332c;color:#b9c7b0}
+html[data-theme=dark] .eyebrow{color:#93ab88}
+html[data-theme=dark] .primary{background:#2f7a5c;box-shadow:none}
+html[data-theme=dark] .primary:hover{background:#38906c}
+html[data-theme=dark] .month-picker button{background:#1a221d;border-color:#2c3830;color:#cfe0d3}
+html[data-theme=dark] .month-picker input{color:#dfe9e1}
+html[data-theme=dark] .currency{color:#9fb0a2}html[data-theme=dark] .currency span{color:#7f8c83}
+html[data-theme=dark] .total-card{background:#1f5a44}
+html[data-theme=dark] .stat-card,html[data-theme=dark] .panel{background:#1a221d;border-color:#2a352e}
+html[data-theme=dark] .stat-card .card-label,html[data-theme=dark] .stat-card p,html[data-theme=dark] .stat-card strong small{color:#8f9c93}
+html[data-theme=dark] .stat-icon{background:#24302a;color:#94b886}html[data-theme=dark] .stat-icon.peach{background:#33291f;color:#d9ab78}
+html[data-theme=dark] .main-tabs{background:#212b25!important}
+html[data-theme=dark] .main-tabs button{color:#93a198}
+html[data-theme=dark] .main-tabs button[data-state=active]{background:#2c3a32!important;color:#e3ebe5!important;box-shadow:none}
+html[data-theme=dark] :is(.export,.text-button){color:#8fc5a2}
+html[data-theme=dark] :is(.section-heading p,.subtle,.quiet-empty,.table-hint,.empty p,.legend small,.donut small,.chart-column small,.year-total){color:#8d9a91}
+html[data-theme=dark] .empty-icon{background:#24302a;color:#94b886}
+html[data-theme=dark] .chart{border-color:#2a352e}
+html[data-theme=dark] .bar{background:#2f3d33}html[data-theme=dark] .bar.active{background:#5aa57f}
+html[data-theme=dark] .year-total strong{color:#a8d4bb}
+html[data-theme=dark] .tip{background:#1f2a22;color:#8fb27a}html[data-theme=dark] .tip p{color:#8d9a91}html[data-theme=dark] .tip strong{color:#b4cfa0}
+html[data-theme=dark] .donut>div{background:#1a221d}
+html[data-theme=dark] :is(.expense-row,.category-row,.compare-row,.budget-input){border-color:#26312b}
+html[data-theme=dark] .expense-icon{background:#24302a;color:#94b886}
+html[data-theme=dark] .expense-row p,html[data-theme=dark] .category-row small{color:#8d9a91}
+html[data-theme=dark] .icon-button{color:#9fb894}html[data-theme=dark] .icon-button:hover{background:#24302a}html[data-theme=dark] .delete{color:#d99a89}
+html[data-theme=dark] .search{background:#161d19;border-color:#2c3830;color:#7f8c83}html[data-theme=dark] .search input{color:#e3ebe5}
+html[data-theme=dark] .matrix :is(th,td){color:#a9b6ad}
+html[data-theme=dark] .matrix :is(th,td):first-child{background:#1a221d;color:#dfe9e1}
+html[data-theme=dark] .matrix tfoot td{background:#212b25}
+html[data-theme=dark] footer{color:#6f7c73}
+html[data-theme=dark] .expense-dialog{background:#1a221d}
+html[data-theme=dark] .expense-dialog input,html[data-theme=dark] .amount-input{background:#161d19;border-color:#34423a;color:#e3ebe5}
+html[data-theme=dark] .amount-input input{background:none}html[data-theme=dark] .amount-input span{color:#94b886}
+html[data-theme=dark] .error{background:#3a221d;color:#f0b4a6}
+html[data-theme=dark] .category-create>div{background:#1f2a22;border-color:#2c3830}
+html[data-theme=dark] .budget-bar{background:#26312b}html[data-theme=dark] .budget-fill{background:#6fae86}html[data-theme=dark] .budget-fill.over{background:#d4806c}
+html[data-theme=dark] :is(.budget-label span,.budget-status,.compare-values,.change){color:#8d9a91}
+html[data-theme=dark] :is(.budget-status.over,.change.up){color:#f0a08c}html[data-theme=dark] .change.down{color:#7fcf98}
+html[data-theme=dark] .backup-option{background:#161d19;border-color:#2c3830;color:#dfe9e1}html[data-theme=dark] .backup-option:hover{background:#1f2a22}html[data-theme=dark] .backup-option svg{color:#8fc5a2}html[data-theme=dark] .backup-option small{color:#8d9a91}
+html[data-theme=dark] .backup-result{background:#1f3326;color:#bfe3c9}
+html[data-theme=dark] .recurring-mark{color:#8fc5a2}
+html[data-theme=dark] .scope-toggle{background:#212b25}html[data-theme=dark] .scope-toggle button{color:#93a198}html[data-theme=dark] .scope-toggle button[aria-pressed=true]{background:#2c3a32;color:#e3ebe5;box-shadow:none}
+html[data-theme=dark] .filters label{color:#8d9a91}html[data-theme=dark] :is(.filters select,.filters input){background:#161d19;border-color:#2c3830;color:#dfe9e1}
+html[data-theme=dark] .income-stats>div{background:#1f2a22}html[data-theme=dark] .income-stats small{color:#8d9a91}
+html[data-theme=dark] .income-stats .net{background:#1f3326}html[data-theme=dark] .income-stats .net strong,html[data-theme=dark] .income-amount{color:#7fcf98}
+html[data-theme=dark] .income-stats .net.negative{background:#3a221d}html[data-theme=dark] .income-stats .net.negative strong,html[data-theme=dark] .matrix .net-row td.negative{color:#f0a08c}
+html[data-theme=dark] .matrix .income-row td{background:#1f2a22;color:#7fcf98}html[data-theme=dark] .matrix .net-row td{background:#1f3326}
+html[data-theme=dark] .chip{background:#1f2a22;border-color:#2c3830;color:#dfe9e1}html[data-theme=dark] .chip:hover{background:#26342b}html[data-theme=dark] .chip small{color:#8d9a91}
+html[data-theme=dark] .theme-toggle{color:#b9c7b0}html[data-theme=dark] .theme-toggle:hover{background:#24302a}
+html[data-theme=dark] .matrix :is(thead,tbody,tfoot,tr){border-color:#2a352e}
+html[data-theme=dark] .matrix tfoot td:first-child{background:#212b25}
+html[data-theme=dark] .matrix .income-row td:first-child{background:#1f2a22}html[data-theme=dark] .matrix .net-row td:first-child{background:#1f3326}
