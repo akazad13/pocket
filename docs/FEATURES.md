@@ -49,7 +49,7 @@ Keep this file current: move an idea to "Implemented" when it ships.
 | Linked expenses and income | Expenses have an optional "Paid from" account and income an optional "Received in" account; both change that account's balance. New entries default to the most recently used open account. Unlinked entries never affect balances. |
 | CSV export | Downloads `pocket-<year>.csv` with the category-by-month totals table. |
 | Backup and restore | "Backup & restore" dialog: download a full JSON backup (categories, budgets, recurring rules, expenses), export every expense as CSV, and restore from a backup. Restore only adds what is missing (expenses by ID, categories case-insensitively, budgets for categories without one) and never changes or deletes data. The whole file is validated before anything is written. Tested with 6,000 expenses. `app/backup.tsx`, `/api/backup`. |
-| Recurring expenses | "Recurring" dialog to add, edit and stop monthly rules (category, amount, day 1 to 31, note, start month). Due occurrences are added automatically when expenses load, catching up missed months; day 29 to 31 falls on the last day of shorter months. Generated expenses show a repeat icon and behave like normal expenses; deleting one does not bring it back. Edits apply to months not yet added. Categories used by a rule cannot be deleted. Included in backups. `app/recurring.tsx`, `/api/recurring`, `lib/recurring.ts`. |
+| Recurring items | "Recurring" dialog to add, edit and stop monthly rules of three kinds: expenses (category, optional Paid from account), income (source, optional Received in account) and transfers between two accounts (e.g. DPS instalment, loan EMI). Each has an amount, day 1 to 31, note and start month. Due occurrences are added automatically before expenses, income or accounts load, catching up missed months; day 29 to 31 falls on the last day of shorter months. Generated entries show a repeat icon and behave like normal ones; deleting one does not bring it back. Edits apply to months not yet added. Categories and accounts used by a rule cannot be deleted. Included in backups. `app/recurring.tsx`, `/api/recurring`, `lib/rules.ts` (unit tested), `lib/recurring.ts`. |
 | Monthly budgets | Optional monthly limit per category (same every month). Overview panel shows spent vs budget with a progress bar, amount left or over, and a count of over-budget categories. Edit all budgets in one dialog; blank removes a budget. Budgets follow category renames and are removed with the category. `app/budgets.tsx`, `/api/budgets`. |
 
 ### Platform and quality
@@ -66,7 +66,6 @@ Keep this file current: move an idea to "Implemented" when it ships.
 
 ## Known limitations
 These are the gaps the ideas below address.
-- Recurring rules cannot link an account yet, so generated expenses are unlinked until edited.
 - Account balances are all-time totals; there is no balance-over-time chart or balance on a past date.
 - The all-expenses CSV does not include the account.
 - Restore cannot import CSV files from other apps or banks (JSON backups only).
@@ -79,7 +78,6 @@ Proposed, not yet prioritised. Size: S = under an hour, M = a few hours, L = a d
 
 | # | Idea | Why | Size |
 |---|---|---|---|
-| 16 | **Recurring income and transfers with accounts** (salary into bank, monthly DPS instalment, loan EMI; recurring expenses gain "Paid from") | The biggest monthly movements are regular; today they must be entered by hand | M |
 | 17 | **Investment details** on DPS, FD, Sanchayapatra: start date, maturity date, profit rate, instalment; expected maturity value and an "Upcoming maturities" list | Know when money unlocks and what it will be worth | M |
 | 18 | **Loan and EMI tracker**: principal, rate, tenure; remaining balance, instalments left, next due date, interest vs principal split | Loans are the largest debts; see the payoff path | M |
 | 19 | **Savings goals** (emergency fund, Hajj, laptop) with target, date, linked accounts and progress | Turns savings into plans | M |

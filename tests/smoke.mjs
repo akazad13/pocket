@@ -17,6 +17,7 @@ const mergeFrom = `${tag} merge from`;
 const mergeInto = `${tag} merge into`;
 const mergeIds = [1, 2].map((n) => `${expenseId}-mg${n}`);
 const acc = { bank: `${expenseId}-acc-bank`, cash: `${expenseId}-acc-cash`, loan: `${expenseId}-acc-loan` };
+const recKinds = { bank: `${expenseId}-rk-bank`, dps: `${expenseId}-rk-dps`, income: `${ruleId}-ri`, transfer: `${ruleId}-rt` };
 const accIds = { expense: `${expenseId}-acc-exp`, income: `${expenseId}-acc-inc`, transfer: `${expenseId}-acc-tr`, adjustment: `${expenseId}-acc-adj` };
 const incomeIds = [1, 2].map((n) => `${expenseId}-inc${n}`);
 const dhakaToday = new Intl.DateTimeFormat("en-CA", { timeZone: "Asia/Dhaka" }).format(new Date());
@@ -180,6 +181,7 @@ async function run() {
   await incomeChecks();
   await mergeChecks();
   await accountChecks();
+  await recurringKindChecks();
 }
 
 async function incomeChecks() {
@@ -323,6 +325,41 @@ async function accountChecks() {
   await call("DELETE", "/api/categories", { name: category });
 }
 
+async function recurringKindChecks() {
+  const month = dhakaToday.slice(0, 7);
+  await call("POST", "/api/accounts", { id: recKinds.bank, name: `${tag} RK Bank`, type: "bank", opening: "0" });
+  await call("POST", "/api/accounts", { id: recKinds.dps, name: `${tag} RK DPS`, type: "dps", opening: "0" });
+  const income = { id: recKinds.income, kind: "income", source: "Salary", account: recKinds.bank, amount: "50000", day: 1, note: "salary", startMonth: month };
+  const transfer = { id: recKinds.transfer, kind: "transfer", account: recKinds.bank, toAccount: recKinds.dps, amount: "5000", day: 1, note: "DPS", startMonth: month };
+  let r = await call("POST", "/api/recurring", { ...transfer, toAccount: recKinds.bank });
+  check("POST recurring transfer to the same account is rejected (400)", r.status === 400, r);
+  r = await call("POST", "/api/recurring", { ...transfer, toAccount: `${tag}-nope` });
+  check("POST recurring transfer to an unknown account is rejected (400)", r.status === 400, r);
+  r = await call("POST", "/api/recurring", { ...income, source: " " });
+  check("POST recurring income without a source is rejected (400)", r.status === 400, r);
+  r = await call("POST", "/api/recurring", income);
+  check("POST recurring income creates it", r.status === 201 && r.json?.rule?.kind === "income" && r.json.rule.source === "Salary" && r.json.rule.account === recKinds.bank, r);
+  r = await call("POST", "/api/recurring", transfer);
+  check("POST recurring transfer creates it", r.status === 201 && r.json?.rule?.kind === "transfer" && r.json.rule.toAccount === recKinds.dps, r);
+  r = await call("GET", "/api/income");
+  check("Recurring income is generated into the account", r.json?.income?.find((x) => x.id === `rec-${recKinds.income}-${month}`)?.account === recKinds.bank, r.status);
+  r = await call("GET", "/api/accounts");
+  const t = r.json?.transfers?.find((x) => x.id === `rec-${recKinds.transfer}-${month}`);
+  check("Recurring transfer is generated", t?.from === recKinds.bank && t.to === recKinds.dps && t.cents === 500000, t);
+  r = await call("GET", "/api/income");
+  check("Generation is idempotent", r.json?.income?.filter((x) => x.id.startsWith(`rec-${recKinds.income}-`)).length === 1);
+  r = await call("PUT", "/api/recurring", { ...transfer, amount: "6000" });
+  check("PUT recurring transfer updates it", r.status === 200 && r.json?.rule?.cents === 600000, r);
+  await call("DELETE", "/api/income", { id: `rec-${recKinds.income}-${month}` });
+  await call("DELETE", "/api/accounts/transfers", { id: `rec-${recKinds.transfer}-${month}` });
+  r = await call("DELETE", "/api/accounts", { id: recKinds.dps });
+  check("DELETE account used by a recurring rule is rejected (409)", r.status === 409, r);
+  for (const id of [recKinds.income, recKinds.transfer]) await call("DELETE", "/api/recurring", { id });
+  r = await call("DELETE", "/api/accounts", { id: recKinds.dps });
+  check("DELETE account after its rules stop succeeds", r.status === 200, r);
+  await call("DELETE", "/api/accounts", { id: recKinds.bank });
+}
+
 async function generated() {
   const { json } = await call("GET", "/api/expenses");
   return json.expenses.filter((e) => e.id.startsWith(`rec-${ruleId}-`));
@@ -434,6 +471,11 @@ async function cleanup() {
   // Best effort: remove anything left behind if a step failed midway.
   await call("DELETE", "/api/recurring", { id: ruleId }).catch(() => {});
   await call("DELETE", "/api/recurring", { id: `${ruleId}-mg` }).catch(() => {});
+  for (const id of [recKinds.income, recKinds.transfer]) await call("DELETE", "/api/recurring", { id }).catch(() => {});
+  const month = dhakaToday.slice(0, 7);
+  await call("DELETE", "/api/income", { id: `rec-${recKinds.income}-${month}` }).catch(() => {});
+  await call("DELETE", "/api/accounts/transfers", { id: `rec-${recKinds.transfer}-${month}` }).catch(() => {});
+  for (const id of [recKinds.dps, recKinds.bank]) await call("DELETE", "/api/accounts", { id }).catch(() => {});
   await call("DELETE", "/api/accounts/transfers", { id: accIds.transfer }).catch(() => {});
   await call("DELETE", "/api/accounts/adjustments", { id: accIds.adjustment }).catch(() => {});
   await call("DELETE", "/api/income", { id: accIds.income }).catch(() => {});

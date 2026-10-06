@@ -1,6 +1,6 @@
 import {validateExpense,type Expense} from './expenses';
 import {categoryName} from './categories';
-import {validateRule,type Rule} from './recurring';
+import {validateRule,type Rule} from './rules';
 import {validateIncome,type Income} from './income';
 import {validateStyle,type Styles} from './category-style';
 import {validateAccount,validateTransfer,validateAdjustment,type Account,type Transfer,type Adjustment} from './accounts';
@@ -31,17 +31,17 @@ export function prepareImport(raw:unknown,existing:string[],existingAccounts:str
   const v=validateExpense({id:e.id,category:resolve(e.category),amount:(e.cents/100).toFixed(2),date:e.date,note:e.note??'',method:e.method,account:e.account},[...byKey.values()]);linked(v.account);return v;
  }catch(err){throw Error(`Expense ${i+1}: ${(err as Error).message}`);}});
  const budgets=Object.entries(b.budgets).map(([c,cents])=>{if(!validCents(cents))throw Error(`Budget for ${c}: invalid amount.`);return{category:resolve(c),cents};});
- if(b.recurring!==undefined&&!Array.isArray(b.recurring))throw Error('This backup is incomplete.');
- const recurring=(b.recurring??[]).map((r,i)=>{try{
-  if(!r||typeof r!=='object'||!validCents(r.cents))throw Error('Invalid amount.');
-  if(r.lastMonth!==null&&(typeof r.lastMonth!=='string'||! /^\d{4}-(0[1-9]|1[0-2])$/.test(r.lastMonth)))throw Error('Invalid progress month.');
-  return {...validateRule({...r,category:resolve(r.category),amount:(r.cents/100).toFixed(2)},[...byKey.values()]),lastMonth:r.lastMonth};
- }catch(err){throw Error(`Recurring expense ${i+1}: ${(err as Error).message}`);}});
  if(b.income!==undefined&&!Array.isArray(b.income))throw Error('This backup is incomplete.');
  const income=(b.income??[]).map((x,i)=>{try{
   if(!x||typeof x!=='object'||!validCents(x.cents))throw Error('Invalid amount.');
   const v=validateIncome({...x,amount:(x.cents/100).toFixed(2),note:x.note??''});linked(v.account);return v;
  }catch(err){throw Error(`Income ${i+1}: ${(err as Error).message}`);}});
+ if(b.recurring!==undefined&&!Array.isArray(b.recurring))throw Error('This backup is incomplete.');
+ const recurring=(b.recurring??[]).map((r,i)=>{try{
+  if(!r||typeof r!=='object'||!validCents(r.cents))throw Error('Invalid amount.');
+  if(r.lastMonth!==null&&(typeof r.lastMonth!=='string'||! /^\d{4}-(0[1-9]|1[0-2])$/.test(r.lastMonth)))throw Error('Invalid progress month.');
+  const v=validateRule({...r,category:(r.kind??'expense')==='expense'?resolve(r.category):'',amount:(r.cents/100).toFixed(2)},[...byKey.values()]);linked(v.account);linked(v.toAccount);return {...v,lastMonth:r.lastMonth};
+ }catch(err){throw Error(`Recurring item ${i+1}: ${(err as Error).message}`);}});
  const transfers=(b.transfers??[]).map((t,i)=>{try{
   if(!t||typeof t!=='object'||!validCents(t.cents))throw Error('Invalid amount.');
   const v=validateTransfer({...t,amount:(t.cents/100).toFixed(2)});linked(v.from);linked(v.to);return v;

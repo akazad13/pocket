@@ -80,3 +80,6 @@ html[data-theme=dark] .add-menu [role=menuitem] svg{color:#8fc5a2}
 html[data-theme=dark] .worth-split{color:#b9d6c4}
 html[data-theme=dark] .income-icon{color:#7fcf98;background:#1f3326}
 html[data-theme=dark] .transfer-amount{color:#a8b5ac}
+html[data-theme=dark] .rule-icon{background:#24302a;color:#94b886}
+html[data-theme=dark] .rule-icon.income{background:#1f3326;color:#7fcf98}
+html[data-theme=dark] .rule-icon.transfer{background:#222b33;color:#9db4c8}
