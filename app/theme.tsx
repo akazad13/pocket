@@ -1,6 +1,6 @@
 "use client";
 import {useEffect,useSyncExternalStore} from 'react';
-import {Monitor,Moon,Sun} from 'lucide-react';
+import {Contrast,Moon,Sun} from 'lucide-react';
 import {THEME_KEY as KEY,DARK_QUERY as QUERY} from '@/lib/theme-script';
 // Theme choice lives in localStorage ('system' | 'light' | 'dark'); <html data-theme> holds the resolved theme.
 // layout.tsx sets data-theme before first paint with the same rules, so there is no flash.
@@ -15,6 +15,6 @@ const order:Mode[]=['system','light','dark'],labels={system:'System theme',light
 export default function ThemeToggle(){
  const{mode,resolved}=useTheme();
  useEffect(()=>{document.documentElement.dataset.theme=resolved;},[resolved]);
- const next=order[(order.indexOf(mode)+1)%order.length],Icon=mode==='system'?Monitor:mode==='dark'?Moon:Sun;
+ const next=order[(order.indexOf(mode)+1)%order.length],Icon=mode==='system'?Contrast:mode==='dark'?Moon:Sun;
  return <button className="theme-toggle" onClick={()=>setMode(next)} aria-label={`${labels[mode]}. Switch to ${labels[next].toLowerCase()}`} title={labels[mode]}><Icon size={17}/></button>;
 }
