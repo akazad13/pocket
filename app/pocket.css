@@ -19,3 +19,22 @@ body{background:#f8f9f6;color:#22382e;font-family:Arial,Helvetica,sans-serif}but
 .theme-toggle{width:35px;height:35px;display:grid;place-items:center;border-radius:50%;color:#64725b}.theme-toggle:hover{background:#f1f5eb}
 .category-row{flex-wrap:wrap}.style-swatch{width:30px;height:30px;border-radius:8px;display:grid;place-items:center;color:#fff;flex-shrink:0}.style-picker{flex-basis:100%;display:grid;gap:10px;padding:10px 0 4px}.style-picker>div{display:flex;flex-wrap:wrap;gap:6px}.swatch{width:26px;height:26px;border-radius:50%;border:2px solid transparent}.swatch[aria-checked=true]{border-color:#22382e;box-shadow:inset 0 0 0 2px #fff}.icon-choice{width:32px;height:32px;display:grid;place-items:center;border-radius:7px;border:1px solid #e3e9dc;color:#467147}.icon-choice[aria-checked=true]{background:#256a53;color:#fff;border-color:#256a53}.style-picker .text-button{justify-self:start;padding-left:0}
 .category-row>.style-picker{flex:0 0 100%}
+.yearly .income-stats{grid-template-columns:repeat(auto-fit,minmax(150px,1fr))}
+.yearly .income-stats .change{display:flex;justify-content:flex-start;margin-top:6px;font-size:11px;font-weight:500}
+.year-highlights{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:10px}
+.year-highlights button{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:4px 10px;align-items:baseline;text-align:left;border:1px solid #e4e8df;border-radius:9px;padding:12px 14px;background:#fff;cursor:pointer}
+.year-highlights button:hover{border-color:#256a53}
+.year-highlights small{grid-column:1/-1;font-size:10px;color:#7a8873;letter-spacing:.3px}
+.year-highlights b{font-size:14px;font-weight:600}
+.year-highlights span{font-size:12px;color:#42613f;white-space:nowrap}
+.yearly-grid{grid-template-columns:1.3fr 1fr;margin-top:20px}
+.year-categories{display:grid;gap:14px;margin-top:18px}
+.year-category{display:flex;gap:12px;align-items:center}
+.year-category .expense-icon{padding:8px}
+.year-category>div{flex:1;min-width:0}
+.year-category-label{display:flex;gap:10px;align-items:baseline;font-size:12px;margin-bottom:6px}
+.year-category-label b{flex:1;font-weight:500;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.year-category-label span{white-space:nowrap}
+.year-category-label small{width:40px;text-align:right;color:#7a8873}
+@media(max-width:800px){.yearly-grid{grid-template-columns:1fr}}
+@media(max-width:600px){.yearly-grid{gap:15px;margin-top:15px}.year-highlights{grid-template-columns:1fr}.year-category .expense-icon{display:none}}

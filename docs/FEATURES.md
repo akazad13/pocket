@@ -40,6 +40,7 @@ Keep this file current: move an idea to "Implemented" when it ships.
 | Expenses tab | List for the selected month or all time, newest first. Search by category or note; filter by category, amount range and (all time) date range; live count and total of the results; Clear filters. On mobile the filters collapse behind a Filters button showing how many are active. Logic in `lib/filter.ts` (unit tested). |
 | Month-over-month comparison | Total card shows the % change vs the previous month. "Compared with <month>" panel on Overview lists each category's last month → this month and % change ("New" when there was nothing before), biggest changes first, top 6 with Show all. Increases in warm red, decreases in green. Logic in `lib/compare.ts` (unit tested). |
 | Monthly table tab | Categories down, months across, row and column totals for the selected year. Sticky first column, horizontal scroll on mobile. |
+| Year tab | Year in review for the selected month's year: total spent with % change vs the previous year, average per month (from the first month with spending to this month, or December for past years), income and saved/overspent when income exists, biggest and quietest month (click to open that month), categories ranked by spend with share bars (top 8, Show all), and the five largest single expenses. Logic in `lib/yearly.ts` (unit tested). `app/yearly.tsx`. |
 | CSV export | Downloads `pocket-<year>.csv` with the category-by-month totals table. |
 | Backup and restore | "Backup & restore" dialog: download a full JSON backup (categories, budgets, recurring rules, expenses), export every expense as CSV, and restore from a backup. Restore only adds what is missing (expenses by ID, categories case-insensitively, budgets for categories without one) and never changes or deletes data. The whole file is validated before anything is written. Tested with 6,000 expenses. `app/backup.tsx`, `/api/backup`. |
 | Recurring expenses | "Recurring" dialog to add, edit and stop monthly rules (category, amount, day 1 to 31, note, start month). Due occurrences are added automatically when expenses load, catching up missed months; day 29 to 31 falls on the last day of shorter months. Generated expenses show a repeat icon and behave like normal expenses; deleting one does not bring it back. Edits apply to months not yet added. Categories used by a rule cannot be deleted. Included in backups. `app/recurring.tsx`, `/api/recurring`, `lib/recurring.ts`. |
@@ -70,7 +71,6 @@ Proposed, not yet prioritised. Size: S = under an hour, M = a few hours, L = a d
 
 | # | Idea | Why | Size |
 |---|---|---|---|
-| 12 | **Yearly report view** (top categories, biggest months, average per month) | Year-end review and tax prep (there is a Tax category) | M |
 | 13 | **Receipt photo attachment** stored in R2 | Proof for medical, tax, and business expenses | L |
 | 14 | **Installable PWA** with offline entry queued until online | Feels like a native phone app | L |
 | 15 | **Merge categories** (move all expenses from A into B, then delete A) | Today deleting a used category requires editing each expense | S |

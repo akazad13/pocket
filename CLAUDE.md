@@ -33,6 +33,7 @@ app/recurring.tsx          Recurring rules dialog (list/add/edit/stop).
 app/income.tsx             Income & savings panel with its own add/edit dialog; income state lives in tracker.
 app/category-icon.tsx      Icon key → lucide component (fallback ReceiptText).
 app/comparison.tsx         "Compared with last month" panel; changeText()/ChangeIcon reused by the total card.
+app/yearly.tsx             "Year" tab: year-in-review panels built from lib/yearly.ts.
 app/backup.tsx             Backup & restore dialog (JSON download, all-expenses CSV, restore upload).
 app/page.tsx               Re-exports tracker.
 app/layout.tsx             Metadata, imports globals.css + pocket.css.
@@ -56,6 +57,7 @@ lib/backup.ts              Backup type, prepareImport() validation/category mapp
 lib/recurring.ts           Rule type, applyRecurring() generator, validateRule(), dhakaToday().
 lib/income.ts              Income type, defaultSources, validateIncome().
 lib/compare.ts             Pure month-over-month comparison (totals and per category).
+lib/yearly.ts              Pure year-in-review numbers (totals, average, ranked categories/months, largest).
 lib/theme-script.ts        Inline <head> script that sets data-theme before paint (kept out of the client module so the server layout gets the string).
 lib/category-style.ts      PALETTE, ICONS, validateStyle(), colorFor() fallback colour by position.
 lib/quick.ts               Pure quick-add suggestions (frequent recent expenses).
