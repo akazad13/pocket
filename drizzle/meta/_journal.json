@@ -57,6 +57,13 @@
       "when": 1791235114863,
       "tag": "0007_graceful_lady_mastermind",
       "breakpoints": true
+    },
+    {
+      "idx": 8,
+      "version": "6",
+      "when": 1791260782191,
+      "tag": "0008_vengeful_iron_fist",
+      "breakpoints": true
     }
   ]
 }

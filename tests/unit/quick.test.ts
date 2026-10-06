@@ -4,7 +4,7 @@ import {quickPicks} from '../../lib/quick.ts';
 import type {Expense} from '../../lib/expenses.ts';
 
 let n = 0;
-const e = (category: string, cents: number, date: string, note = '', method = ''): Expense => ({id: String(n++), category, cents, date, note, method});
+const e = (category: string, cents: number, date: string, note = '', method = ''): Expense => ({id: String(n++), category, cents, date, note, method, account: ''});
 
 test('ranks by frequency, then recency, and merges same category+amount+note', () => {
   const picks = quickPicks([

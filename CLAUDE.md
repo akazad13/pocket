@@ -12,7 +12,7 @@ The project was scaffolded by the OpenAI "Sites" starter (`site-creator-vinext-s
 | Dev server | `npm run dev` | http://127.0.0.1:5173/ . Long-running: start with `run_in_background`. Uses local D1 in `.wrangler/state`. |
 | Typecheck | `npm run typecheck` | ~10s. Passes clean. **Primary verification step.** |
 | Unit tests | `npm run test:unit` | ~1s. `node:test` on TypeScript via `--experimental-strip-types`; files `tests/unit/*.test.ts`. For pure logic in `lib/` (no `cloudflare:workers` imports). Test files import with `.ts` extensions; `tests/unit/register.mjs` resolves extensionless imports inside `lib/`. |
-| Smoke test | `npm run smoke` | Needs `npm run dev` running. 101 API checks (CRUD, validation, rename cascade, origin check). Uses unique `Smoke ...` names and cleans up. Run after any change to `app/api/` or `lib/`. |
+| Smoke test | `npm run smoke` | Needs `npm run dev` running. 126 API checks (CRUD, validation, rename cascade, origin check). Uses unique `Smoke ...` names and cleans up. Run after any change to `app/api/` or `lib/`. |
 | Lint | `npm run lint` | ~60s. Clean (0 errors); keep it that way. The React Compiler rule forbids synchronous setState inside effects: set state only after an `await`. |
 | Build | `npm run build` | Outputs `dist/` (Worker + client). |
 | Run built app | `npm start` | wrangler dev against `dist/server/wrangler.json`. |
@@ -34,6 +34,7 @@ app/income.tsx             Income & savings panel with its own add/edit dialog; 
 app/category-icon.tsx      Icon key → lucide component (fallback ReceiptText).
 app/comparison.tsx         "Compared with last month" panel; changeText()/ChangeIcon reused by the total card.
 app/yearly.tsx             "Year" tab: year-in-review panels built from lib/yearly.ts.
+app/accounts.tsx           "Accounts" tab: net worth, account list/detail/history, account, transfer and update-balance dialogs; exports AccountPicker used by expense and income forms.
 app/backup.tsx             Backup & restore dialog (JSON download, all-expenses CSV, restore upload).
 app/page.tsx               Re-exports tracker.
 app/layout.tsx             Metadata, imports globals.css + pocket.css.
@@ -49,6 +50,9 @@ app/api/budgets/route.ts   GET {budgets:{name:cents}}, PUT {budgets:{name:amount
 app/api/backup/route.ts    GET full JSON backup (attachment); POST merge-only restore.
 app/api/income/route.ts    GET, POST, PUT, DELETE {id}; same pattern as expenses (no category).
 app/api/recurring/route.ts GET rules, POST create, PUT edit (not start month), DELETE {id}.
+app/api/accounts/route.ts  GET {accounts, transfers, adjustments}, POST, PUT (edit/close), DELETE {id} (409 if it has history).
+app/api/accounts/transfers/route.ts POST, PUT, DELETE {id}.
+app/api/accounts/adjustments/route.ts POST {amount: signed value change}, DELETE {id}.
 lib/expenses.ts            Default 26 category names, Expense type, validateExpense(), shared isAmount()/isDate() validators.
 lib/categories.ts          getCategories() (lazy-seeds defaults once), categoryName() validator.
 lib/budgets.ts             getBudgets(), budgetCents() validator.
@@ -59,6 +63,8 @@ lib/recurring.ts           Rule type, applyRecurring() generator, validateRule()
 lib/income.ts              Income type, defaultSources, validateIncome().
 lib/compare.ts             Pure month-over-month comparison (totals and per category).
 lib/yearly.ts              Pure year-in-review numbers (totals, average, ranked categories/months, largest).
+lib/accounts.ts            Pure: account types/groups, validators, values() balances, totals(), adjustmentFor(). Client-safe.
+lib/account-db.ts          Server-only: SELECT strings, toAccount(), missingAccount() existence check.
 lib/theme-script.ts        Inline <head> script that sets data-theme before paint (kept out of the client module so the server layout gets the string).
 lib/category-style.ts      PALETTE, ICONS, validateStyle(), colorFor() fallback colour by position.
 lib/quick.ts               Pure quick-add suggestions (frequent recent expenses).
@@ -66,7 +72,7 @@ lib/filter.ts              Pure expense filtering (text, category, date range, a
 lib/months.ts              Pure month helpers (nextMonth, occurrenceDate) safe for client and server.
 lib/database.ts            database(): returns raw env.DB (D1Database); jsonChunks() for bulk json_each inserts.
 db/schema.ts               Drizzle table definitions (source of truth for migrations only).
-drizzle/*.sql              Generated migrations 0000..0007.
+drizzle/*.sql              Generated migrations 0000..0008.
 docs/FEATURES.md           Implemented features, known limitations, feature ideas backlog. Read before planning new work; update when a feature ships.
 tests/smoke.mjs            API smoke test (plain Node fetch, no dependencies).
 tests/unit/*.test.ts       Unit tests for pure lib/ modules.
@@ -79,11 +85,14 @@ Generated/ignored, never edit or search: `dist/`, `.next/`, `.vinext/`, `.wrangl
 ## Data model and invariants
 
 Tables (SQLite/D1):
-- `expenses(id text pk, category text, cents integer, date text 'YYYY-MM-DD', note text default '', method text default '')`: `method` is the optional payment method ('' = not recorded).
+- `expenses(id text pk, category text, cents integer, date text 'YYYY-MM-DD', note text default '', method text default '', account text default '')`: `method` is the optional payment method ('' = not recorded); `account` is an optional account id ('' = not linked).
 - `custom_categories(key text pk = lower(name), name text, color text default '', icon text default '')`: color/icon must be from `PALETTE`/`ICONS` in `lib/category-style.ts`
 - `app_state(key text pk)`: flag row `categories_initialized` marks that default categories were seeded.
 - `budgets(category text pk, cents integer)`: monthly budget per category display name.
-- `income(id text pk, source text, cents integer, date text, note text)`: money in; independent of categories.
+- `income(id text pk, source text, cents integer, date text, note text, account text default '')`: money in; independent of categories; optional account id.
+- `accounts(id text pk, name, type, opening integer, note, closed integer 0/1)`: `type` from `ACCOUNT_TYPES` in `lib/accounts.ts`. `opening` is the starting balance, or the amount owed for debt types (`loan_taken`, `credit_card`). Names unique case-insensitively (checked in the route).
+- `transfers(id text pk, from_account, to_account, cents > 0, date, note)` and `adjustments(id text pk, account, cents signed, date, note)`.
+- Balances are computed, never stored: value = ±opening + income − expenses + transfers in − out + adjustments, with debts negative (`values()`); the UI shows debts as a positive amount owed (`shown()`). Adjustment cents are the signed change in net-worth value. Accounts with any linked row cannot be deleted (409), only closed.
 - `recurring(id text pk, category, cents, day 1-31, note, start_month 'YYYY-MM', last_month nullable)`: monthly rules. `last_month` is the last month generated.
 
 Rules to preserve:

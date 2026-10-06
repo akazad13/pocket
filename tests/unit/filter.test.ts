@@ -4,10 +4,10 @@ import {filterExpenses,isFiltered,noFilters} from '../../lib/filter.ts';
 import type {Expense} from '../../lib/expenses.ts';
 
 const items: Expense[] = [
-  {id: 'a', category: 'Food', cents: 15000, date: '2026-01-10', note: 'Lunch with team', method: 'bKash'},
-  {id: 'b', category: 'Rent', cents: 2500000, date: '2026-02-01', note: '', method: 'Bank transfer'},
-  {id: 'c', category: 'Food', cents: 999, date: '2026-03-05', note: 'snack', method: 'Cash'},
-  {id: 'd', category: 'Transport', cents: 25050, date: '2025-12-31', note: 'CNG', method: ''},
+  {id: 'a', category: 'Food', cents: 15000, date: '2026-01-10', note: 'Lunch with team', method: 'bKash', account: ''},
+  {id: 'b', category: 'Rent', cents: 2500000, date: '2026-02-01', note: '', method: 'Bank transfer', account: ''},
+  {id: 'c', category: 'Food', cents: 999, date: '2026-03-05', note: 'snack', method: 'Cash', account: ''},
+  {id: 'd', category: 'Transport', cents: 25050, date: '2025-12-31', note: 'CNG', method: '', account: ''},
 ];
 const ids = (f: Partial<typeof noFilters>) => filterExpenses(items, {...noFilters, ...f}).map((e) => e.id);
 

@@ -42,6 +42,10 @@ Keep this file current: move an idea to "Implemented" when it ships.
 | Month-over-month comparison | Total card shows the % change vs the previous month. "Compared with <month>" panel on Overview lists each category's last month → this month and % change ("New" when there was nothing before), biggest changes first, top 6 with Show all. Increases in warm red, decreases in green. Logic in `lib/compare.ts` (unit tested). |
 | Monthly table tab | Categories down, months across, row and column totals for the selected year. Sticky first column, horizontal scroll on mobile. |
 | Year tab | Year in review for the selected month's year: total spent with % change vs the previous year, average per month (from the first month with spending to this month, or December for past years), income and saved/overspent when income exists, biggest and quietest month (click to open that month), categories ranked by spend with share bars (top 8, Show all), and the five largest single expenses. Logic in `lib/yearly.ts` (unit tested). `app/yearly.tsx`. |
+| Accounts and net worth | Accounts tab: add cash, bank, mobile wallet, DPS, FD, mutual fund, Sanchayapatra, shares, loan given, loan taken, credit card or other accounts, each with a starting balance and note. Shows assets, amount owed and net worth, accounts grouped by kind with group totals. Loans taken and credit cards are debts (shown as amount owed). Tap an account for its balance and full history. Accounts with history cannot be deleted; close them to hide them from lists and pickers. `app/accounts.tsx`, `/api/accounts`, `lib/accounts.ts` (unit tested). |
+| Transfers | Move money between any two accounts (e.g. bank to cash, or an EMI from bank to a loan or card). Edit or delete with Undo from the activity list or account history. `/api/accounts/transfers`. |
+| Balance updates | Set a new balance or amount owed for interest, profit, fees or a new market value; the difference is stored as a signed adjustment. Deletable with Undo. `/api/accounts/adjustments`. |
+| Linked expenses and income | Expenses have an optional "Paid from" account and income an optional "Received in" account; both change that account's balance. New entries default to the most recently used open account. Unlinked entries never affect balances. |
 | CSV export | Downloads `pocket-<year>.csv` with the category-by-month totals table. |
 | Backup and restore | "Backup & restore" dialog: download a full JSON backup (categories, budgets, recurring rules, expenses), export every expense as CSV, and restore from a backup. Restore only adds what is missing (expenses by ID, categories case-insensitively, budgets for categories without one) and never changes or deletes data. The whole file is validated before anything is written. Tested with 6,000 expenses. `app/backup.tsx`, `/api/backup`. |
 | Recurring expenses | "Recurring" dialog to add, edit and stop monthly rules (category, amount, day 1 to 31, note, start month). Due occurrences are added automatically when expenses load, catching up missed months; day 29 to 31 falls on the last day of shorter months. Generated expenses show a repeat icon and behave like normal expenses; deleting one does not bring it back. Edits apply to months not yet added. Categories used by a rule cannot be deleted. Included in backups. `app/recurring.tsx`, `/api/recurring`, `lib/recurring.ts`. |
@@ -61,7 +65,9 @@ Keep this file current: move an idea to "Implemented" when it ships.
 
 ## Known limitations
 These are the gaps the ideas below address.
-- No account balances (cash in hand, bank) yet; income and expenses are tracked as flows only.
+- Recurring rules cannot link an account yet, so generated expenses are unlinked until edited.
+- Account balances are all-time totals; there is no balance-over-time chart or balance on a past date.
+- The all-expenses CSV does not include the account.
 - Restore cannot import CSV files from other apps or banks (JSON backups only).
 - All expenses are loaded on every page load (no pagination); fine for years of personal data, but unbounded.
 - Backups are manual; nothing is backed up automatically.

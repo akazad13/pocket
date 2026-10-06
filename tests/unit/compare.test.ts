@@ -4,7 +4,7 @@ import {compareMonths} from '../../lib/compare.ts';
 import {prevMonth} from '../../lib/months.ts';
 import type {Expense} from '../../lib/expenses.ts';
 
-const e = (category: string, cents: number, date: string): Expense => ({id: `${category}${date}${cents}`, category, cents, date, note: '', method: ''});
+const e = (category: string, cents: number, date: string): Expense => ({id: `${category}${date}${cents}`, category, cents, date, note: '', method: '', account: ''});
 
 test('prevMonth rolls back over the year', () => {
   assert.equal(prevMonth('2026-10'), '2026-09');

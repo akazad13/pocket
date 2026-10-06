@@ -42,3 +42,39 @@ body{background:#f8f9f6;color:#22382e;font-family:Arial,Helvetica,sans-serif}but
 .merge-form p{flex:0 0 100%;font-size:12px;color:#5d6d57}
 .merge-form p b{font-size:12px;font-weight:600}
 .merge-form select{flex:1;min-width:0;height:36px;border:1px solid #dfe5d8;border-radius:8px;padding:0 8px;background:#fff;color:inherit;font-size:13px}
+.accounts .empty p{max-width:320px}
+.account-actions{display:flex;gap:14px}
+.account-actions .text-button{display:flex;align-items:center;gap:5px}
+.net-worth{grid-template-columns:repeat(3,1fr)}
+.account-group{margin-top:20px}
+.account-group h3{display:flex;justify-content:space-between;font-size:11px;font-weight:600;letter-spacing:.4px;text-transform:uppercase;color:#7a8873;padding-bottom:8px;border-bottom:1px solid #edf0e7}
+.account-group h3 span{text-transform:none;letter-spacing:0;color:#42613f}
+.account-row{display:flex;width:100%;gap:12px;align-items:center;padding:13px 4px;border-bottom:1px solid #edf0e7;text-align:left;background:none;cursor:pointer;border-radius:0}
+.account-row:hover{background:#f6f8f2}
+.account-row>div{flex:1;min-width:0}
+.account-row b{display:block;font-size:13px;font-weight:500;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.account-row small{display:block;font-size:11px;color:#9aa18f;margin-top:4px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.account-row strong{font-size:13px;white-space:nowrap}
+.account-row strong.owed{color:#a8493b}
+.account-row.closed{opacity:.6}
+.account-icon{display:grid;place-items:center;width:38px;height:38px;flex-shrink:0;border-radius:10px;background:#eef4e8;color:#256a53}
+.account-activity{margin-top:20px}
+.account-balance{margin:4px 0 2px}
+.account-balance small{display:block;font-size:11px;color:#7a8873}
+.account-balance strong{display:block;font-size:26px;font-weight:600;margin-top:4px}
+.account-buttons{display:flex;flex-wrap:wrap;gap:8px}
+.account-buttons button{display:flex;align-items:center;gap:6px;font-size:12px;font-weight:500;padding:8px 12px;border:1px solid #dfe5d8;border-radius:8px;background:#fff;color:#335b40;cursor:pointer}
+.account-buttons button:hover{border-color:#256a53}
+.account-history{display:grid;border-top:1px solid #edf0e7}
+.history-row{display:flex;align-items:center;gap:10px;padding:10px 0;border-bottom:1px solid #edf0e7}
+.history-row>div{flex:1;min-width:0}
+.history-row b{display:block;font-size:13px;font-weight:500}
+.history-row small{display:block;font-size:11px;color:#9aa18f;margin-top:3px;overflow-wrap:anywhere}
+.history-row strong{font-size:13px;white-space:nowrap}
+.history-row strong.up{color:#2f6b43}
+.history-spacer{width:32px;flex-shrink:0}
+.field-hint{font-size:11px;font-weight:400;color:#7a8873;line-height:1.5}
+.expense-dialog label.check-row{display:flex;align-items:center;gap:10px;font-weight:400}
+.expense-dialog .check-row input{width:18px;min-height:0;height:18px;padding:0;flex-shrink:0}
+.text-button.danger{color:#a8493b;justify-self:center}
+@media(max-width:600px){.main-tabs{overflow-x:auto;justify-content:flex-start!important;scrollbar-width:none}.main-tabs::-webkit-scrollbar{display:none}.main-tabs button{flex:0 0 auto}.net-worth{grid-template-columns:1fr 1fr}.net-worth .net{grid-column:1/-1}.accounts .section-heading{flex-wrap:wrap}.account-icon{width:34px;height:34px}.account-group{margin-top:16px}.account-activity{margin-top:15px}}

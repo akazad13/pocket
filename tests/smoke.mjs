@@ -16,6 +16,8 @@ const ruleId = `smoke-rule-${Date.now().toString(36)}`;
 const mergeFrom = `${tag} merge from`;
 const mergeInto = `${tag} merge into`;
 const mergeIds = [1, 2].map((n) => `${expenseId}-mg${n}`);
+const acc = { bank: `${expenseId}-acc-bank`, cash: `${expenseId}-acc-cash`, loan: `${expenseId}-acc-loan` };
+const accIds = { expense: `${expenseId}-acc-exp`, income: `${expenseId}-acc-inc`, transfer: `${expenseId}-acc-tr`, adjustment: `${expenseId}-acc-adj` };
 const incomeIds = [1, 2].map((n) => `${expenseId}-inc${n}`);
 const dhakaToday = new Intl.DateTimeFormat("en-CA", { timeZone: "Asia/Dhaka" }).format(new Date());
 
@@ -45,9 +47,9 @@ function check(name, condition, detail) {
   }
 }
 
-async function findExpense() {
+async function findExpense(id = expenseId) {
   const { json } = await call("GET", "/api/expenses");
-  return json?.expenses?.find((e) => e.id === expenseId);
+  return json?.expenses?.find((e) => e.id === id);
 }
 
 async function run() {
@@ -177,6 +179,7 @@ async function run() {
   await recurringChecks();
   await incomeChecks();
   await mergeChecks();
+  await accountChecks();
 }
 
 async function incomeChecks() {
@@ -250,6 +253,74 @@ async function mergeChecks() {
   await call("DELETE", "/api/recurring", { id: `${ruleId}-mg` });
   for (const id of mergeIds) await call("DELETE", "/api/expenses", { id });
   await call("DELETE", "/api/categories", { name: mergeInto });
+}
+
+async function accountChecks() {
+  const bank = { id: acc.bank, name: `${tag} Bank`, type: "bank", opening: "1000", note: "" };
+  for (const [label, patch] of [["no name", { name: " " }], ["unknown type", { type: "crypto" }], ["negative opening", { opening: "-1" }]]) {
+    const r = await call("POST", "/api/accounts", { ...bank, ...patch });
+    check(`POST account with ${label} is rejected (400)`, r.status === 400, r);
+  }
+  let r = await call("POST", "/api/accounts", bank, { Origin: "http://evil.example" });
+  check("POST account from a foreign origin is rejected (403)", r.status === 403, r);
+  r = await call("POST", "/api/accounts", bank);
+  check("POST account creates it (201)", r.status === 201 && r.json?.account?.opening === 100000 && r.json.account.closed === false, r);
+  r = await call("POST", "/api/accounts", { ...bank, id: acc.cash, name: bank.name.toUpperCase() });
+  check("POST account with a duplicate name is rejected (409)", r.status === 409, r);
+  await call("POST", "/api/accounts", { id: acc.cash, name: `${tag} Cash`, type: "cash", opening: "" });
+  await call("POST", "/api/accounts", { id: acc.loan, name: `${tag} Loan`, type: "loan_taken", opening: "5000" });
+  r = await call("GET", "/api/accounts");
+  check("GET accounts lists them", r.status === 200 && [acc.bank, acc.cash, acc.loan].every((id) => r.json?.accounts?.some((a) => a.id === id)), r.status);
+
+  await call("POST", "/api/categories", { name: category });
+  r = await call("POST", "/api/expenses", { id: accIds.expense, category, amount: "25", date: "2026-10-01", note: "", account: `${tag}-nope` });
+  check("POST expense with an unknown account is rejected (400)", r.status === 400, r);
+  r = await call("POST", "/api/expenses", { id: accIds.expense, category, amount: "25", date: "2026-10-01", note: "", account: acc.cash });
+  check("POST expense saves its account", r.status === 201 && r.json?.expense?.account === acc.cash, r);
+  check("GET expenses returns the account", (await findExpense(accIds.expense))?.account === acc.cash);
+  r = await call("POST", "/api/income", { id: accIds.income, source: "Salary", amount: "300", date: "2026-10-01", note: "", account: acc.bank });
+  check("POST income saves its account", r.status === 201 && r.json?.income?.account === acc.bank, r);
+
+  const transfer = { id: accIds.transfer, from: acc.bank, to: acc.loan, amount: "500", date: "2026-10-02", note: "EMI" };
+  r = await call("POST", "/api/accounts/transfers", { ...transfer, to: acc.bank });
+  check("POST transfer to the same account is rejected (400)", r.status === 400, r);
+  r = await call("POST", "/api/accounts/transfers", { ...transfer, to: `${tag}-nope` });
+  check("POST transfer to an unknown account is rejected (400)", r.status === 400, r);
+  r = await call("POST", "/api/accounts/transfers", transfer);
+  check("POST transfer creates it (201)", r.status === 201 && r.json?.transfer?.cents === 50000, r);
+  r = await call("PUT", "/api/accounts/transfers", { ...transfer, amount: "600" });
+  check("PUT transfer updates it", r.status === 200 && r.json?.transfer?.cents === 60000, r);
+
+  r = await call("POST", "/api/accounts/adjustments", { id: accIds.adjustment, account: acc.bank, amount: "0", date: "2026-10-03", note: "" });
+  check("POST zero balance update is rejected (400)", r.status === 400, r);
+  r = await call("POST", "/api/accounts/adjustments", { id: accIds.adjustment, account: acc.bank, amount: "-12.34", date: "2026-10-03", note: "fee" });
+  check("POST balance update stores a signed amount", r.status === 201 && r.json?.adjustment?.cents === -1234, r);
+  r = await call("GET", "/api/accounts");
+  check("GET accounts returns transfers and balance updates", r.json?.transfers?.find((t) => t.id === accIds.transfer)?.from === acc.bank && r.json?.adjustments?.some((j) => j.id === accIds.adjustment), r.json?.transfers);
+
+  r = await call("DELETE", "/api/accounts", { id: acc.bank });
+  check("DELETE account with history is rejected (409)", r.status === 409, r);
+  r = await call("PUT", "/api/accounts", { ...bank, opening: "1000.50", closed: true });
+  check("PUT account edits and closes it", r.status === 200 && r.json?.account?.closed === true && r.json.account.opening === 100050, r);
+
+  const backup = await (await fetch(base + "/api/backup")).json();
+  check("Backup includes accounts, transfers and balance updates", backup.accounts?.some((a) => a.id === acc.bank && a.closed) && backup.transfers?.some((t) => t.id === accIds.transfer) && backup.adjustments?.some((j) => j.id === accIds.adjustment));
+  check("Backup keeps expense and income accounts", backup.expenses?.find((e) => e.id === accIds.expense)?.account === acc.cash && backup.income?.find((x) => x.id === accIds.income)?.account === acc.bank);
+  const empty = { app: "pocket", version: 1, exportedAt: "", categories: [], budgets: {}, expenses: [] };
+  r = await call("POST", "/api/backup", { ...empty, transfers: [{ ...backup.transfers.find((t) => t.id === accIds.transfer), to: `${tag}-nope` }] });
+  check("Restore rejects a transfer to an unknown account (400)", r.status === 400 && /Transfer 1/.test(r.json?.error), r);
+  await call("DELETE", "/api/accounts/transfers", { id: accIds.transfer });
+  r = await call("POST", "/api/backup", { ...empty, accounts: backup.accounts.filter((a) => a.id === acc.bank), transfers: backup.transfers.filter((t) => t.id === accIds.transfer) });
+  check("Restore adds the missing transfer and skips the existing account", r.status === 200 && r.json?.transfersAdded === 1 && r.json.accountsAdded === 0, r);
+
+  await call("DELETE", "/api/accounts/transfers", { id: accIds.transfer });
+  await call("DELETE", "/api/accounts/adjustments", { id: accIds.adjustment });
+  await call("DELETE", "/api/expenses", { id: accIds.expense });
+  await call("DELETE", "/api/income", { id: accIds.income });
+  r = await call("DELETE", "/api/accounts", { id: acc.bank });
+  check("DELETE account without history succeeds", r.status === 200, r);
+  for (const id of [acc.cash, acc.loan]) await call("DELETE", "/api/accounts", { id });
+  await call("DELETE", "/api/categories", { name: category });
 }
 
 async function generated() {
@@ -363,10 +434,14 @@ async function cleanup() {
   // Best effort: remove anything left behind if a step failed midway.
   await call("DELETE", "/api/recurring", { id: ruleId }).catch(() => {});
   await call("DELETE", "/api/recurring", { id: `${ruleId}-mg` }).catch(() => {});
+  await call("DELETE", "/api/accounts/transfers", { id: accIds.transfer }).catch(() => {});
+  await call("DELETE", "/api/accounts/adjustments", { id: accIds.adjustment }).catch(() => {});
+  await call("DELETE", "/api/income", { id: accIds.income }).catch(() => {});
   for (const id of incomeIds) await call("DELETE", "/api/income", { id }).catch(() => {});
   const leftovers = await generated().catch(() => []);
-  for (const id of [expenseId, `${expenseId}-m`, ...importIds, ...mergeIds, ...leftovers.map((e) => e.id)]) await call("DELETE", "/api/expenses", { id }).catch(() => {});
+  for (const id of [expenseId, `${expenseId}-m`, ...importIds, ...mergeIds, accIds.expense, ...leftovers.map((e) => e.id)]) await call("DELETE", "/api/expenses", { id }).catch(() => {});
   for (const name of [category, renamed, baseCat, importedCat, recCat, recRenamed, mergeFrom, mergeInto]) await call("DELETE", "/api/categories", { name }).catch(() => {});
+  for (const id of Object.values(acc)) await call("DELETE", "/api/accounts", { id }).catch(() => {});
 }
 
 try {

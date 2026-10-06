@@ -5,13 +5,13 @@ import type {Expense} from '../../lib/expenses.ts';
 import type {Income} from '../../lib/income.ts';
 
 let n = 0;
-const e = (category: string, cents: number, date: string): Expense => ({id: String(n++), category, cents, date, note: '', method: ''});
+const e = (category: string, cents: number, date: string): Expense => ({id: String(n++), category, cents, date, note: '', method: '', account: ''});
 const items = [
   e('Rent', 2000000, '2026-01-01'), e('Rent', 2000000, '2026-02-01'), e('Food', 500000, '2026-02-10'),
   e('Food', 300000, '2026-10-03'), e('Tax', 1000000, '2026-06-30'),
   e('Rent', 1800000, '2025-12-01'), e('Food', 99, '2027-01-01'),
 ];
-const income: Income[] = [{id: 'i', source: 'Salary', cents: 9000000, date: '2026-03-01', note: ''}];
+const income: Income[] = [{id: 'i', source: 'Salary', cents: 9000000, date: '2026-03-01', note: '', account: ''}];
 
 test('totals, previous year change and category shares', () => {
   const r = yearReport(items, income, '2026', '2026-10-06');
