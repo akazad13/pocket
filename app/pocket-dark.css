@@ -94,3 +94,9 @@ html[data-theme=dark] .bar.income-bar.active{background:#7fb0d6}
 html[data-theme=dark] .chart-legend{color:#8d9a91}
 html[data-theme=dark] .chart-legend i{background:#5aa57f}
 html[data-theme=dark] .chart-legend .income-dot{background:#7fb0d6}
+html[data-theme=dark] .zakat-section,html[data-theme=dark] .zakat-due{border-color:#26312b}
+html[data-theme=dark] .zakat-row small{color:#8d9a91}
+html[data-theme=dark] .zakat-row.debt strong{color:#f0a08c}
+html[data-theme=dark] .zakat-result{background:#1f2a22}
+html[data-theme=dark] .zakat-result span{color:#a8b5ac}
+html[data-theme=dark] .zakat-due strong{color:#7fcf98}

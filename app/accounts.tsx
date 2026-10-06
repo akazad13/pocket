@@ -7,6 +7,7 @@ import {Select,SelectTrigger,SelectValue,SelectContent,SelectItem,SelectGroup,Se
 import {money} from '@/lib/format';
 import {UNITS,unitName,qtyText,ACCOUNT_TYPES,GROUPS,typeInfo,isDebt,values,shown,totals,adjustmentFor,type Account,type AccountType,type Transfer,type Adjustment} from '@/lib/accounts';
 import type {Expense} from '@/lib/expenses';
+import Zakat from './zakat';
 import {SAVING_TYPES,LOAN_TYPES,hasTerms,maturity,upcomingMaturities,ratePct,loanInfo} from '@/lib/terms';
 import type {Income} from '@/lib/income';
 type Setter<T>=React.Dispatch<React.SetStateAction<T[]>>;
@@ -72,7 +73,7 @@ export default function Accounts({accounts,transfers,adjustments,items,income,to
  const upcoming=upcomingMaturities(accounts,bal,today),loans=open.filter(a=>LOAN_TYPES.includes(a.type)).map(a=>({a,l:loanInfo(a,bal(a),today)!}));
  const current=detail?byId[detail]:undefined,updating=update?byId[update.id]:undefined;
  return <>
- <section className="panel accounts"><div className="section-heading"><div><h2>Accounts &amp; net worth</h2><p>What you own and owe across cash, banks, savings and loans</p></div><div className="account-actions">{open.length>1&&<button className="text-button" onClick={()=>startMove()}><ArrowLeftRight size={14}/> Transfer</button>}<button className="text-button" onClick={()=>startAccount()}><Plus size={14}/> Add account</button></div></div>
+ <section className="panel accounts"><div className="section-heading"><div><h2>Accounts &amp; net worth</h2><p>What you own and owe across cash, banks, savings and loans</p></div><div className="account-actions">{accounts.length>0&&<Zakat accounts={accounts} shown={bal}/>}{open.length>1&&<button className="text-button" onClick={()=>startMove()}><ArrowLeftRight size={14}/> Transfer</button>}<button className="text-button" onClick={()=>startAccount()}><Plus size={14}/> Add account</button></div></div>
  {!accounts.length?<div className="empty"><span className="empty-icon"><Landmark size={28}/></span><h3>Bring your money together</h3><p>Add cash, bank accounts, DPS, FD, Sanchayapatra, mutual funds and loans to see your net worth.</p><button className="primary" onClick={()=>startAccount()}><Plus size={18}/> Add an account</button></div>:<>
  <div className="income-stats net-worth"><div><small>Assets</small><strong>{money(t.assets)}</strong></div><div><small>Owed</small><strong>{money(t.debts)}</strong></div><div className={t.net<0?'net negative':'net'}><small>Net worth</small><strong>{money(t.net)}</strong></div></div>
  {GROUPS.map(g=>{const xs=open.filter(a=>typeInfo(a.type).group===g.key);return xs.length>0&&<div className="account-group" key={g.key}><h3>{g.label}<span>{money(xs.reduce((s,a)=>s+(v[a.id]??0),0))}</span></h3>{xs.map(row)}</div>;})}

@@ -122,3 +122,16 @@ html[data-private] :is(.matrix td:not(:first-child),.matrix th:last-child){filte
 .chart-legend span{display:inline-flex;align-items:center;gap:6px}
 .chart-legend i{width:9px;height:9px;border-radius:2px;background:#387354}
 .chart-legend .income-dot{background:#4d7fa6}
+.zakat-section{display:grid;gap:10px;border-top:1px solid #edf0e7;padding-top:14px}
+.zakat-section>b{font-size:12px}
+.zakat-row{display:flex;align-items:center;gap:10px;font-size:13px}
+.expense-dialog label.zakat-row{font-weight:400}
+.zakat-row span{flex:1;min-width:0}
+.zakat-row small{display:block;font-size:10px;color:#9aa18f;margin-top:2px}
+.zakat-row strong{font-size:13px;white-space:nowrap}
+.zakat-row.debt strong{color:#a8493b}
+.zakat-result{display:grid;gap:7px;background:#f6f8f2;border-radius:10px;padding:13px 15px;font-size:12px}
+.zakat-result>div{display:flex;justify-content:space-between;gap:10px}
+.zakat-result span{color:#5d6d57}
+.zakat-due{border-top:1px solid #e4e8df;padding-top:9px;margin-top:3px;align-items:baseline}
+.zakat-due strong{font-size:22px;color:#256a53}
