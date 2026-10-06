@@ -380,6 +380,14 @@ async function termsChecks() {
   const restored = r.json?.accounts?.find((x) => x.id === dps.id);
   check("Restore keeps account terms", restored?.rate === 950 && restored.instalment === 500000 && restored.maturityDate === "2030-01-15", restored);
   await call("DELETE", "/api/accounts", { id: dps.id });
+  const gold = { id: `${expenseId}-gold`, name: `${tag} Gold`, type: "gold", opening: "1400000", quantity: "12.5", unit: "vori" };
+  r = await call("POST", "/api/accounts", { ...gold, unit: "katha" });
+  check("POST gold with a land unit is rejected (400)", r.status === 400, r);
+  r = await call("POST", "/api/accounts", gold);
+  check("POST gold saves quantity in thousandths", r.status === 201 && r.json?.account?.quantity === 12500 && r.json.account.unit === "vori", r);
+  r = await call("GET", "/api/accounts");
+  check("GET accounts returns quantity and unit", r.json?.accounts?.find((x) => x.id === gold.id)?.unit === "vori", r.status);
+  await call("DELETE", "/api/accounts", { id: gold.id });
 }
 
 async function generated() {
@@ -497,7 +505,7 @@ async function cleanup() {
   const month = dhakaToday.slice(0, 7);
   await call("DELETE", "/api/income", { id: `rec-${recKinds.income}-${month}` }).catch(() => {});
   await call("DELETE", "/api/accounts/transfers", { id: `rec-${recKinds.transfer}-${month}` }).catch(() => {});
-  for (const id of [recKinds.dps, recKinds.bank, `${expenseId}-terms`]) await call("DELETE", "/api/accounts", { id }).catch(() => {});
+  for (const id of [recKinds.dps, recKinds.bank, `${expenseId}-terms`, `${expenseId}-gold`]) await call("DELETE", "/api/accounts", { id }).catch(() => {});
   await call("DELETE", "/api/accounts/transfers", { id: accIds.transfer }).catch(() => {});
   await call("DELETE", "/api/accounts/adjustments", { id: accIds.adjustment }).catch(() => {});
   await call("DELETE", "/api/income", { id: accIds.income }).catch(() => {});

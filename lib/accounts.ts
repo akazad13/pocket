@@ -1,15 +1,20 @@
 import {isAmount,isDate,type Expense} from './expenses';
 import type {Income} from './income';
 // Pure account logic shared by client and server (no database imports).
-export type AccountType='cash'|'bank'|'wallet'|'dps'|'fd'|'mutual_fund'|'sanchayapatra'|'shares'|'loan_given'|'loan_taken'|'credit_card'|'other';
+export type AccountType='cash'|'bank'|'wallet'|'dps'|'fd'|'mutual_fund'|'sanchayapatra'|'shares'|'gold'|'property'|'loan_given'|'loan_taken'|'credit_card'|'other';
 // Terms (optional, '' / 0 when unset): startDate, maturityDate (end date for loans), rate in basis points (9.5% = 950), instalment in cents per month.
-export type Account={id:string;name:string;type:AccountType;opening:number;note:string;closed:boolean;startDate:string;maturityDate:string;rate:number;instalment:number};
+// Gold and property may record how much is held: quantity in thousandths of `unit` (12.5 vori = 12500).
+export type Account={id:string;name:string;type:AccountType;opening:number;note:string;closed:boolean;startDate:string;maturityDate:string;rate:number;instalment:number;quantity:number;unit:string};
+export const UNITS:Partial<Record<AccountType,{key:string;label:string}[]>>={gold:[{key:'vori',label:'vori (bhori)'},{key:'gram',label:'gram'}],property:[{key:'katha',label:'katha'},{key:'decimal',label:'decimal (shatak)'},{key:'bigha',label:'bigha'},{key:'sqft',label:'sq ft'}]};
+export const unitName=(u:string)=>u==='sqft'?'sq ft':u;
+export const qtyText=(a:Pick<Account,'quantity'|'unit'>)=>a.quantity?`${(a.quantity/1000).toLocaleString('en',{maximumFractionDigits:3})} ${unitName(a.unit)}`:'';
 export type Transfer={id:string;from:string;to:string;cents:number;date:string;note:string};
 export type Adjustment={id:string;account:string;cents:number;date:string;note:string};
-export const GROUPS=[{key:'money',label:'Cash & bank'},{key:'invest',label:'Savings & investments'},{key:'loan',label:'Loans & credit'},{key:'other',label:'Other'}] as const;
+export const GROUPS=[{key:'money',label:'Cash & bank'},{key:'invest',label:'Savings & investments'},{key:'assets',label:'Gold & property'},{key:'loan',label:'Loans & credit'},{key:'other',label:'Other'}] as const;
 export const ACCOUNT_TYPES:{key:AccountType;label:string;group:typeof GROUPS[number]['key'];debt?:true}[]=[
  {key:'cash',label:'Cash',group:'money'},{key:'bank',label:'Bank account',group:'money'},{key:'wallet',label:'Mobile wallet',group:'money'},
  {key:'dps',label:'DPS',group:'invest'},{key:'fd',label:'Fixed deposit (FD)',group:'invest'},{key:'mutual_fund',label:'Mutual fund',group:'invest'},{key:'sanchayapatra',label:'Sanchayapatra',group:'invest'},{key:'shares',label:'Shares',group:'invest'},
+ {key:'gold',label:'Gold',group:'assets'},{key:'property',label:'Land & property',group:'assets'},
  {key:'loan_given',label:'Loan given',group:'loan'},{key:'loan_taken',label:'Loan taken',group:'loan',debt:true},{key:'credit_card',label:'Credit card',group:'loan',debt:true},
  {key:'other',label:'Other',group:'other'}];
 export const typeInfo=(t:AccountType)=>ACCOUNT_TYPES.find(x=>x.key===t)??ACCOUNT_TYPES[ACCOUNT_TYPES.length-1];
@@ -26,7 +31,10 @@ export function validateAccount(p:Record<string,unknown>):Account{
  if(startDate&&maturityDate&&maturityDate<startDate)throw Error('The maturity or end date must be after the start date.');
  const rate=p.rate===undefined||p.rate===''?'0':p.rate;if(typeof rate!=='string'||! /^\d{1,2}(\.\d{1,2})?$/.test(rate))throw Error('Enter the rate as a yearly percentage, like 9.5.');
  const instalment=p.instalment===undefined||p.instalment===''?'0':p.instalment;if(typeof instalment!=='string'||! /^\d{1,9}(\.\d{1,2})?$/.test(instalment))throw Error('Enter the monthly instalment as an amount with up to two decimal places.');
- return {id:p.id,name,type:p.type as AccountType,opening:Math.round(Number(opening)*100),note:note(p.note),closed:p.closed===true,startDate,maturityDate,rate:Math.round(Number(rate)*100),instalment:Math.round(Number(instalment)*100)};
+ const units=UNITS[p.type as AccountType],quantity=p.quantity===undefined||p.quantity===''?'0':p.quantity,unit=p.unit===undefined?'':p.unit;
+ if(typeof quantity!=='string'||! /^\d{1,7}(\.\d{1,3})?$/.test(quantity))throw Error('Enter the quantity with up to three decimal places.');
+ const q=Math.round(Number(quantity)*1000);if(q&&(!units||!units.some(u=>u.key===unit)))throw Error('Choose a unit for the quantity.');
+ return {id:p.id,name,type:p.type as AccountType,opening:Math.round(Number(opening)*100),note:note(p.note),closed:p.closed===true,startDate,maturityDate,rate:Math.round(Number(rate)*100),instalment:Math.round(Number(instalment)*100),quantity:q,unit:q?unit as string:''};
 }
 export function validateTransfer(p:Record<string,unknown>):Transfer{
  if(typeof p.id!=='string'||!ID.test(p.id))throw Error('Invalid transfer ID.');

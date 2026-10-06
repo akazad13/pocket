@@ -1,6 +1,6 @@
 import {database} from './database';
 import type {Account} from './accounts';
-export const ACCOUNT_SELECT='SELECT id, name, type, opening, note, closed, start_date AS startDate, maturity_date AS maturityDate, rate, instalment FROM accounts';
+export const ACCOUNT_SELECT='SELECT id, name, type, opening, note, closed, start_date AS startDate, maturity_date AS maturityDate, rate, instalment, quantity, unit FROM accounts';
 export const TRANSFER_SELECT='SELECT id, from_account AS "from", to_account AS "to", cents, date, note FROM transfers';
 export const ADJUSTMENT_SELECT='SELECT id, account, cents, date, note FROM adjustments';
 export type AccountRow=Omit<Account,'closed'>&{closed:number};

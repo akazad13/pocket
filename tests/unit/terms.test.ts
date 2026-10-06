@@ -3,7 +3,7 @@ import assert from 'node:assert/strict';
 import {monthsBetween, maturity, upcomingMaturities, ratePct, loanInfo} from '../../lib/terms.ts';
 import type {Account} from '../../lib/accounts.ts';
 
-const acc = (patch: Partial<Account>): Account => ({id: 'a', name: 'a', type: 'fd', opening: 0, note: '', closed: false, startDate: '', maturityDate: '', rate: 0, instalment: 0, ...patch});
+const acc = (patch: Partial<Account>): Account => ({id: 'a', name: 'a', type: 'fd', opening: 0, note: '', closed: false, startDate: '', maturityDate: '', rate: 0, instalment: 0, quantity: 0, unit: '', ...patch});
 
 test('monthsBetween counts whole months', () => {
   assert.equal(monthsBetween('2026-10-06', '2027-10-06'), 12);
