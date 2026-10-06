@@ -130,3 +130,5 @@ html[data-theme=dark] .upcoming-icon{background:#24302a;color:#94b886}
 html[data-theme=dark] .upcoming-icon.in{background:#1f3326;color:#7fcf98}
 html[data-theme=dark] .upcoming-icon.out{background:#33291f;color:#d9ab78}
 html[data-theme=dark] .upcoming-icon.move{background:#222b33;color:#9db4c8}
+html[data-theme=dark] :is(.taxyear-grid h3,.taxyear-row){border-color:#26312b}
+html[data-theme=dark] .taxyear-row small{color:#8d9a91}

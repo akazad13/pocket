@@ -29,6 +29,7 @@ Git: `main` branch, LF line endings enforced by `.gitattributes`. The folder is 
 ```
 app/tracker.tsx            Main UI: one "use client" component (~80 very long lines). All state and fetches, summary cards, the Add split button/menu, tabs (Overview, Transactions, Accounts, Reports), expense dialog, and the top-level income and transfer dialogs.
 app/bills.tsx              Bills panel on Overview; bills state lives in tracker (shared with the forecast). Pay posts an expense then PUTs the bill's paidMonth.
+app/taxyear.tsx            Reports > Tax year (July-June) summary and CSV.
 app/upcoming.tsx           "Next 30 days" panel (items from lib/forecast.ts, computed in tracker; tracker also loads /api/recurring for it).
 app/goals.tsx              Savings goals panel + dialog on Overview (self-contained, fetches /api/goals, refetches on `version`).
 app/budgets.tsx            Budgets panel + edit dialog (self-contained, fetches /api/budgets).
@@ -75,6 +76,7 @@ lib/yearly.ts              Pure year-in-review numbers (totals, average, ranked 
 lib/accounts.ts            Pure: account types/groups, validators, values() balances, totals(), adjustmentFor(). Client-safe.
 lib/terms.ts               Pure: SAVING_TYPES/LOAN_TYPES, monthsBetween(), maturity() estimates, upcomingMaturities(), loanInfo() (interest split, payoff, next due), ratePct().
 lib/networth.ts            Pure: lastMonths(), netWorthSeries() (totals at each month end from dated history).
+lib/taxyear.ts             Pure: taxYearOf(), taxYearLabel(), taxYearRange(), taxYearSummary().
 lib/forecast.ts            Pure: upcoming() items from rules, bills, loan EMIs, maturities; forecastTotals().
 lib/bills.ts               Pure: Bill type, validateBill(), billStatus(), sortBills().
 lib/goals.ts               Pure: Goal type, validateGoal(), goalProgress().

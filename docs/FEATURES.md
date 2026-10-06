@@ -52,6 +52,7 @@ Keep this file current: move an idea to "Implemented" when it ships.
 | Transfers | Move money between any two accounts (e.g. bank to cash, or an EMI from bank to a loan or card). Edit or delete with Undo from the activity list or account history. `/api/accounts/transfers`. |
 | Balance updates | Set a new balance or amount owed for interest, profit, fees or a new market value; the difference is stored as a signed adjustment. Deletable with Undo. `/api/accounts/adjustments`. |
 | Linked expenses and income | Expenses have an optional "Paid from" account and income an optional "Received in" account; both change that account's balance. New entries default to the most recently used open account. Unlinked entries never affect balances. |
+| Reports: tax year | Bangladesh tax year (1 July to 30 June) with previous/next: total income and income by source, money invested (transfers into DPS, FD, Sanchayapatra, shares and mutual funds from other accounts), tax paid (the "Tax" category) and total spent, plus a CSV download. No tax rules are applied; a note points to the current NBR rules. `app/taxyear.tsx`, `lib/taxyear.ts` (unit tested). |
 | CSV export | Downloads `pocket-<year>.csv` with the category-by-month totals table. |
 | Backup and restore | "Backup & restore" dialog: download a full JSON backup (categories, budgets, recurring rules, expenses), export every expense as CSV, and restore from a backup (accounts, transfers, balance updates, goals and bills included). Restore only adds what is missing (expenses by ID, categories case-insensitively, budgets for categories without one) and never changes or deletes data. The whole file is validated before anything is written. Tested with 6,000 expenses. `app/backup.tsx`, `/api/backup`. |
 | Recurring items | "Recurring" dialog to add, edit and stop monthly rules of three kinds: expenses (category, optional Paid from account), income (source, optional Received in account) and transfers between two accounts (e.g. DPS instalment, loan EMI). Each has an amount, day 1 to 31, note and start month. Due occurrences are added automatically before expenses, income or accounts load, catching up missed months; day 29 to 31 falls on the last day of shorter months. Generated entries show a repeat icon and behave like normal ones; deleting one does not bring it back. Edits apply to months not yet added. Categories and accounts used by a rule cannot be deleted. Included in backups. `app/recurring.tsx`, `/api/recurring`, `lib/rules.ts` (unit tested), `lib/recurring.ts`. |
@@ -87,7 +88,6 @@ Proposed, not yet prioritised. Size: S = under an hour, M = a few hours, L = a d
 
 | # | Idea | Why | Size |
 |---|---|---|---|
-| 23 | **Tax-year view** (July to June) with income totals and investment rebate helpers (Sanchayapatra, DPS, life insurance) | Tax return prep | M |
 | 13 | **Receipt photo attachment** stored in R2 | Proof for medical, tax, and business expenses | L |
 | 14 | **Installable PWA** with offline entry queued until online | Feels like a native phone app | L |
 

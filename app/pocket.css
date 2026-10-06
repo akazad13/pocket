@@ -206,3 +206,15 @@ html[data-private] :is(.matrix td:not(:first-child),.matrix th:last-child){filte
 .upcoming-icon.out{background:#fbf2e9;color:#b07a3e}
 .upcoming-icon.move{background:#eef1f4;color:#4d6478}
 @media(max-width:600px){.upcoming{margin-top:15px}.upcoming-icon{display:none}.upcoming-row{gap:8px}}
+.taxyear-nav{display:flex;gap:4px}
+.taxyear .income-stats{grid-template-columns:repeat(auto-fit,minmax(150px,1fr))}
+.taxyear-grid{display:grid;grid-template-columns:1fr 1fr;gap:24px;margin:18px 0 14px}
+.taxyear-grid h3{font-size:12px;font-weight:600;padding-bottom:8px;border-bottom:1px solid #edf0e7}
+.taxyear-row{display:flex;justify-content:space-between;gap:10px;padding:9px 0;border-bottom:1px solid #f1f3ec;font-size:13px}
+.taxyear-row span{min-width:0}
+.taxyear-row small{display:block;font-size:10px;color:#9aa18f;margin-top:2px}
+.taxyear-row b{font-weight:600;white-space:nowrap}
+.taxyear .quiet-empty{padding:14px 0 6px}
+.taxyear>.text-button{margin-top:10px}
+@media(max-width:800px){.taxyear-grid{grid-template-columns:1fr}}
+.text-button>svg{display:inline-block;vertical-align:-2px;margin-right:4px}
