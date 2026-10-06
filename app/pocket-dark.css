@@ -110,3 +110,6 @@ html[data-theme=dark] .networth-axis{color:#8d9a91}
 html[data-theme=dark] .networth-table summary{color:#8fc5a2}
 html[data-theme=dark] .networth-table :is(th,td){border-color:#26312b}
 html[data-theme=dark] .networth-table th{color:#8d9a91}
+html[data-theme=dark] :is(.goal-label span,.goal-status){color:#8d9a91}
+html[data-theme=dark] .goal-status.late{color:#f0a08c}
+html[data-theme=dark] .budget-fill.done{background:#2fa872}

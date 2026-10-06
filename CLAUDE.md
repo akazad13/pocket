@@ -12,7 +12,7 @@ The project was scaffolded by the OpenAI "Sites" starter (`site-creator-vinext-s
 | Dev server | `npm run dev` | http://127.0.0.1:5173/ . Long-running: start with `run_in_background`. Uses local D1 in `.wrangler/state`. |
 | Typecheck | `npm run typecheck` | ~10s. Passes clean. **Primary verification step.** |
 | Unit tests | `npm run test:unit` | ~1s. `node:test` on TypeScript via `--experimental-strip-types`; files `tests/unit/*.test.ts`. For pure logic in `lib/` (no `cloudflare:workers` imports). Test files import with `.ts` extensions; `tests/unit/register.mjs` resolves extensionless imports inside `lib/`. |
-| Smoke test | `npm run smoke` | Needs `npm run dev` running. 146 API checks (CRUD, validation, rename cascade, origin check). Uses unique `Smoke ...` names and cleans up. Run after any change to `app/api/` or `lib/`. |
+| Smoke test | `npm run smoke` | Needs `npm run dev` running. 155 API checks (CRUD, validation, rename cascade, origin check). Uses unique `Smoke ...` names and cleans up. Run after any change to `app/api/` or `lib/`. |
 | Lint | `npm run lint` | ~60s. Clean (0 errors); keep it that way. The React Compiler rule forbids synchronous setState inside effects: set state only after an `await`. |
 | Build | `npm run build` | Outputs `dist/` (Worker + client). |
 | Run built app | `npm start` | wrangler dev against `dist/server/wrangler.json`. |
@@ -28,6 +28,7 @@ Git: `main` branch, LF line endings enforced by `.gitattributes`. The folder is 
 
 ```
 app/tracker.tsx            Main UI: one "use client" component (~80 very long lines). All state and fetches, summary cards, the Add split button/menu, tabs (Overview, Transactions, Accounts, Reports), expense dialog, and the top-level income and transfer dialogs.
+app/goals.tsx              Savings goals panel + dialog on Overview (self-contained, fetches /api/goals, refetches on `version`).
 app/budgets.tsx            Budgets panel + edit dialog (self-contained, fetches /api/budgets).
 app/recurring.tsx          Recurring rules dialog (list/add/edit/stop) for expense, income and transfer rules.
 app/income.tsx             IncomePanel (Overview), IncomeDialog (keyed per opening), IncomeRow, deleteIncome(); income state lives in tracker.
@@ -53,6 +54,7 @@ app/api/budgets/route.ts   GET {budgets:{name:cents}}, PUT {budgets:{name:amount
 app/api/backup/route.ts    GET full JSON backup (attachment); POST merge-only restore.
 app/api/income/route.ts    GET, POST, PUT, DELETE {id}; same pattern as expenses (no category).
 app/api/recurring/route.ts GET rules, POST create, PUT edit (not start month), DELETE {id}. Checks accounts exist.
+app/api/goals/route.ts     GET, POST, PUT, DELETE {id}; checks linked accounts exist.
 app/api/accounts/route.ts  GET {accounts, transfers, adjustments}, POST, PUT (edit/close), DELETE {id} (409 if it has history).
 app/api/accounts/transfers/route.ts POST, PUT, DELETE {id}.
 app/api/accounts/adjustments/route.ts POST {amount: signed value change}, DELETE {id}.
@@ -70,9 +72,10 @@ lib/yearly.ts              Pure year-in-review numbers (totals, average, ranked 
 lib/accounts.ts            Pure: account types/groups, validators, values() balances, totals(), adjustmentFor(). Client-safe.
 lib/terms.ts               Pure: SAVING_TYPES/LOAN_TYPES, monthsBetween(), maturity() estimates, upcomingMaturities(), loanInfo() (interest split, payoff, next due), ratePct().
 lib/networth.ts            Pure: lastMonths(), netWorthSeries() (totals at each month end from dated history).
+lib/goals.ts               Pure: Goal type, validateGoal(), goalProgress().
 lib/zakat.ts               Pure: nisab, default counted types, debts due within a year, zakat() total.
 lib/activity.ts            Pure: merges expenses, income and transfers into one filtered list (Transactions tab, Recent activity); flows() totals.
-lib/account-db.ts          Server-only: SELECT strings, toAccount(), missingAccount() existence check.
+lib/account-db.ts          Server-only: SELECT strings, toAccount(), toGoal(), missingAccount() existence check. Keep helpers here, not exported from route files.
 lib/theme-script.ts        Inline <head> script that sets data-theme before paint (kept out of the client module so the server layout gets the string).
 lib/category-style.ts      PALETTE, ICONS, validateStyle(), colorFor() fallback colour by position.
 lib/quick.ts               Pure quick-add suggestions (frequent recent expenses).
@@ -80,7 +83,7 @@ lib/filter.ts              Pure expense filtering (text, category, date range, a
 lib/months.ts              Pure month helpers (nextMonth, occurrenceDate) safe for client and server.
 lib/database.ts            database(): returns raw env.DB (D1Database); jsonChunks() for bulk json_each inserts.
 db/schema.ts               Drizzle table definitions (source of truth for migrations only).
-drizzle/*.sql              Generated migrations 0000..0011.
+drizzle/*.sql              Generated migrations 0000..0012.
 docs/FEATURES.md           Implemented features, known limitations, feature ideas backlog. Read before planning new work; update when a feature ships.
 tests/smoke.mjs            API smoke test (plain Node fetch, no dependencies).
 tests/unit/*.test.ts       Unit tests for pure lib/ modules.
@@ -99,6 +102,7 @@ Tables (SQLite/D1):
 - `budgets(category text pk, cents integer)`: monthly budget per category display name.
 - `income(id text pk, source text, cents integer, date text, note text, account text default '')`: money in; independent of categories; optional account id.
 - `accounts(id text pk, name, type, opening integer, note, closed integer 0/1, start_date, maturity_date, rate integer basis points, instalment integer cents, quantity integer, unit)`: terms are optional ('' / 0) and used by savings (maturity) and loans (end date, EMI). `quantity integer` (thousandths) and `unit` ('vori'|'gram'|'katha'|'decimal'|'bigha'|'sqft', from `UNITS`) record holdings for gold and property. `type` from `ACCOUNT_TYPES` in `lib/accounts.ts`. `opening` is the starting balance, or the amount owed for debt types (`loan_taken`, `credit_card`). Names unique case-insensitively (checked in the route).
+- `goals(id text pk, name, target integer cents, target_date '', accounts text JSON array of account ids, saved integer, note)`: progress = linked accounts' shown balances, else `saved`.
 - `transfers(id text pk, from_account, to_account, cents > 0, date, note)` and `adjustments(id text pk, account, cents signed, date, note)`.
 - Balances are computed, never stored: value = ±opening + income − expenses + transfers in − out + adjustments, with debts negative (`values()`); the UI shows debts as a positive amount owed (`shown()`). Adjustment cents are the signed change in net-worth value. Accounts with any linked row cannot be deleted (409), only closed.
 - `recurring(id text pk, kind 'expense'|'income'|'transfer', category, source, account, to_account, cents, day 1-31, note, start_month 'YYYY-MM', last_month nullable)`: monthly rules. Expense rules use `category` (+ optional `account` paid from); income rules use `source` (+ optional `account` received in); transfer rules use `account` → `to_account`. Unused fields are ''. `last_month` is the last month generated.

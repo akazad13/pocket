@@ -15,3 +15,5 @@ export const accounts=sqliteTable('accounts',{id:text('id').primaryKey(),name:te
 export const transfers=sqliteTable('transfers',{id:text('id').primaryKey(),fromAccount:text('from_account').notNull(),toAccount:text('to_account').notNull(),cents:integer('cents').notNull(),date:text('date').notNull(),note:text('note').notNull().default('')});
 // Signed change in an account's net-worth value (e.g. interest, market value updates).
 export const adjustments=sqliteTable('adjustments',{id:text('id').primaryKey(),account:text('account').notNull(),cents:integer('cents').notNull(),date:text('date').notNull(),note:text('note').notNull().default('')});
+// Savings goals: target in cents, optional target date, linked account ids (JSON array) or a manual saved amount.
+export const goals=sqliteTable('goals',{id:text('id').primaryKey(),name:text('name').notNull(),target:integer('target').notNull(),targetDate:text('target_date').notNull().default(''),accounts:text('accounts').notNull().default('[]'),saved:integer('saved').notNull().default(0),note:text('note').notNull().default('')});

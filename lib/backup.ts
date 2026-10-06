@@ -4,9 +4,10 @@ import {validateRule,type Rule} from './rules';
 import {validateIncome,type Income} from './income';
 import {validateStyle,type Styles} from './category-style';
 import {validateAccount,validateTransfer,validateAdjustment,type Account,type Transfer,type Adjustment} from './accounts';
+import {validateGoal,type Goal} from './goals';
 export const BACKUP_VERSION=1;
 export const MAX_IMPORT_EXPENSES=20000;
-export type Backup={app:'pocket';version:number;exportedAt:string;categories:string[];budgets:Record<string,number>;expenses:Expense[];recurring?:Rule[];income?:Income[];styles?:Styles;accounts?:Account[];transfers?:Transfer[];adjustments?:Adjustment[]};
+export type Backup={app:'pocket';version:number;exportedAt:string;categories:string[];budgets:Record<string,number>;expenses:Expense[];recurring?:Rule[];income?:Income[];styles?:Styles;accounts?:Account[];transfers?:Transfer[];adjustments?:Adjustment[];goals?:Goal[]};
 const validCents=(v:unknown):v is number=>Number.isInteger(v)&&(v as number)>0&&(v as number)<=99999999999;
 // Validates a parsed backup and maps its category names onto existing ones (case-insensitive).
 // Throws Error with a user-facing message on the first problem; nothing is written on failure.
@@ -20,7 +21,7 @@ export function prepareImport(raw:unknown,existing:string[],existingAccounts:str
  const byKey=new Map(existing.map(n=>[n.toLowerCase(),n]));const newCategories:string[]=[];
  const resolve=(value:unknown)=>{const name=categoryName(value),key=name.toLowerCase();if(!byKey.has(key)){byKey.set(key,name);newCategories.push(name);}return byKey.get(key)!;};
  b.categories.forEach((c,i)=>{try{resolve(c);}catch(e){throw Error(`Category ${i+1}: ${(e as Error).message}`);}});
- for(const k of ['accounts','transfers','adjustments'] as const)if(b[k]!==undefined&&!Array.isArray(b[k]))throw Error('This backup is incomplete.');
+ for(const k of ['accounts','transfers','adjustments','goals'] as const)if(b[k]!==undefined&&!Array.isArray(b[k]))throw Error('This backup is incomplete.');
  const accountIds=new Set(existingAccounts),linked=(id:string)=>{if(id&&!accountIds.has(id))throw Error('Its account is not in this backup.');return id;};
  const accounts=(b.accounts??[]).map((a,i)=>{try{
   if(!a||typeof a!=='object'||!Number.isInteger(a.opening)||a.opening<0||a.opening>99999999999)throw Error('Invalid starting balance.');
@@ -54,5 +55,9 @@ export function prepareImport(raw:unknown,existing:string[],existingAccounts:str
  if(expenses.length+income.length+transfers.length+adjustments.length>MAX_IMPORT_EXPENSES)throw Error(`Backups can contain at most ${MAX_IMPORT_EXPENSES} entries.`);
  if(b.styles!==undefined&&(!b.styles||typeof b.styles!=='object'||Array.isArray(b.styles)))throw Error('This backup is incomplete.');
  const styles=Object.entries(b.styles??{}).map(([c,s])=>{try{return {key:resolve(c).toLowerCase(),...validateStyle(s??{})};}catch(err){throw Error(`Style for ${c}: ${(err as Error).message}`);}});
- return {newCategories,expenses,budgets,recurring,income,styles,accounts,transfers,adjustments};
+ const goals=(b.goals??[]).map((g,i)=>{try{
+  if(!g||typeof g!=='object'||!validCents(g.target)||(g.saved!==undefined&&(!Number.isInteger(g.saved)||g.saved<0||g.saved>99999999999)))throw Error('Invalid amount.');
+  const v=validateGoal({...g,target:(g.target/100).toFixed(2),saved:g.saved?(g.saved/100).toFixed(2):''});v.accounts.forEach(linked);return v;
+ }catch(err){throw Error(`Goal ${i+1}: ${(err as Error).message}`);}});
+ return {newCategories,expenses,budgets,recurring,income,styles,accounts,transfers,adjustments,goals};
 }

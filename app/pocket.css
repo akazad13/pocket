@@ -157,3 +157,16 @@ html[data-private] :is(.matrix td:not(:first-child),.matrix th:last-child){filte
 .networth-table th{font-weight:600;color:#7a8873;font-size:11px}
 .networth .field-hint{margin-top:10px}
 .networth-table{overflow-x:auto}@media(max-width:600px){.networth-table table{font-size:11px}.networth-table :is(th,td){padding:6px 3px}}
+.goals{margin-top:20px}
+.goal-list{display:grid;gap:16px;margin-top:18px}
+.goal-row{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:7px 10px;align-items:center}
+.goal-label{display:flex;justify-content:space-between;gap:10px;font-size:12px;grid-column:1}
+.goal-label b{font-weight:500}
+.goal-label span{color:#7a8873;white-space:nowrap}
+.goal-row .budget-bar{grid-column:1}
+.goal-row .icon-button{grid-column:2;grid-row:1/4}
+.goal-status{grid-column:1;font-size:11px;color:#7a8873}
+.goal-status.late{color:#a8493b}
+.budget-fill.done{background:#13805a}
+@media(max-width:600px){.goals{margin-top:15px}}
+.section-heading>.text-button{display:inline-flex;align-items:center;gap:5px}

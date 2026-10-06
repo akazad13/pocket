@@ -183,6 +183,7 @@ async function run() {
   await accountChecks();
   await recurringKindChecks();
   await termsChecks();
+  await goalChecks();
 }
 
 async function incomeChecks() {
@@ -390,6 +391,32 @@ async function termsChecks() {
   await call("DELETE", "/api/accounts", { id: gold.id });
 }
 
+async function goalChecks() {
+  const bankId = `${expenseId}-goal-bank`, goalId = `${expenseId}-goal`;
+  await call("POST", "/api/accounts", { id: bankId, name: `${tag} Goal bank`, type: "bank", opening: "1000" });
+  const goal = { id: goalId, name: `${tag} Hajj`, target: "600000", targetDate: "2028-01-01", accounts: [bankId], note: "" };
+  let r = await call("POST", "/api/goals", { ...goal, target: "0" });
+  check("POST goal without a target is rejected (400)", r.status === 400, r);
+  r = await call("POST", "/api/goals", { ...goal, accounts: [`${tag}-nope`] });
+  check("POST goal linked to an unknown account is rejected (400)", r.status === 400, r);
+  r = await call("POST", "/api/goals", goal, { Origin: "http://evil.example" });
+  check("POST goal from a foreign origin is rejected (403)", r.status === 403, r);
+  r = await call("POST", "/api/goals", goal);
+  check("POST goal creates it", r.status === 201 && r.json?.goal?.target === 60000000 && r.json.goal.accounts[0] === bankId, r);
+  r = await call("GET", "/api/goals");
+  check("GET goals returns linked accounts as a list", r.json?.goals?.find((g) => g.id === goalId)?.accounts?.[0] === bankId, r.status);
+  r = await call("PUT", "/api/goals", { ...goal, accounts: [], saved: "2500" });
+  check("PUT goal switches to a manual saved amount", r.status === 200 && r.json?.goal?.saved === 250000 && r.json.goal.accounts.length === 0, r);
+  const backup = await (await fetch(base + "/api/backup")).json();
+  check("Backup includes goals", backup.goals?.some((g) => g.id === goalId));
+  await call("DELETE", "/api/goals", { id: goalId });
+  r = await call("POST", "/api/backup", { app: "pocket", version: 1, exportedAt: "", categories: [], budgets: {}, expenses: [], goals: backup.goals.filter((g) => g.id === goalId) });
+  check("Restore adds the goal", r.status === 200 && r.json?.goalsAdded === 1, r);
+  r = await call("DELETE", "/api/goals", { id: goalId });
+  check("DELETE goal succeeds", r.status === 200, r);
+  await call("DELETE", "/api/accounts", { id: bankId });
+}
+
 async function generated() {
   const { json } = await call("GET", "/api/expenses");
   return json.expenses.filter((e) => e.id.startsWith(`rec-${ruleId}-`));
@@ -505,7 +532,8 @@ async function cleanup() {
   const month = dhakaToday.slice(0, 7);
   await call("DELETE", "/api/income", { id: `rec-${recKinds.income}-${month}` }).catch(() => {});
   await call("DELETE", "/api/accounts/transfers", { id: `rec-${recKinds.transfer}-${month}` }).catch(() => {});
-  for (const id of [recKinds.dps, recKinds.bank, `${expenseId}-terms`, `${expenseId}-gold`]) await call("DELETE", "/api/accounts", { id }).catch(() => {});
+  await call("DELETE", "/api/goals", { id: `${expenseId}-goal` }).catch(() => {});
+  for (const id of [recKinds.dps, recKinds.bank, `${expenseId}-terms`, `${expenseId}-gold`, `${expenseId}-goal-bank`]) await call("DELETE", "/api/accounts", { id }).catch(() => {});
   await call("DELETE", "/api/accounts/transfers", { id: accIds.transfer }).catch(() => {});
   await call("DELETE", "/api/accounts/adjustments", { id: accIds.adjustment }).catch(() => {});
   await call("DELETE", "/api/income", { id: accIds.income }).catch(() => {});
