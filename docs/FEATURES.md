@@ -57,6 +57,7 @@ Keep this file current: move an idea to "Implemented" when it ships.
 ### Platform and quality
 | Feature | Details |
 |---|---|
+| Privacy mode | Eye button in the header hides every amount (shown as BDT ••••; the monthly table is blurred) so the app can be used in public. Remembered on this device. `app/privacy.tsx`, `lib/format.ts`. |
 | Storage | Cloudflare D1 (SQLite); amounts stored as integer cents. Local dev persists in `.wrangler/state`. |
 | Dark mode | Theme switch in the top bar cycles System, Light and Dark (saved per browser). System follows the OS live. Applied before first paint, so no flash. Toasts follow the theme. | `app/theme.tsx`, `app/pocket-dark.css`, `lib/theme-script.ts` |
 | Mobile-first layout | Responsive at 1180 / 800 / 600px breakpoints; checked at 390px. |
@@ -87,7 +88,6 @@ Proposed, not yet prioritised. Size: S = under an hour, M = a few hours, L = a d
 | 23 | **Tax-year view** (July to June) with income totals and investment rebate helpers (Sanchayapatra, DPS, life insurance) | Tax return prep | M |
 | 24 | **Gold and property** as assets with units (vori/gram, decimal) and a manual price | Common store of value not covered by account types | S |
 | 25 | **Income vs spending chart** on Overview (two bars per month) | The current chart shows spending only | S |
-| 26 | **Privacy mode**: one tap blurs all amounts | Use the app in public | S |
 | 27 | **Cash-flow forecast** for the next 30 days from recurring items and bills | Know if the month will be tight before it is | M |
 | 13 | **Receipt photo attachment** stored in R2 | Proof for medical, tax, and business expenses | L |
 | 14 | **Installable PWA** with offline entry queued until online | Feels like a native phone app | L |

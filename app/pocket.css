@@ -112,3 +112,4 @@ body{background:#f8f9f6;color:#22382e;font-family:Arial,Helvetica,sans-serif}but
 .terms-warning{color:#a8493b}
 .loan-progress{display:grid;gap:5px;margin-top:2px}
 .loan-bar{height:5px;margin-top:7px;max-width:260px}
+html[data-private] :is(.matrix td:not(:first-child),.matrix th:last-child){filter:blur(6px)}

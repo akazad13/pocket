@@ -40,6 +40,7 @@ app/page.tsx               Re-exports tracker.
 app/layout.tsx             Metadata, imports globals.css + pocket.css.
 app/pocket-dark.css        Dark theme overrides (html[data-theme=dark]); shadcn tokens + every hardcoded app colour.
 app/theme.tsx              ThemeToggle + useTheme() (useSyncExternalStore over localStorage 'pocket-theme').
+app/privacy.tsx            PrivacyToggle + usePrivacy() ('pocket-private'); masks money() output and sets html[data-private] for CSS blurs.
 app/pocket.css             All app styling (minified-style, plain class names, 3 breakpoints: 1180/800/600px).
 app/globals.css            Tailwind v4 + shadcn theme tokens. pocket.css overrides tokens in :root.
 app/api/expenses/route.ts  GET list, POST create, PUT update, DELETE {id}.
@@ -56,7 +57,7 @@ app/api/accounts/adjustments/route.ts POST {amount: signed value change}, DELETE
 lib/expenses.ts            Default 26 category names, Expense type, validateExpense(), shared isAmount()/isDate() validators.
 lib/categories.ts          getCategories() (lazy-seeds defaults once), categoryName() validator.
 lib/budgets.ts             getBudgets(), budgetCents() validator.
-lib/format.ts              money() BDT formatter shared by components.
+lib/format.ts              money() BDT formatter shared by components; masked while privacy mode is on. New plain-number displays need an html[data-private] blur rule.
 lib/csv.ts                 toCsv() (formula-injection safe) and download() helpers.
 lib/backup.ts              Backup type, prepareImport() validation/category mapping.
 lib/recurring.ts           Server-only: RULE_SELECT, applyRecurring() (inserts due rows into expenses, income, transfers), dhakaToday().
