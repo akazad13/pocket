@@ -48,6 +48,7 @@ Keep this file current: move an idea to "Implemented" when it ships.
 | Loans and EMIs | Loan taken and loan given accounts take optional terms: started on, last instalment date, interest rate and monthly EMI. A "Loans" panel on Accounts shows what is left, the EMI, the next due date (the start date's day each month), a repaid bar against the starting amount and the estimated payoff month. The account detail splits the next instalment into interest and principal, compares the payoff estimate with the schedule and warns when the EMI does not cover the interest. "Make a payment" (or "Record a repayment" for money lent) pre-fills the EMI. `lib/terms.ts` `loanInfo()` (unit tested). |
 | Gold and property | "Gold" and "Land & property" account types (group Gold & property) with an optional quantity and unit: vori or gram for gold; katha, decimal, bigha or sq ft for land. Rows show the quantity; the detail shows the implied price per unit. Update balance takes today's price per unit and works out the new value. |
 | Zakat calculator | "Zakat" on the Accounts tab. Nisab from silver (52.5 vori) or gold (7.5 vori) at a price per vori you enter (remembered on this device). Counts cash, bank, wallet, savings, investments, gold and money lent by default (tick or untick any account; property is opt-in), optionally subtracts debts due within a year (credit card balance, up to 12 loan EMIs), and shows 2.5% of the net when it reaches the nisab. Labelled as a guide. `app/zakat.tsx`, `lib/zakat.ts` (unit tested). |
+| Net worth over time | Accounts tab line chart of net worth at each month end for the last 12 months, rebuilt from dated entries, transfers and balance updates, with the change this month and over the year, hover/focus tooltips (own, owe, net) and a "Show numbers" table. Starting balances count from the beginning. `app/networth.tsx`, `lib/networth.ts` (unit tested). |
 | Transfers | Move money between any two accounts (e.g. bank to cash, or an EMI from bank to a loan or card). Edit or delete with Undo from the activity list or account history. `/api/accounts/transfers`. |
 | Balance updates | Set a new balance or amount owed for interest, profit, fees or a new market value; the difference is stored as a signed adjustment. Deletable with Undo. `/api/accounts/adjustments`. |
 | Linked expenses and income | Expenses have an optional "Paid from" account and income an optional "Received in" account; both change that account's balance. New entries default to the most recently used open account. Unlinked entries never affect balances. |
@@ -71,7 +72,7 @@ Keep this file current: move an idea to "Implemented" when it ships.
 
 ## Known limitations
 These are the gaps the ideas below address.
-- Account balances are all-time totals; there is no balance-over-time chart or balance on a past date.
+- Starting balances have no date, so net worth history before you began tracking shows those balances.
 - The all-expenses CSV does not include the account.
 - Restore cannot import CSV files from other apps or banks (JSON backups only).
 - All expenses are loaded on every page load (no pagination); fine for years of personal data, but unbounded.
@@ -84,7 +85,6 @@ Proposed, not yet prioritised. Size: S = under an hour, M = a few hours, L = a d
 | # | Idea | Why | Size |
 |---|---|---|---|
 | 19 | **Savings goals** (emergency fund, Hajj, laptop) with target, date, linked accounts and progress | Turns savings into plans | M |
-| 20 | **Net worth over time** chart, rebuilt from dated history (opening balances, entries, transfers, updates) | See whether you are getting richer month by month | M |
 | 21 | **Bills and due dates** (credit card, utilities, school fees) with an upcoming list and reminders | Avoid late fees | M |
 | 23 | **Tax-year view** (July to June) with income totals and investment rebate helpers (Sanchayapatra, DPS, life insurance) | Tax return prep | M |
 | 27 | **Cash-flow forecast** for the next 30 days from recurring items and bills | Know if the month will be tight before it is | M |

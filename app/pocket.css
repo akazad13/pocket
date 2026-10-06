@@ -135,3 +135,25 @@ html[data-private] :is(.matrix td:not(:first-child),.matrix th:last-child){filte
 .zakat-result span{color:#5d6d57}
 .zakat-due{border-top:1px solid #e4e8df;padding-top:9px;margin-top:3px;align-items:baseline}
 .zakat-due strong{font-size:22px;color:#256a53}
+.networth-head{display:flex;flex-wrap:wrap;align-items:baseline;gap:6px 14px;margin-top:14px}
+.networth-head strong{font-size:24px;font-weight:600}
+.networth-head span{font-size:12px;color:#5d6d57}
+.networth-plot{position:relative;height:150px;margin:18px 6px 0}
+.networth-plot svg{position:absolute;inset:0;width:100%;height:100%;overflow:visible}
+.networth-line{fill:none;stroke:#13805a;stroke-width:2;stroke-linejoin:round;stroke-linecap:round}
+.networth-zero{stroke:#dfe5d8;stroke-width:1}
+.networth-dot{position:absolute;width:28px;height:28px;margin:-14px 0 0 -14px;border-radius:50%;background:none;display:grid;place-items:center;padding:0}
+.networth-dot::after{content:'';width:8px;height:8px;border-radius:50%;background:#13805a;box-shadow:0 0 0 2px #fff}
+.networth-dot.active::after{width:11px;height:11px}
+.networth-tip{position:absolute;transform:translate(10px,-50%);background:#22382e;color:#fff;border-radius:8px;padding:8px 10px;font-size:11px;display:grid;gap:3px;white-space:nowrap;pointer-events:none;z-index:2}
+.networth-tip.left{transform:translate(calc(-100% - 10px),-50%)}
+.networth-tip small{color:#c3d8cb}
+.networth-axis{display:flex;justify-content:space-between;margin:10px 0 0;font-size:10px;color:#9da594}
+.networth-table{margin-top:14px;font-size:12px}
+.networth-table summary{cursor:pointer;color:#467147;font-size:11px}
+.networth-table table{width:100%;margin-top:10px;border-collapse:collapse}
+.networth-table :is(th,td){text-align:right;padding:6px 4px;border-bottom:1px solid #edf0e7;white-space:nowrap}
+.networth-table :is(th,td):first-child{text-align:left}
+.networth-table th{font-weight:600;color:#7a8873;font-size:11px}
+.networth .field-hint{margin-top:10px}
+.networth-table{overflow-x:auto}@media(max-width:600px){.networth-table table{font-size:11px}.networth-table :is(th,td){padding:6px 3px}}

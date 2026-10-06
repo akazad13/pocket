@@ -35,6 +35,7 @@ app/category-icon.tsx      Icon key → lucide component (fallback ReceiptText).
 app/comparison.tsx         "Compared with last month" panel; changeText()/ChangeIcon reused by the total card.
 app/yearly.tsx             "Year" tab: year-in-review panels built from lib/yearly.ts.
 app/accounts.tsx           "Accounts" tab: net worth, account list/detail/history, account and update-balance dialogs. Exports AccountPicker, TransferDialog (keyed per opening), TransferRow, deleteTransfer() used by the tracker.
+app/networth.tsx           Net worth over time chart (Accounts tab): SVG line + HTML dots, tooltip, numbers table. Line colours #13805a / #2fa872 (dark) pass the dataviz palette validator; the brand #256a53 is too grey for chart marks.
 app/zakat.tsx              Zakat calculator dialog (Accounts tab); nisab basis/price in localStorage 'pocket-zakat'.
 app/backup.tsx             Backup & restore dialog (JSON download, all-expenses CSV, restore upload).
 app/page.tsx               Re-exports tracker.
@@ -68,6 +69,7 @@ lib/compare.ts             Pure month-over-month comparison (totals and per cate
 lib/yearly.ts              Pure year-in-review numbers (totals, average, ranked categories/months, largest).
 lib/accounts.ts            Pure: account types/groups, validators, values() balances, totals(), adjustmentFor(). Client-safe.
 lib/terms.ts               Pure: SAVING_TYPES/LOAN_TYPES, monthsBetween(), maturity() estimates, upcomingMaturities(), loanInfo() (interest split, payoff, next due), ratePct().
+lib/networth.ts            Pure: lastMonths(), netWorthSeries() (totals at each month end from dated history).
 lib/zakat.ts               Pure: nisab, default counted types, debts due within a year, zakat() total.
 lib/activity.ts            Pure: merges expenses, income and transfers into one filtered list (Transactions tab, Recent activity); flows() totals.
 lib/account-db.ts          Server-only: SELECT strings, toAccount(), missingAccount() existence check.
