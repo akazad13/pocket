@@ -65,7 +65,7 @@ lib/income.ts              Income type, defaultSources, validateIncome().
 lib/compare.ts             Pure month-over-month comparison (totals and per category).
 lib/yearly.ts              Pure year-in-review numbers (totals, average, ranked categories/months, largest).
 lib/accounts.ts            Pure: account types/groups, validators, values() balances, totals(), adjustmentFor(). Client-safe.
-lib/terms.ts               Pure: SAVING_TYPES/LOAN_TYPES, monthsBetween(), maturity() estimates, upcomingMaturities(), ratePct().
+lib/terms.ts               Pure: SAVING_TYPES/LOAN_TYPES, monthsBetween(), maturity() estimates, upcomingMaturities(), loanInfo() (interest split, payoff, next due), ratePct().
 lib/activity.ts            Pure: merges expenses, income and transfers into one filtered list (Transactions tab, Recent activity); flows() totals.
 lib/account-db.ts          Server-only: SELECT strings, toAccount(), missingAccount() existence check.
 lib/theme-script.ts        Inline <head> script that sets data-theme before paint (kept out of the client module so the server layout gets the string).

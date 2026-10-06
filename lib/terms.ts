@@ -1,4 +1,5 @@
 import type {Account,AccountType} from './accounts';
+import {occurrenceDate} from './months';
 // Pure estimates from an account's terms (rate in basis points, instalment in cents per month). Estimates, not bank statements.
 export const SAVING_TYPES:AccountType[]=['dps','fd','sanchayapatra'];
 export const LOAN_TYPES:AccountType[]=['loan_taken','loan_given'];
@@ -28,3 +29,16 @@ export function upcomingMaturities(accounts:Account[],balanceOf:(a:Account)=>num
 }
 // '9.5%' from basis points; '' when unset.
 export const ratePct=(bp:number)=>bp?`${(bp/100).toString()}%`:'';
+const addMonths=(m:string,n:number)=>{const[y,mo]=m.split('-').map(Number),t=y*12+mo-1+n;return `${Math.floor(t/12)}-${String(t%12+1).padStart(2,'0')}`;};
+export type LoanInfo={monthlyInterest:number;interestPart:number|null;principalPart:number|null;monthsToPayoff:number|null;payoffMonth:string|null;scheduledMonths:number|null;nextDue:string|null;repaid:number|null;covers:boolean};
+// owed is the amount still owed (shown balance). The EMI pays this month's interest first, the rest reduces the principal.
+export function loanInfo(a:Account,owed:number,today:string):LoanInfo|null{
+ if(!LOAN_TYPES.includes(a.type))return null;
+ const i=a.rate/10000/12,emi=a.instalment,monthlyInterest=Math.round(Math.max(owed,0)*i),covers=!emi||owed<=0||emi>monthlyInterest;
+ let n:number|null=null;
+ if(owed<=0)n=0;else if(emi>0&&covers)n=i===0?Math.ceil(owed/emi):Math.ceil(-Math.log(1-i*owed/emi)/Math.log(1+i));
+ let nextDue:string|null=null;
+ // Instalments fall on the start date's day each month (clamped to short months).
+ if(a.startDate&&owed>0){const day=Number(a.startDate.slice(8,10)),m=today.slice(0,7);let d=occurrenceDate(m,day);if(d<today)d=occurrenceDate(addMonths(m,1),day);if(d<a.startDate)d=a.startDate;if(!a.maturityDate||d<=a.maturityDate)nextDue=d;}
+ return {monthlyInterest,interestPart:emi&&owed>0?Math.min(emi,monthlyInterest):null,principalPart:emi&&owed>0?Math.max(0,Math.min(emi-monthlyInterest,owed)):null,monthsToPayoff:n,payoffMonth:n?addMonths(today.slice(0,7),n-1):null,scheduledMonths:a.maturityDate&&a.maturityDate>=today?monthsBetween(today,a.maturityDate)+1:null,nextDue,repaid:a.opening>0?Math.round(Math.min(1,Math.max(0,1-owed/a.opening))*1000)/1000:null,covers};
+}
