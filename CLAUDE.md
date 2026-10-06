@@ -12,7 +12,7 @@ The project was scaffolded by the OpenAI "Sites" starter (`site-creator-vinext-s
 | Dev server | `npm run dev` | http://127.0.0.1:5173/ . Long-running: start with `run_in_background`. Uses local D1 in `.wrangler/state`. |
 | Typecheck | `npm run typecheck` | ~10s. Passes clean. **Primary verification step.** |
 | Unit tests | `npm run test:unit` | ~1s. `node:test` on TypeScript via `--experimental-strip-types`; files `tests/unit/*.test.ts`. For pure logic in `lib/` (no `cloudflare:workers` imports). Test files import with `.ts` extensions; `tests/unit/register.mjs` resolves extensionless imports inside `lib/`. |
-| Smoke test | `npm run smoke` | Needs `npm run dev` running. 90 API checks (CRUD, validation, rename cascade, origin check). Uses unique `Smoke ...` names and cleans up. Run after any change to `app/api/` or `lib/`. |
+| Smoke test | `npm run smoke` | Needs `npm run dev` running. 101 API checks (CRUD, validation, rename cascade, origin check). Uses unique `Smoke ...` names and cleans up. Run after any change to `app/api/` or `lib/`. |
 | Lint | `npm run lint` | ~60s. Clean (0 errors); keep it that way. The React Compiler rule forbids synchronous setState inside effects: set state only after an `await`. |
 | Build | `npm run build` | Outputs `dist/` (Worker + client). |
 | Run built app | `npm start` | wrangler dev against `dist/server/wrangler.json`. |
@@ -44,6 +44,7 @@ app/globals.css            Tailwind v4 + shadcn theme tokens. pocket.css overrid
 app/api/expenses/route.ts  GET list, POST create, PUT update, DELETE {id}.
 app/api/categories/route.ts GET {categories, styles}, POST add, PUT rename {name, previous}, DELETE {name}.
 app/api/categories/style/route.ts PUT {name, color, icon} ('' clears).
+app/api/categories/merge/route.ts POST {from, into}: moves expenses, rules and budget (if target has none), deletes from, in one batch.
 app/api/budgets/route.ts   GET {budgets:{name:cents}}, PUT {budgets:{name:amount|''}} bulk set/remove in one batch.
 app/api/backup/route.ts    GET full JSON backup (attachment); POST merge-only restore.
 app/api/income/route.ts    GET, POST, PUT, DELETE {id}; same pattern as expenses (no category).

@@ -29,6 +29,7 @@ Keep this file current: move an idea to "Implemented" when it ships.
 | Add category | Inline "Add category" inside the expense dialog; new category is selected immediately. Case-insensitive duplicates rejected; 1 to 50 chars. | `addCategory()`; `POST /api/categories` |
 | Rename category | "Manage categories" dialog; renaming updates every existing expense in that category. | `PUT /api/categories` |
 | Colours and icons | In Manage categories, tap a category's swatch to pick one of 12 colours and 20 icons (or reset). Used by the donut, legend and expense rows; unstyled categories get a palette colour by position. Kept on rename; included in backups (restore only styles categories that have none). | `lib/category-style.ts`, `app/category-icon.tsx`, `PUT /api/categories/style` |
+| Merge categories | In Manage categories, the merge button on a row picks another category; after confirming, all its expenses and recurring rules move there and the source is deleted in one batch. The target keeps its colour, icon and budget (it takes the source's budget only if it has none). Cannot be undone. | `mergeCategory()`; `POST /api/categories/merge` |
 | Delete category | Only allowed when the category has no expenses; confirmation dialog. Shows the expense count per category. | `DELETE /api/categories` |
 
 ### Views and insights
@@ -73,7 +74,6 @@ Proposed, not yet prioritised. Size: S = under an hour, M = a few hours, L = a d
 |---|---|---|---|
 | 13 | **Receipt photo attachment** stored in R2 | Proof for medical, tax, and business expenses | L |
 | 14 | **Installable PWA** with offline entry queued until online | Feels like a native phone app | L |
-| 15 | **Merge categories** (move all expenses from A into B, then delete A) | Today deleting a used category requires editing each expense | S |
 
 ## Decisions
 Record ideas that were rejected or deferred, with the reason, so they are not proposed again.

@@ -64,3 +64,5 @@ html[data-theme=dark] .year-highlights button{background:#1f2a22;border-color:#2
 html[data-theme=dark] .year-highlights button:hover{border-color:#5aa57f}
 html[data-theme=dark] :is(.year-highlights small,.year-category-label small){color:#8d9a91}
 html[data-theme=dark] .year-highlights span{color:#a8d4bb}
+html[data-theme=dark] .merge-form p{color:#a8b5ac}
+html[data-theme=dark] .merge-form select{background:#151c18;border-color:#2f3b33}

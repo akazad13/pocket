@@ -13,6 +13,9 @@ const importIds = [1, 2, 3, 4, 5].map((n) => `${expenseId}-imp${n}`);
 const recCat = `${tag} rec`;
 const recRenamed = `${tag} rec2`;
 const ruleId = `smoke-rule-${Date.now().toString(36)}`;
+const mergeFrom = `${tag} merge from`;
+const mergeInto = `${tag} merge into`;
+const mergeIds = [1, 2].map((n) => `${expenseId}-mg${n}`);
 const incomeIds = [1, 2].map((n) => `${expenseId}-inc${n}`);
 const dhakaToday = new Intl.DateTimeFormat("en-CA", { timeZone: "Asia/Dhaka" }).format(new Date());
 
@@ -173,6 +176,7 @@ async function run() {
   await backupChecks();
   await recurringChecks();
   await incomeChecks();
+  await mergeChecks();
 }
 
 async function incomeChecks() {
@@ -207,6 +211,45 @@ async function incomeChecks() {
   check("DELETE income succeeds", r.status === 200, r);
   r = await call("GET", "/api/income");
   check("Deleted income is gone", !r.json.income.some((x) => x.id === id));
+}
+
+async function mergeChecks() {
+  await call("POST", "/api/categories", { name: mergeFrom });
+  await call("POST", "/api/categories", { name: mergeInto });
+  for (const id of mergeIds) await call("POST", "/api/expenses", { id, category: mergeFrom, amount: "10", date: "2026-03-01", note: "" });
+  await call("POST", "/api/recurring", { id: `${ruleId}-mg`, category: mergeFrom, amount: "5", day: 1, note: "", startMonth: "2099-01" });
+  await call("PUT", "/api/budgets", { budgets: { [mergeFrom]: "30" } });
+
+  let r = await call("POST", "/api/categories/merge", { from: mergeFrom, into: mergeFrom.toUpperCase() });
+  check("Merging a category into itself is rejected (400)", r.status === 400, r);
+  r = await call("POST", "/api/categories/merge", { from: mergeFrom, into: `${tag} nope` });
+  check("Merging into an unknown category returns 404", r.status === 404, r);
+  r = await call("POST", "/api/categories/merge", { from: mergeFrom, into: mergeInto }, { Origin: "http://evil.example" });
+  check("Merge from a foreign origin is rejected (403)", r.status === 403, r);
+
+  r = await call("POST", "/api/categories/merge", { from: mergeFrom, into: mergeInto.toLowerCase() });
+  check("Merge succeeds and reports moved expenses", r.status === 200 && r.json?.moved === 2 && r.json.into === mergeInto && r.json.from === mergeFrom, r);
+  const { json } = await call("GET", "/api/expenses");
+  check("Merge moves expenses", mergeIds.every((id) => json.expenses.find((e) => e.id === id)?.category === mergeInto));
+  r = await call("GET", "/api/recurring");
+  check("Merge moves recurring rules", r.json?.rules?.find((x) => x.id === `${ruleId}-mg`)?.category === mergeInto, r.json);
+  r = await call("GET", "/api/budgets");
+  check("Merge moves the budget when the target has none", r.json?.budgets?.[mergeInto] === 3000 && !(mergeFrom in r.json.budgets), r.json);
+  r = await call("GET", "/api/categories");
+  check("Merge deletes the source category", !r.json?.categories?.includes(mergeFrom) && r.json.categories.includes(mergeInto), r.json?.categories);
+
+  await call("POST", "/api/categories", { name: mergeFrom });
+  await call("PUT", "/api/budgets", { budgets: { [mergeFrom]: "99" } });
+  r = await call("POST", "/api/categories/merge", { from: mergeFrom, into: mergeInto });
+  check("Merging an empty category succeeds", r.status === 200 && r.json?.moved === 0, r);
+  r = await call("GET", "/api/budgets");
+  check("Merge keeps the target's own budget", r.json?.budgets?.[mergeInto] === 3000 && !(mergeFrom in r.json.budgets), r.json);
+  r = await call("POST", "/api/categories/merge", { from: mergeFrom, into: mergeInto });
+  check("Merging a category that is gone returns 404", r.status === 404, r);
+
+  await call("DELETE", "/api/recurring", { id: `${ruleId}-mg` });
+  for (const id of mergeIds) await call("DELETE", "/api/expenses", { id });
+  await call("DELETE", "/api/categories", { name: mergeInto });
 }
 
 async function generated() {
@@ -319,10 +362,11 @@ async function backupChecks() {
 async function cleanup() {
   // Best effort: remove anything left behind if a step failed midway.
   await call("DELETE", "/api/recurring", { id: ruleId }).catch(() => {});
+  await call("DELETE", "/api/recurring", { id: `${ruleId}-mg` }).catch(() => {});
   for (const id of incomeIds) await call("DELETE", "/api/income", { id }).catch(() => {});
   const leftovers = await generated().catch(() => []);
-  for (const id of [expenseId, `${expenseId}-m`, ...importIds, ...leftovers.map((e) => e.id)]) await call("DELETE", "/api/expenses", { id }).catch(() => {});
-  for (const name of [category, renamed, baseCat, importedCat, recCat, recRenamed]) await call("DELETE", "/api/categories", { name }).catch(() => {});
+  for (const id of [expenseId, `${expenseId}-m`, ...importIds, ...mergeIds, ...leftovers.map((e) => e.id)]) await call("DELETE", "/api/expenses", { id }).catch(() => {});
+  for (const name of [category, renamed, baseCat, importedCat, recCat, recRenamed, mergeFrom, mergeInto]) await call("DELETE", "/api/categories", { name }).catch(() => {});
 }
 
 try {
