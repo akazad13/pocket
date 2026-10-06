@@ -103,3 +103,9 @@ body{background:#f8f9f6;color:#22382e;font-family:Arial,Helvetica,sans-serif}but
 .rule-icon.income{background:#e6f1e0;color:#2f6b43}
 .rule-icon.transfer{background:#eef1f4;color:#4d6478}
 .expense-dialog .kind-toggle{display:flex;margin-top:0}.expense-dialog .kind-toggle button{flex:1}
+.account-terms{display:grid;gap:5px;font-size:12px;color:#5d6d57;background:#f6f8f2;border-radius:9px;padding:11px 13px;line-height:1.5}
+.account-terms b{color:#22382e;font-weight:600}
+.account-terms small{font-size:10px;color:#9aa18f}
+.expense-dialog .terms-fields{display:grid;gap:12px;border:1px solid #e4e8df;border-radius:10px;padding:12px 14px 14px;min-width:0}
+.terms-fields legend{font-size:12px;font-weight:600;padding:0 6px}
+.add-group.mobile-add{display:none}@media(max-width:600px){.add-group.mobile-add{display:flex}}

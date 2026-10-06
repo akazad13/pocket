@@ -20,8 +20,8 @@ async function mutate(request:Request,method:string){
  let a;try{a=validateAccount(p);}catch(e){return Response.json({error:e instanceof Error?e.message:'Invalid account.'},{status:400});}
  try{
   if(await db.prepare('SELECT 1 FROM accounts WHERE lower(name) = lower(?) AND id <> ?').bind(a.name,a.id).first())return Response.json({error:'You already have an account with this name.'},{status:409});
-  if(method==='PUT'){const r=await db.prepare('UPDATE accounts SET name = ?, type = ?, opening = ?, note = ?, closed = ? WHERE id = ?').bind(a.name,a.type,a.opening,a.note,a.closed?1:0,a.id).run();if(!r.meta.changes)return Response.json({error:'Account no longer exists. Please refresh.'},{status:404});}
-  else await db.prepare('INSERT INTO accounts (id, name, type, opening, note, closed) VALUES (?, ?, ?, ?, ?, ?)').bind(a.id,a.name,a.type,a.opening,a.note,a.closed?1:0).run();
+  if(method==='PUT'){const r=await db.prepare('UPDATE accounts SET name = ?, type = ?, opening = ?, note = ?, closed = ?, start_date = ?, maturity_date = ?, rate = ?, instalment = ? WHERE id = ?').bind(a.name,a.type,a.opening,a.note,a.closed?1:0,a.startDate,a.maturityDate,a.rate,a.instalment,a.id).run();if(!r.meta.changes)return Response.json({error:'Account no longer exists. Please refresh.'},{status:404});}
+  else await db.prepare('INSERT INTO accounts (id, name, type, opening, note, closed, start_date, maturity_date, rate, instalment) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)').bind(a.id,a.name,a.type,a.opening,a.note,a.closed?1:0,a.startDate,a.maturityDate,a.rate,a.instalment).run();
   return Response.json({account:a},{status:method==='POST'?201:200});
  }catch(e){if(String(e).includes('UNIQUE constraint'))return Response.json({error:'This account already exists.'},{status:409});console.error(e);return failure();}
 }

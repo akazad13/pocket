@@ -71,6 +71,13 @@
       "when": 1791262675054,
       "tag": "0009_panoramic_hammerhead",
       "breakpoints": true
+    },
+    {
+      "idx": 10,
+      "version": "6",
+      "when": 1791263002259,
+      "tag": "0010_living_madripoor",
+      "breakpoints": true
     }
   ]
 }

@@ -24,7 +24,8 @@ export function prepareImport(raw:unknown,existing:string[],existingAccounts:str
  const accountIds=new Set(existingAccounts),linked=(id:string)=>{if(id&&!accountIds.has(id))throw Error('Its account is not in this backup.');return id;};
  const accounts=(b.accounts??[]).map((a,i)=>{try{
   if(!a||typeof a!=='object'||!Number.isInteger(a.opening)||a.opening<0||a.opening>99999999999)throw Error('Invalid starting balance.');
-  const v=validateAccount({...a,opening:(a.opening/100).toFixed(2)});accountIds.add(v.id);return v;
+  if((a.rate!==undefined&&(!Number.isInteger(a.rate)||a.rate<0||a.rate>9999))||(a.instalment!==undefined&&(!Number.isInteger(a.instalment)||a.instalment<0||a.instalment>99999999999)))throw Error('Invalid rate or instalment.');
+  const v=validateAccount({...a,opening:(a.opening/100).toFixed(2),rate:a.rate?(a.rate/100).toFixed(2):'',instalment:a.instalment?(a.instalment/100).toFixed(2):''});accountIds.add(v.id);return v;
  }catch(err){throw Error(`Account ${i+1}: ${(err as Error).message}`);}});
  const expenses=b.expenses.map((e,i)=>{try{
   if(!e||typeof e!=='object'||!validCents(e.cents))throw Error('Invalid amount.');

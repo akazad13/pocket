@@ -2,16 +2,18 @@ import {test} from 'node:test';
 import assert from 'node:assert/strict';
 import {validateAccount, validateTransfer, validateAdjustment, values, shown, totals, adjustmentFor, type Account} from '../../lib/accounts.ts';
 
-const acc = (id: string, type: Account['type'], opening: number): Account => ({id, name: id, type, opening, note: '', closed: false});
+const acc = (id: string, type: Account['type'], opening: number): Account => ({id, name: id, type, opening, note: '', closed: false, startDate: '', maturityDate: '', rate: 0, instalment: 0});
 const cash = acc('cash', 'cash', 10000), bank = acc('bank', 'bank', 500000), loan = acc('loan', 'loan_taken', 1000000), card = acc('card', 'credit_card', 0);
 const all = [cash, bank, loan, card];
 
 test('validateAccount normalises name, opening and closed', () => {
   const a = validateAccount({id: 'a1', name: '  City   Bank ', type: 'bank', opening: '1500.5', note: ' salary ', closed: true});
-  assert.deepEqual(a, {id: 'a1', name: 'City Bank', type: 'bank', opening: 150050, note: 'salary', closed: true});
+  assert.deepEqual(a, {id: 'a1', name: 'City Bank', type: 'bank', opening: 150050, note: 'salary', closed: true, startDate: '', maturityDate: '', rate: 0, instalment: 0});
+  const t = validateAccount({id: 'a2', name: 'DPS', type: 'dps', startDate: '2025-01-15', maturityDate: '2030-01-15', rate: '9.5', instalment: '5000'});
+  assert.deepEqual([t.startDate, t.maturityDate, t.rate, t.instalment], ['2025-01-15', '2030-01-15', 950, 500000]);
   assert.equal(validateAccount({id: 'a1', name: 'Cash', type: 'cash'}).opening, 0);
   assert.equal(validateAccount({id: 'a1', name: 'Cash', type: 'cash', opening: '0'}).opening, 0);
-  for (const bad of [{name: ''}, {name: 'x'.repeat(51)}, {type: 'crypto'}, {opening: '-5'}, {opening: '1.234'}, {note: 'n'.repeat(201)}, {id: 'bad id'}]) {
+  for (const bad of [{name: ''}, {name: 'x'.repeat(51)}, {type: 'crypto'}, {opening: '-5'}, {opening: '1.234'}, {note: 'n'.repeat(201)}, {id: 'bad id'}, {startDate: '2026-02-30'}, {startDate: '2027-01-01', maturityDate: '2026-01-01'}, {rate: '120'}, {rate: '9.555'}, {instalment: '-1'}]) {
     assert.throws(() => validateAccount({id: 'a1', name: 'Cash', type: 'cash', ...bad}), Error, JSON.stringify(bad));
   }
 });

@@ -2,7 +2,8 @@ import {isAmount,isDate,type Expense} from './expenses';
 import type {Income} from './income';
 // Pure account logic shared by client and server (no database imports).
 export type AccountType='cash'|'bank'|'wallet'|'dps'|'fd'|'mutual_fund'|'sanchayapatra'|'shares'|'loan_given'|'loan_taken'|'credit_card'|'other';
-export type Account={id:string;name:string;type:AccountType;opening:number;note:string;closed:boolean};
+// Terms (optional, '' / 0 when unset): startDate, maturityDate (end date for loans), rate in basis points (9.5% = 950), instalment in cents per month.
+export type Account={id:string;name:string;type:AccountType;opening:number;note:string;closed:boolean;startDate:string;maturityDate:string;rate:number;instalment:number};
 export type Transfer={id:string;from:string;to:string;cents:number;date:string;note:string};
 export type Adjustment={id:string;account:string;cents:number;date:string;note:string};
 export const GROUPS=[{key:'money',label:'Cash & bank'},{key:'invest',label:'Savings & investments'},{key:'loan',label:'Loans & credit'},{key:'other',label:'Other'}] as const;
@@ -21,7 +22,11 @@ export function validateAccount(p:Record<string,unknown>):Account{
  if(!ACCOUNT_TYPES.some(t=>t.key===p.type))throw Error('Choose an account type.');
  const opening=p.opening===undefined||p.opening===''?'0':p.opening;
  if(typeof opening!=='string'||! /^\d{1,9}(\.\d{1,2})?$/.test(opening))throw Error('Enter the starting balance as an amount with up to two decimal places.');
- return {id:p.id,name,type:p.type as AccountType,opening:Math.round(Number(opening)*100),note:note(p.note),closed:p.closed===true};
+ const date=(v:unknown,label:string)=>{if(v===undefined||v==='')return '';if(!isDate(v))throw Error(`Enter a valid ${label}.`);return v;},startDate=date(p.startDate,'start date'),maturityDate=date(p.maturityDate,'maturity or end date');
+ if(startDate&&maturityDate&&maturityDate<startDate)throw Error('The maturity or end date must be after the start date.');
+ const rate=p.rate===undefined||p.rate===''?'0':p.rate;if(typeof rate!=='string'||! /^\d{1,2}(\.\d{1,2})?$/.test(rate))throw Error('Enter the rate as a yearly percentage, like 9.5.');
+ const instalment=p.instalment===undefined||p.instalment===''?'0':p.instalment;if(typeof instalment!=='string'||! /^\d{1,9}(\.\d{1,2})?$/.test(instalment))throw Error('Enter the monthly instalment as an amount with up to two decimal places.');
+ return {id:p.id,name,type:p.type as AccountType,opening:Math.round(Number(opening)*100),note:note(p.note),closed:p.closed===true,startDate,maturityDate,rate:Math.round(Number(rate)*100),instalment:Math.round(Number(instalment)*100)};
 }
 export function validateTransfer(p:Record<string,unknown>):Transfer{
  if(typeof p.id!=='string'||!ID.test(p.id))throw Error('Invalid transfer ID.');

@@ -182,6 +182,7 @@ async function run() {
   await mergeChecks();
   await accountChecks();
   await recurringKindChecks();
+  await termsChecks();
 }
 
 async function incomeChecks() {
@@ -360,6 +361,27 @@ async function recurringKindChecks() {
   await call("DELETE", "/api/accounts", { id: recKinds.bank });
 }
 
+async function termsChecks() {
+  const dps = { id: `${expenseId}-terms`, name: `${tag} Terms DPS`, type: "dps", opening: "1000", startDate: "2025-01-15", maturityDate: "2030-01-15", rate: "9.5", instalment: "5000" };
+  let r = await call("POST", "/api/accounts", { ...dps, rate: "150" });
+  check("POST account with an impossible rate is rejected (400)", r.status === 400, r);
+  r = await call("POST", "/api/accounts", { ...dps, maturityDate: "2024-01-01" });
+  check("POST account maturing before it opens is rejected (400)", r.status === 400, r);
+  r = await call("POST", "/api/accounts", dps);
+  const a = r.json?.account;
+  check("POST account saves terms", r.status === 201 && a?.rate === 950 && a.instalment === 500000 && a.maturityDate === "2030-01-15", r);
+  r = await call("GET", "/api/accounts");
+  check("GET accounts returns terms", r.json?.accounts?.find((x) => x.id === dps.id)?.startDate === "2025-01-15", r.status);
+  const backup = await (await fetch(base + "/api/backup")).json();
+  check("Backup includes account terms", backup.accounts?.find((x) => x.id === dps.id)?.rate === 950);
+  await call("DELETE", "/api/accounts", { id: dps.id });
+  r = await call("POST", "/api/backup", { app: "pocket", version: 1, exportedAt: "", categories: [], budgets: {}, expenses: [], accounts: backup.accounts.filter((x) => x.id === dps.id) });
+  r = await call("GET", "/api/accounts");
+  const restored = r.json?.accounts?.find((x) => x.id === dps.id);
+  check("Restore keeps account terms", restored?.rate === 950 && restored.instalment === 500000 && restored.maturityDate === "2030-01-15", restored);
+  await call("DELETE", "/api/accounts", { id: dps.id });
+}
+
 async function generated() {
   const { json } = await call("GET", "/api/expenses");
   return json.expenses.filter((e) => e.id.startsWith(`rec-${ruleId}-`));
@@ -475,7 +497,7 @@ async function cleanup() {
   const month = dhakaToday.slice(0, 7);
   await call("DELETE", "/api/income", { id: `rec-${recKinds.income}-${month}` }).catch(() => {});
   await call("DELETE", "/api/accounts/transfers", { id: `rec-${recKinds.transfer}-${month}` }).catch(() => {});
-  for (const id of [recKinds.dps, recKinds.bank]) await call("DELETE", "/api/accounts", { id }).catch(() => {});
+  for (const id of [recKinds.dps, recKinds.bank, `${expenseId}-terms`]) await call("DELETE", "/api/accounts", { id }).catch(() => {});
   await call("DELETE", "/api/accounts/transfers", { id: accIds.transfer }).catch(() => {});
   await call("DELETE", "/api/accounts/adjustments", { id: accIds.adjustment }).catch(() => {});
   await call("DELETE", "/api/income", { id: accIds.income }).catch(() => {});

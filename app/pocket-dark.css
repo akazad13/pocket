@@ -83,3 +83,7 @@ html[data-theme=dark] .transfer-amount{color:#a8b5ac}
 html[data-theme=dark] .rule-icon{background:#24302a;color:#94b886}
 html[data-theme=dark] .rule-icon.income{background:#1f3326;color:#7fcf98}
 html[data-theme=dark] .rule-icon.transfer{background:#222b33;color:#9db4c8}
+html[data-theme=dark] .account-terms{background:#1f2a22;color:#a8b5ac}
+html[data-theme=dark] .account-terms b{color:#e3ebe5}
+html[data-theme=dark] .account-terms small{color:#8d9a91}
+html[data-theme=dark] .expense-dialog .terms-fields{border-color:#2f3b33}
