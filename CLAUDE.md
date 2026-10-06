@@ -28,7 +28,8 @@ Git: `main` branch, LF line endings enforced by `.gitattributes`. The folder is 
 
 ```
 app/tracker.tsx            Main UI: one "use client" component (~80 very long lines). All state and fetches, summary cards, the Add split button/menu, tabs (Overview, Transactions, Accounts, Reports), expense dialog, and the top-level income and transfer dialogs.
-app/bills.tsx              Bills panel on Overview (self-contained, fetches /api/bills); Pay posts an expense then PUTs the bill's paidMonth.
+app/bills.tsx              Bills panel on Overview; bills state lives in tracker (shared with the forecast). Pay posts an expense then PUTs the bill's paidMonth.
+app/upcoming.tsx           "Next 30 days" panel (items from lib/forecast.ts, computed in tracker; tracker also loads /api/recurring for it).
 app/goals.tsx              Savings goals panel + dialog on Overview (self-contained, fetches /api/goals, refetches on `version`).
 app/budgets.tsx            Budgets panel + edit dialog (self-contained, fetches /api/budgets).
 app/recurring.tsx          Recurring rules dialog (list/add/edit/stop) for expense, income and transfer rules.
@@ -74,6 +75,7 @@ lib/yearly.ts              Pure year-in-review numbers (totals, average, ranked 
 lib/accounts.ts            Pure: account types/groups, validators, values() balances, totals(), adjustmentFor(). Client-safe.
 lib/terms.ts               Pure: SAVING_TYPES/LOAN_TYPES, monthsBetween(), maturity() estimates, upcomingMaturities(), loanInfo() (interest split, payoff, next due), ratePct().
 lib/networth.ts            Pure: lastMonths(), netWorthSeries() (totals at each month end from dated history).
+lib/forecast.ts            Pure: upcoming() items from rules, bills, loan EMIs, maturities; forecastTotals().
 lib/bills.ts               Pure: Bill type, validateBill(), billStatus(), sortBills().
 lib/goals.ts               Pure: Goal type, validateGoal(), goalProgress().
 lib/zakat.ts               Pure: nisab, default counted types, debts due within a year, zakat() total.
@@ -118,7 +120,7 @@ Rules to preserve:
 - A category with expenses cannot be deleted (409).
 - Expense IDs are client-generated `crypto.randomUUID()`; server validates `^[a-zA-Z0-9-]{1,64}$`.
 - Dates: validated as real calendar dates >= 1900-01-01. "Today" is computed in Asia/Dhaka in the client.
-- Recurring generation is lazy: `GET /api/expenses`, `/api/income` and `/api/accounts` each call `applyRecurring()` first (concurrent calls are safe). Generated IDs are `rec-<ruleId>-<YYYY-MM>` in the expenses, income or transfers table (idempotent via ON CONFLICT); `last_month` advancing is what stops deleted occurrences from returning. Lib code imported by client components must not import `lib/database.ts` (it pulls in `cloudflare:workers`); put shared pure logic in files like `lib/months.ts` and use `import type` for server types.
+- Recurring generation is lazy: `GET /api/expenses`, `/api/income`, `/api/accounts` and `/api/recurring` each call `applyRecurring()` first (concurrent calls are safe). Generated IDs are `rec-<ruleId>-<YYYY-MM>` in the expenses, income or transfers table (idempotent via ON CONFLICT); `last_month` advancing is what stops deleted occurrences from returning. Lib code imported by client components must not import `lib/database.ts` (it pulls in `cloudflare:workers`); put shared pure logic in files like `lib/months.ts` and use `import type` for server types.
 - Seeding is lazy: `getCategories()` inserts defaults on first call if `categories_initialized` is absent. Deleting all categories will not re-seed.
 
 Bulk writes: D1 limits queries per request (50 on the free plan) and bound parameters per query (100), so insert many rows with one `json_each(?)` statement per ~500KB chunk (see `/api/backup` POST), not one statement per row.

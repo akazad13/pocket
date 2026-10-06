@@ -186,3 +186,23 @@ html[data-private] :is(.matrix td:not(:first-child),.matrix th:last-child){filte
 .bill-row.paid :is(b,strong){color:#7a8873}
 .bill-row .text-button{font-weight:600}
 @media(max-width:600px){.bills{margin-top:15px}.bill-row{gap:7px}.bill-icon{display:none}}
+.upcoming{margin-top:20px}
+.upcoming .section-heading p b{font-weight:600}
+.up-in{color:#2f6b43}
+.up-out{color:#a8493b}
+.upcoming-list{margin-top:10px}
+.upcoming-row{display:flex;align-items:center;gap:10px;padding:10px 0;border-bottom:1px solid #edf0e7}
+.upcoming-row:last-child{border:0}
+.upcoming-row>div{flex:1;min-width:0}
+.upcoming-row>div b{display:block;font-size:13px;font-weight:500;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.upcoming-row>div small{display:block;font-size:11px;color:#9aa18f;margin-top:3px}
+.upcoming-row strong{font-size:13px;white-space:nowrap}
+.upcoming-row.overdue>div small{color:#a8493b}
+.upcoming-date{display:grid;justify-items:center;width:34px;flex-shrink:0;line-height:1.1}
+.upcoming-date b{font-size:15px;font-weight:600}
+.upcoming-date small{font-size:10px;color:#7a8873;text-transform:uppercase}
+.upcoming-icon{display:grid;place-items:center;width:26px;height:26px;border-radius:7px;flex-shrink:0;background:#f2f5eb;color:#7f9870}
+.upcoming-icon.in{background:#e6f1e0;color:#2f6b43}
+.upcoming-icon.out{background:#fbf2e9;color:#b07a3e}
+.upcoming-icon.move{background:#eef1f4;color:#4d6478}
+@media(max-width:600px){.upcoming{margin-top:15px}.upcoming-icon{display:none}.upcoming-row{gap:8px}}

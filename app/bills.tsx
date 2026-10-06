@@ -1,5 +1,5 @@
 "use client";
-import {useEffect,useState} from 'react';
+import {useState} from 'react';
 import {CalendarClock,Check,Pencil,Plus,Trash2} from 'lucide-react';
 import {Dialog,DialogContent,DialogTitle,DialogDescription} from '@/components/ui/dialog';
 import {Select,SelectTrigger,SelectValue,SelectContent,SelectItem} from '@/components/ui/select';
@@ -8,15 +8,14 @@ import {sortBills,type Bill} from '@/lib/bills';
 import type {Account} from '@/lib/accounts';
 import type {Expense} from '@/lib/expenses';
 import {AccountPicker} from './accounts';
-type Props={categories:string[];accounts:Account[];today:string;version:number;onExpenseSaved:(e:Expense)=>void;onNotice:(text:string)=>void};
+type Props={bills:Bill[];setBills:React.Dispatch<React.SetStateAction<Bill[]>>;categories:string[];accounts:Account[];today:string;onExpenseSaved:(e:Expense)=>void;onNotice:(text:string)=>void};
 type Form={id:string;isNew:boolean;name:string;category:string;amount:string;day:string;account:string;note:string;paidMonth:string};
 const post=async<T,>(path:string,method:string,body:unknown)=>{const r=await fetch(path,{method,headers:{'Content-Type':'application/json'},body:JSON.stringify(body)});const j=await r.json() as T&{error?:string};if(!r.ok)throw Error(j.error||'Couldn’t save. Please try again.');return j;};
 const dayMonth=(d:string)=>new Date(d+'T12:00:00').toLocaleDateString('en-GB',{day:'numeric',month:'short'});
 const body=(b:Bill,paidMonth=b.paidMonth)=>({...b,amount:b.cents?(b.cents/100).toFixed(2):'',paidMonth});
-// Self-contained like Budgets: fetches /api/bills and refetches when `version` bumps. Paying records an expense and marks the month paid.
-export default function Bills({categories,accounts,today,version,onExpenseSaved,onNotice}:Props){
- const[bills,setBills]=useState<Bill[]>([]),[loadError,setLoadError]=useState(''),[form,setForm]=useState<Form|null>(null),[pay,setPay]=useState<null|{bill:Bill;amount:string;date:string;account:string}>(null),[saving,setSaving]=useState(false),[error,setError]=useState('');
- useEffect(()=>{let live=true;fetch('/api/bills').then(async r=>{const j=await r.json() as {bills:Bill[]};if(!r.ok)throw Error();if(live){setBills(j.bills);setLoadError('');}}).catch(()=>{if(live)setLoadError('Bills couldn’t be loaded.');});return()=>{live=false;};},[version]);
+// Bills live in the tracker (the forecast uses them too). Paying records an expense and marks the month paid.
+export default function Bills({bills,setBills,categories,accounts,today,onExpenseSaved,onNotice}:Props){
+ const[loadError,setLoadError]=useState(''),[form,setForm]=useState<Form|null>(null),[pay,setPay]=useState<null|{bill:Bill;amount:string;date:string;account:string}>(null),[saving,setSaving]=useState(false),[error,setError]=useState('');
  const month=today.slice(0,7),list=sortBills(bills,today),replace=(b:Bill)=>setBills(old=>[...old.filter(x=>x.id!==b.id),b]);
  function start(b?:Bill){setError('');setForm(b?{id:b.id,isNew:false,name:b.name,category:b.category,amount:b.cents?String(b.cents/100):'',day:String(b.day),account:b.account,note:b.note,paidMonth:b.paidMonth}:{id:crypto.randomUUID(),isNew:true,name:'',category:categories.includes('Utilities')?'Utilities':categories[0]||'',amount:'',day:'10',account:'',note:'',paidMonth:''});}
  async function save(e:React.FormEvent){e.preventDefault();if(!form)return;setSaving(true);setError('');try{const{bill}=await post<{bill:Bill}>('/api/bills',form.isNew?'POST':'PUT',{...form,day:Number(form.day)});replace(bill);setForm(null);onNotice(form.isNew?'Bill added':'Bill saved');}catch(err){setError(err instanceof Error?err.message:'Couldn’t save.');}finally{setSaving(false);}}
