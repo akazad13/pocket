@@ -78,3 +78,24 @@ body{background:#f8f9f6;color:#22382e;font-family:Arial,Helvetica,sans-serif}but
 .expense-dialog .check-row input{width:18px;min-height:0;height:18px;padding:0;flex-shrink:0}
 .text-button.danger{color:#a8493b;justify-self:center}
 @media(max-width:600px){.main-tabs{overflow-x:auto;justify-content:flex-start!important;scrollbar-width:none}.main-tabs::-webkit-scrollbar{display:none}.main-tabs button{flex:0 0 auto}.net-worth{grid-template-columns:1fr 1fr}.net-worth .net{grid-column:1/-1}.accounts .section-heading{flex-wrap:wrap}.account-icon{width:34px;height:34px}.account-group{margin-top:16px}.account-activity{margin-top:15px}}
+.add-group{display:inline-flex;gap:1px;flex-shrink:0}
+.add-group .primary{margin:0}
+.add-group .primary:first-child{border-radius:9px 0 0 9px}
+.add-group .add-more{border-radius:0 9px 9px 0;padding:12px 11px}
+.add-menu{min-width:220px}
+.add-menu [role=menuitem]{display:flex;align-items:center;gap:10px;padding:10px 12px;font-size:13px;cursor:pointer}
+.add-menu [role=menuitem] svg{color:#256a53}
+.worth-split{display:flex;flex-wrap:wrap;gap:6px 14px;font-size:12px;color:#d4e6da;margin:-8px 0 14px}
+.card-link{display:inline-flex;align-items:center;gap:4px;font-size:12px;font-weight:600;color:#fff;background:#ffffff1a;border-radius:6px;padding:6px 10px;margin:-8px 0 14px}
+.total-card .pill{color:inherit;font-size:11px;border:0}
+.stat-card strong.money-value{font-size:26px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.stat-card p .change{justify-content:flex-start;margin-right:8px;font-size:11px}
+.most-on{display:inline-block}
+.kind-toggle{display:inline-flex;margin-top:18px}
+.report-toggle{display:inline-flex;margin-bottom:16px}
+.report-toggle button{display:inline-flex;align-items:center;gap:6px}
+.income-icon{color:#2f6b43;background:#e6f1e0}
+.transfer-amount{color:#5d6d57}
+@media(max-width:600px){.add-group.desktop-add{display:none}.add-group.mobile-add{gap:1px;overflow:hidden;min-width:0}.add-group.mobile-add .primary{border-radius:0;box-shadow:none}.add-group.mobile-add .primary:first-child{padding-left:22px}.add-group.mobile-add .add-more{padding-right:16px}.stat-card strong.money-value{font-size:18px}.worth-split{font-size:11px}.kind-toggle{display:flex;width:100%}.kind-toggle button{flex:1;padding-inline:4px}}
+@media(max-width:600px){.main-tabs button{padding:8px 10px}.main-tabs button svg{display:none}}
+.add-group .primary{white-space:nowrap}

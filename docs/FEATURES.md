@@ -1,5 +1,6 @@
 # Pocket features
 
+Pocket is a personal money app for one owner (BDT, Asia/Dhaka): accounts and net worth, income, spending, budgets and reports. It never connects to banks; everything is entered by hand.
 Status of what Pocket does today and what could come next.
 Keep this file current: move an idea to "Implemented" when it ships.
 
@@ -8,9 +9,9 @@ Keep this file current: move an idea to "Implemented" when it ships.
 ### Expenses
 | Feature | Details | Code |
 |---|---|---|
-| Add expense | Dialog with amount (BDT, up to 2 decimals), category, date, optional note (max 200 chars). Desktop button in header, floating button on mobile. | `tracker.tsx` `start()`, `save()`; `POST /api/expenses` |
+| Add expense | Dialog with amount (BDT, up to 2 decimals), category, date, optional note (max 200 chars). The Add button (header on desktop, floating on mobile) adds an expense in one tap; its menu also adds income or a transfer. | `tracker.tsx` `start()`, `save()`; `POST /api/expenses` |
 | Edit expense | Pencil button on any expense row reopens the dialog pre-filled. | `PUT /api/expenses` |
-| Delete with undo | Trash button on every expense row (Overview and Expenses). Deletes immediately and shows a toast with Undo for 7 seconds; Undo re-creates the identical expense. If the delete fails, the row comes back with an error toast. | `remove()`, `undo()`; `DELETE`/`POST /api/expenses` |
+| Delete with undo | Trash button on every expense row (Overview and Transactions). Deletes immediately and shows a toast with Undo for 7 seconds; Undo re-creates the identical expense. If the delete fails, the row comes back with an error toast. | `remove()`, `undo()`; `DELETE`/`POST /api/expenses` |
 | Payment method | Optional "Paid with" on each expense (free text up to 30 chars, suggestions: Cash, bKash, Nagad, Card, Bank transfer and past methods). New entries default to the most recently used method. Shown on rows, searchable, filterable (Paid with), in the all-expenses CSV and backups. | `method` column; `lib/expenses.ts` |
 | Quick add | The add dialog shows up to 5 chips for your most frequent expenses of the last 60 days (same category, amount and note), most used first. Tapping one fills amount, category, payment method and note; date stays today. Not shown when editing. | `lib/quick.ts` (unit tested) |
 | Smart defaults | New entries default to the Groceries category and to today (Asia/Dhaka) when viewing the current month, otherwise the 1st of the viewed month. After saving, the view jumps to the expense's month. | `start()`, `today()` |
@@ -19,7 +20,7 @@ Keep this file current: move an idea to "Implemented" when it ships.
 ### Income
 | Feature | Details | Code |
 |---|---|---|
-| Income entries | "Income & savings" panel on Overview: add, edit and delete (with Undo) income with amount, source (suggestions from defaults and past sources), date and note. | `app/income.tsx`; `/api/income` |
+| Income entries | Add from the Add menu or the "Income & savings" panel; edit and delete (with Undo) from the panel or Transactions. Amount, source (suggestions from defaults and past sources), date, optional account and note. | `app/income.tsx` (`IncomeDialog`, `deleteIncome`); `/api/income` |
 | Net savings | Panel shows the month's income, spent, saved or overspent, and savings rate. Monthly table and CSV export add Income and Net rows when any income exists. Included in backups. | `lib/income.ts` |
 
 ### Categories
@@ -36,12 +37,12 @@ Keep this file current: move an idea to "Implemented" when it ships.
 | Feature | Details |
 |---|---|
 | Month navigation | Previous/next buttons and a native month picker. |
-| Summary cards | Total spent this month with entry count, active categories (used / total), largest category with its amount. |
-| Overview tab | Donut chart of spending by category with legend, amounts and percentages; 12-month bar chart for the year (click a bar to jump to that month); year total; 5 most recent expenses of the month. |
-| Expenses tab | List for the selected month or all time, newest first. Search by category or note; filter by category, amount range and (all time) date range; live count and total of the results; Clear filters. On mobile the filters collapse behind a Filters button showing how many are active. Logic in `lib/filter.ts` (unit tested). |
+| Summary cards | Net worth (own / owe, link to Accounts), money in this month with saved amount and rate, money out this month with % change vs last month and the top category. |
+| Overview tab | Donut chart of spending by category with legend, amounts and percentages; 12-month bar chart for the year (click a bar to jump to that month); year total; income & savings, budgets, month comparison; 6 most recent entries of the month across spending, income and transfers. |
+| Transactions tab | Spending, income and transfers in one list for the selected month or all time, newest first, with an All / Spending / Income / Transfers switch and in/out totals. Text search also matches sources and account names; category and payment-method filters apply to spending only. Logic in `lib/activity.ts` (unit tested). Expense filters as before: Search by category or note; filter by category, amount range and (all time) date range; live count and total of the results; Clear filters. On mobile the filters collapse behind a Filters button showing how many are active. Logic in `lib/filter.ts` (unit tested). |
 | Month-over-month comparison | Total card shows the % change vs the previous month. "Compared with <month>" panel on Overview lists each category's last month → this month and % change ("New" when there was nothing before), biggest changes first, top 6 with Show all. Increases in warm red, decreases in green. Logic in `lib/compare.ts` (unit tested). |
-| Monthly table tab | Categories down, months across, row and column totals for the selected year. Sticky first column, horizontal scroll on mobile. |
-| Year tab | Year in review for the selected month's year: total spent with % change vs the previous year, average per month (from the first month with spending to this month, or December for past years), income and saved/overspent when income exists, biggest and quietest month (click to open that month), categories ranked by spend with share bars (top 8, Show all), and the five largest single expenses. Logic in `lib/yearly.ts` (unit tested). `app/yearly.tsx`. |
+| Reports: monthly table | Categories down, months across, row and column totals for the selected year. Sticky first column, horizontal scroll on mobile. |
+| Reports: year in review | Year in review for the selected month's year: total spent with % change vs the previous year, average per month (from the first month with spending to this month, or December for past years), income and saved/overspent when income exists, biggest and quietest month (click to open that month), categories ranked by spend with share bars (top 8, Show all), and the five largest single expenses. Logic in `lib/yearly.ts` (unit tested). `app/yearly.tsx`. |
 | Accounts and net worth | Accounts tab: add cash, bank, mobile wallet, DPS, FD, mutual fund, Sanchayapatra, shares, loan given, loan taken, credit card or other accounts, each with a starting balance and note. Shows assets, amount owed and net worth, accounts grouped by kind with group totals. Loans taken and credit cards are debts (shown as amount owed). Tap an account for its balance and full history. Accounts with history cannot be deleted; close them to hide them from lists and pickers. `app/accounts.tsx`, `/api/accounts`, `lib/accounts.ts` (unit tested). |
 | Transfers | Move money between any two accounts (e.g. bank to cash, or an EMI from bank to a loan or card). Edit or delete with Undo from the activity list or account history. `/api/accounts/transfers`. |
 | Balance updates | Set a new balance or amount owed for interest, profit, fees or a new market value; the difference is stored as a signed adjustment. Deletable with Undo. `/api/accounts/adjustments`. |
@@ -74,10 +75,22 @@ These are the gaps the ideas below address.
 - Unstyled categories share a 12-colour palette by position, so two can look alike until you pick colours.
 
 ## Feature ideas
-Proposed, not yet prioritised. Size: S = under an hour, M = a few hours, L = a day or more.
+Proposed, not yet prioritised. Size: S = under an hour, M = a few hours, L = a day or more. Nothing here connects to a bank.
 
 | # | Idea | Why | Size |
 |---|---|---|---|
+| 16 | **Recurring income and transfers with accounts** (salary into bank, monthly DPS instalment, loan EMI; recurring expenses gain "Paid from") | The biggest monthly movements are regular; today they must be entered by hand | M |
+| 17 | **Investment details** on DPS, FD, Sanchayapatra: start date, maturity date, profit rate, instalment; expected maturity value and an "Upcoming maturities" list | Know when money unlocks and what it will be worth | M |
+| 18 | **Loan and EMI tracker**: principal, rate, tenure; remaining balance, instalments left, next due date, interest vs principal split | Loans are the largest debts; see the payoff path | M |
+| 19 | **Savings goals** (emergency fund, Hajj, laptop) with target, date, linked accounts and progress | Turns savings into plans | M |
+| 20 | **Net worth over time** chart, rebuilt from dated history (opening balances, entries, transfers, updates) | See whether you are getting richer month by month | M |
+| 21 | **Bills and due dates** (credit card, utilities, school fees) with an upcoming list and reminders | Avoid late fees | M |
+| 22 | **Zakat calculator** from cash, savings, investments and gold, minus debts, against the nisab | Yearly obligation, numbers already in the app | S |
+| 23 | **Tax-year view** (July to June) with income totals and investment rebate helpers (Sanchayapatra, DPS, life insurance) | Tax return prep | M |
+| 24 | **Gold and property** as assets with units (vori/gram, decimal) and a manual price | Common store of value not covered by account types | S |
+| 25 | **Income vs spending chart** on Overview (two bars per month) | The current chart shows spending only | S |
+| 26 | **Privacy mode**: one tap blurs all amounts | Use the app in public | S |
+| 27 | **Cash-flow forecast** for the next 30 days from recurring items and bills | Know if the month will be tight before it is | M |
 | 13 | **Receipt photo attachment** stored in R2 | Proof for medical, tax, and business expenses | L |
 | 14 | **Installable PWA** with offline entry queued until online | Feels like a native phone app | L |
 

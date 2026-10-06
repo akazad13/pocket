@@ -1,6 +1,6 @@
 # CLAUDE.md
 
-Pocket: a single-user, mobile-first personal expense tracker (currency BDT, timezone Asia/Dhaka).
+Pocket: a single-user, mobile-first personal money app (accounts and net worth, income, spending, budgets, reports; currency BDT, timezone Asia/Dhaka). No bank connections; everything is entered by hand.
 Next.js 16 App Router code, run by **vinext** (Vite-based Next runtime) on a **Cloudflare Worker** with a **D1** (SQLite) database.
 The project was scaffolded by the OpenAI "Sites" starter (`site-creator-vinext-starter`); most of the tooling outside `app/`, `lib/`, `db/` and `drizzle/` is that starter's plumbing.
 
@@ -27,14 +27,14 @@ Git: `main` branch, LF line endings enforced by `.gitattributes`. The folder is 
 ## Where things are (the only files you normally touch)
 
 ```
-app/tracker.tsx            Main UI: one "use client" component (~50 very long lines). All state, fetches, charts, dialogs.
+app/tracker.tsx            Main UI: one "use client" component (~80 very long lines). All state and fetches, summary cards, the Add split button/menu, tabs (Overview, Transactions, Accounts, Reports), expense dialog, and the top-level income and transfer dialogs.
 app/budgets.tsx            Budgets panel + edit dialog (self-contained, fetches /api/budgets).
 app/recurring.tsx          Recurring rules dialog (list/add/edit/stop).
-app/income.tsx             Income & savings panel with its own add/edit dialog; income state lives in tracker.
+app/income.tsx             IncomePanel (Overview), IncomeDialog (keyed per opening), IncomeRow, deleteIncome(); income state lives in tracker.
 app/category-icon.tsx      Icon key → lucide component (fallback ReceiptText).
 app/comparison.tsx         "Compared with last month" panel; changeText()/ChangeIcon reused by the total card.
 app/yearly.tsx             "Year" tab: year-in-review panels built from lib/yearly.ts.
-app/accounts.tsx           "Accounts" tab: net worth, account list/detail/history, account, transfer and update-balance dialogs; exports AccountPicker used by expense and income forms.
+app/accounts.tsx           "Accounts" tab: net worth, account list/detail/history, account and update-balance dialogs. Exports AccountPicker, TransferDialog (keyed per opening), TransferRow, deleteTransfer() used by the tracker.
 app/backup.tsx             Backup & restore dialog (JSON download, all-expenses CSV, restore upload).
 app/page.tsx               Re-exports tracker.
 app/layout.tsx             Metadata, imports globals.css + pocket.css.
@@ -64,6 +64,7 @@ lib/income.ts              Income type, defaultSources, validateIncome().
 lib/compare.ts             Pure month-over-month comparison (totals and per category).
 lib/yearly.ts              Pure year-in-review numbers (totals, average, ranked categories/months, largest).
 lib/accounts.ts            Pure: account types/groups, validators, values() balances, totals(), adjustmentFor(). Client-safe.
+lib/activity.ts            Pure: merges expenses, income and transfers into one filtered list (Transactions tab, Recent activity); flows() totals.
 lib/account-db.ts          Server-only: SELECT strings, toAccount(), missingAccount() existence check.
 lib/theme-script.ts        Inline <head> script that sets data-theme before paint (kept out of the client module so the server layout gets the string).
 lib/category-style.ts      PALETTE, ICONS, validateStyle(), colorFor() fallback colour by position.
@@ -127,7 +128,7 @@ Data access uses **raw D1 prepared statements** (`database().prepare(...).bind(.
 
 ## UI conventions
 
-- Everything lives in `app/tracker.tsx` as one component with many `useState`s. State is updated optimistically from API responses (no refetch after mutations).
+- Everything lives in `app/tracker.tsx` as one component with many `useState`s. Dialogs that must open from any tab (expense, income, transfer) are rendered by the tracker; income and transfer dialogs are mounted with a fresh `key` per opening so their form state initialises from props without effects. Items in the Add menu run their action from `onCloseAutoFocus` (via the `afterMenu` ref) so the dialog gets focus after the menu closes. State is updated optimistically from API responses (no refetch after mutations).
 - Styling is hand-written CSS classes in `app/pocket.css`, not Tailwind utility classes. **Every new class with a colour, background or border needs a matching `html[data-theme=dark]` rule in `app/pocket-dark.css`**; check both themes in screenshots. Tailwind v4 borders default to currentColor, so shadcn borders (e.g. table rows) may need an explicit colour. Palette: primary `#256a53`, background `#f8f9f6`, text `#22382e`. Mobile layout rules live in `@media(max-width:600px)`; check 390px width after UI changes.
 - Icons from `lucide-react`; dialogs/selects/tabs/tables from `@/components/ui/*` (shadcn on Radix).
 - Flex rows like `.category-row>div{flex:1}` also match new child divs; give full-width children a more specific `flex:0 0 100%` rule.

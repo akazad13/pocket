@@ -5,8 +5,8 @@ import "./pocket-dark.css";
 import { themeScript } from "@/lib/theme-script";
 
 export const metadata: Metadata = {
-  title: "Pocket · Expense tracker",
-  description: "Track everyday expenses and see your monthly spending clearly.",
+  title: "Pocket · Your money",
+  description: "Your whole pocket: accounts, income, spending, savings and net worth in one place.",
   other: {
     "codex-preview": "development",
   },
