@@ -38,7 +38,7 @@ Keep this file current: move an idea to "Implemented" when it ships.
 |---|---|
 | Month navigation | Previous/next buttons and a native month picker. |
 | Summary cards | Net worth (own / owe, link to Accounts), money in this month with saved amount and rate, money out this month with % change vs last month and the top category. |
-| Overview tab | Donut chart of spending by category with legend, amounts and percentages; 12-month bar chart for the year (click a bar to jump to that month); year total; income & savings, budgets, month comparison; 6 most recent entries of the month across spending, income and transfers. |
+| Overview tab | Donut chart of spending by category with legend, amounts and percentages; 12-month bar chart for the year, with a money-in bar beside each month's spending once the year has income (click a bar to jump to that month); year total; income & savings, budgets, month comparison; 6 most recent entries of the month across spending, income and transfers. |
 | Transactions tab | Spending, income and transfers in one list for the selected month or all time, newest first, with an All / Spending / Income / Transfers switch and in/out totals. Text search also matches sources and account names; category and payment-method filters apply to spending only. Logic in `lib/activity.ts` (unit tested). Expense filters as before: Search by category or note; filter by category, amount range and (all time) date range; live count and total of the results; Clear filters. On mobile the filters collapse behind a Filters button showing how many are active. Logic in `lib/filter.ts` (unit tested). |
 | Month-over-month comparison | Total card shows the % change vs the previous month. "Compared with <month>" panel on Overview lists each category's last month → this month and % change ("New" when there was nothing before), biggest changes first, top 6 with Show all. Increases in warm red, decreases in green. Logic in `lib/compare.ts` (unit tested). |
 | Reports: monthly table | Categories down, months across, row and column totals for the selected year. Sticky first column, horizontal scroll on mobile. |
@@ -87,7 +87,6 @@ Proposed, not yet prioritised. Size: S = under an hour, M = a few hours, L = a d
 | 22 | **Zakat calculator** from cash, savings, investments and gold, minus debts, against the nisab | Yearly obligation, numbers already in the app | S |
 | 23 | **Tax-year view** (July to June) with income totals and investment rebate helpers (Sanchayapatra, DPS, life insurance) | Tax return prep | M |
 | 24 | **Gold and property** as assets with units (vori/gram, decimal) and a manual price | Common store of value not covered by account types | S |
-| 25 | **Income vs spending chart** on Overview (two bars per month) | The current chart shows spending only | S |
 | 27 | **Cash-flow forecast** for the next 30 days from recurring items and bills | Know if the month will be tight before it is | M |
 | 13 | **Receipt photo attachment** stored in R2 | Proof for medical, tax, and business expenses | L |
 | 14 | **Installable PWA** with offline entry queued until online | Feels like a native phone app | L |

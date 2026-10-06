@@ -113,3 +113,12 @@ body{background:#f8f9f6;color:#22382e;font-family:Arial,Helvetica,sans-serif}but
 .loan-progress{display:grid;gap:5px;margin-top:2px}
 .loan-bar{height:5px;margin-top:7px;max-width:260px}
 html[data-private] :is(.matrix td:not(:first-child),.matrix th:last-child){filter:blur(6px)}
+.bar-pair{display:flex;align-items:flex-end;justify-content:center;gap:2px;width:100%;flex:1}
+.bar-pair .bar{width:65%}
+.bar-pair .bar.income-bar,.bar-pair .income-bar+.bar{width:34%;min-width:4px}
+.bar.income-bar{background:#cddfeb}
+.bar.income-bar.active{background:#4d7fa6}
+.chart-legend{display:flex;gap:16px;font-size:11px;color:#8d9884;margin-top:12px}
+.chart-legend span{display:inline-flex;align-items:center;gap:6px}
+.chart-legend i{width:9px;height:9px;border-radius:2px;background:#387354}
+.chart-legend .income-dot{background:#4d7fa6}
