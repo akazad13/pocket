@@ -4,7 +4,7 @@ import {ArrowLeftRight,Plus,Pencil,Trash2,Repeat,Gem,LandPlot,Wallet,Landmark,Sm
 import {toast} from 'sonner';
 import {Dialog,DialogContent,DialogTitle,DialogDescription} from '@/components/ui/dialog';
 import {Select,SelectTrigger,SelectValue,SelectContent,SelectItem,SelectGroup,SelectLabel} from '@/components/ui/select';
-import {money} from '@/lib/format';
+import {money,shortDate} from '@/lib/format';
 import {UNITS,unitName,qtyText,ACCOUNT_TYPES,GROUPS,typeInfo,isDebt,values,shown,totals,adjustmentFor,type Account,type AccountType,type Transfer,type Adjustment} from '@/lib/accounts';
 import type {Expense} from '@/lib/expenses';
 import Zakat from './zakat';
@@ -44,7 +44,7 @@ export function TransferDialog({target,accounts,today,onClose,onSaved,onNotice}:
 }
 export function TransferRow({x,accounts,onEdit,onDelete}:{x:Transfer;accounts:Account[];onEdit:()=>void;onDelete:()=>void}){
  const name=(id:string)=>accounts.find(a=>a.id===id)?.name??'Deleted account';
- return <div className="expense-row"><span className="expense-icon"><ArrowLeftRight size={18}/></span><div><b>{name(x.from)} → {name(x.to)}</b><p>{x.id.startsWith('rec-')&&<Repeat size={11} className="recurring-mark" aria-label="Recurring"/>}{x.date}{x.note?` · ${x.note}`:''}</p></div><strong className="transfer-amount">{money(x.cents)}</strong><button className="icon-button" aria-label={`Edit transfer from ${name(x.from)} to ${name(x.to)}`} onClick={onEdit}><Pencil size={16}/></button><button className="icon-button delete" aria-label={`Delete transfer of ${money(x.cents)} on ${x.date}`} onClick={onDelete}><Trash2 size={16}/></button></div>;
+ return <div className="expense-row"><span className="expense-icon"><ArrowLeftRight size={18}/></span><div><b>{name(x.from)} → {name(x.to)}</b><p>{x.id.startsWith('rec-')&&<Repeat size={11} className="recurring-mark" aria-label="Recurring"/>}{shortDate(x.date)}{x.note?` · ${x.note}`:''}</p></div><strong className="transfer-amount">{money(x.cents)}</strong><button className="icon-button" aria-label={`Edit transfer from ${name(x.from)} to ${name(x.to)}`} onClick={onEdit}><Pencil size={16}/></button><button className="icon-button delete" aria-label={`Delete transfer of ${money(x.cents)} on ${x.date}`} onClick={onDelete}><Trash2 size={16}/></button></div>;
 }
 export default function Accounts({accounts,transfers,adjustments,items,income,today,setAccounts,setAdjustments,onTransfer,onDeleteTransfer,onNotice}:Props){
  const[form,setForm]=useState<null|{isNew:boolean;id:string;name:string;type:AccountType;opening:string;note:string;closed:boolean;startDate:string;maturityDate:string;rate:string;instalment:string;quantity:string;unit:string}>(null),[update,setUpdate]=useState<null|{id:string;balance:string;date:string;note:string;price:string}>(null),[detail,setDetail]=useState<string|null>(null),[showClosed,setShowClosed]=useState(false),[saving,setSaving]=useState(false),[error,setError]=useState('');

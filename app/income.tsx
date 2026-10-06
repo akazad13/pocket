@@ -3,7 +3,7 @@ import {useState} from 'react';
 import {Pencil,Plus,Repeat,Trash2,TrendingUp} from 'lucide-react';
 import {toast} from 'sonner';
 import {Dialog,DialogContent,DialogTitle,DialogDescription} from '@/components/ui/dialog';
-import {money} from '@/lib/format';
+import {money,shortDate} from '@/lib/format';
 import {defaultSources,type Income} from '@/lib/income';
 import type {Account} from '@/lib/accounts';
 import {AccountPicker} from './accounts';
@@ -28,7 +28,7 @@ export function IncomeDialog({entry,accounts,entries,month,today,onClose,onSaved
 }
 export function IncomeRow({e,accounts,onEdit,onDelete}:{e:Income;accounts:Account[];onEdit:()=>void;onDelete:()=>void}){
  const a=accountName(accounts,e.account);
- return <div className="expense-row"><span className="expense-icon income-icon"><TrendingUp size={18}/></span><div><b>{e.source}</b><p>{e.id.startsWith('rec-')&&<Repeat size={11} className="recurring-mark" aria-label="Recurring"/>}{e.date}{a?` · ${a}`:''}{e.note?` · ${e.note}`:''}</p></div><strong className="income-amount">+{money(e.cents)}</strong><button className="icon-button" aria-label={`Edit income ${e.source}`} onClick={onEdit}><Pencil size={16}/></button><button className="icon-button delete" aria-label={`Delete income ${e.source} ${money(e.cents)} on ${e.date}`} onClick={onDelete}><Trash2 size={16}/></button></div>;
+ return <div className="expense-row"><span className="expense-icon income-icon"><TrendingUp size={18}/></span><div><b>{e.source}</b><p>{e.id.startsWith('rec-')&&<Repeat size={11} className="recurring-mark" aria-label="Recurring"/>}{shortDate(e.date)}{a?` · ${a}`:''}{e.note?` · ${e.note}`:''}</p></div><strong className="income-amount">+{money(e.cents)}</strong><button className="icon-button" aria-label={`Edit income ${e.source}`} onClick={onEdit}><Pencil size={16}/></button><button className="icon-button delete" aria-label={`Delete income ${e.source} ${money(e.cents)} on ${e.date}`} onClick={onDelete}><Trash2 size={16}/></button></div>;
 }
 type Props={accounts:Account[];entries:Income[];month:string;monthLabel:string;spent:number;onAdd:()=>void;onEdit:(e:Income)=>void;onDelete:(e:Income)=>void};
 export default function IncomePanel({accounts,entries,month,monthLabel,spent,onAdd,onEdit,onDelete}:Props){

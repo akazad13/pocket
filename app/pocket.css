@@ -1,3 +1,5 @@
+/* Bricolage Grotesque for headings and amounts; Hind Siliguri (Bangla + Latin) for interface text. */
+@import url('https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400..700&family=Hind+Siliguri:wght@400;500;600;700&display=swap');
 :root{--background:#f8f9f6;--foreground:#22382e;--primary:#256a53;--primary-foreground:#fff;--card:#fff;--card-foreground:#22382e;--muted:#f0f3ed;--muted-foreground:#748078;--border:#e5e9e2;--input:#dce3da;--ring:#256a53;--accent:#eaf0e7;--accent-foreground:#256a53;--popover:#fff;--popover-foreground:#22382e}
 body{background:#f8f9f6;color:#22382e;font-family:Arial,Helvetica,sans-serif}button,a,input{ -webkit-tap-highlight-color:transparent}button{cursor:pointer}button:disabled{opacity:.55;cursor:wait}button:focus-visible,a:focus-visible,input:focus-visible{outline:2px solid #256a53;outline-offset:4px}.topbar{height:88px;border-bottom:1px solid #e3e7df;display:flex;align-items:center;padding:0 max(28px,calc((100vw - 1120px)/2));gap:10px;background:#fff}.brand{display:flex;align-items:center;font-size:29px;letter-spacing:-1.5px;font-weight:750;text-decoration:none;color:inherit}.brand-icon{display:grid;place-items:center;width:40px;height:40px;background:#256a53;color:#fff;border-radius:12px;margin-right:11px}.brand-dot{color:#83a866}.top-note{margin-left:auto;margin-right:28px;font-size:13px;color:#8a9288}.profile{width:35px;height:35px;display:grid;place-items:center;border-radius:50%;background:#ecebdd;color:#64725b;font-size:13px;font-weight:bold}.app main{max-width:1120px;margin:auto;padding:42px 0 0}.page-heading{display:flex;align-items:center;justify-content:space-between;margin-bottom:30px}.eyebrow{font-size:10px;font-weight:700;letter-spacing:2px;color:#7a8c72;margin-bottom:10px}h1{font-size:37px;line-height:1.2;letter-spacing:-1.4px;font-weight:650}h1 span{color:#92b779}.page-heading p{font-size:14px;color:#8a9288;margin-top:9px}.primary{background:#256a53;color:white;border-radius:9px;border:0;min-height:44px;padding:12px 19px;display:inline-flex;justify-content:center;align-items:center;gap:8px;font-size:13px;font-weight:600;box-shadow:0 3px 5px #183c2910}.primary:hover{background:#1b533e}.toolbar{display:flex;justify-content:space-between;align-items:center;margin-bottom:20px}.month-picker{display:flex;align-items:center;gap:8px}.month-picker button{width:32px;height:36px;display:grid;place-items:center;border:1px solid #e5e9e2;border-radius:7px;background:white}.month-picker input{border:0;background:none;color:#34493b;font-size:14px;font-weight:600;width:170px;padding:5px}.currency{font-size:11px;font-weight:600;letter-spacing:.3px;color:#697b6b}.currency span{font-weight:400;color:#8e978c}.summary{display:grid;grid-template-columns:1.3fr 1fr 1fr;gap:18px;margin-bottom:30px}.total-card,.stat-card{border-radius:14px;padding:23px 25px;min-height:182px}.total-card{background:#256a53;color:#fff}.card-label{font-size:13px;display:flex;align-items:center;justify-content:space-between;color:#bcd3c7}.big-number{font-size:40px;line-height:1.25;font-weight:600;letter-spacing:-1px;margin:17px 0 18px}.card-bottom{display:flex;align-items:center;justify-content:space-between;font-size:11px;color:#c3d8cb}.pill{padding:5px 9px;border-radius:5px;background:#ffffff12}.stat-card{background:#fff;border:1px solid #e6e9e1;position:relative}.stat-card .card-label{color:#7b8478;font-size:12px;margin-top:4px}.stat-icon{float:right;display:grid;place-items:center;background:#f0f3e9;color:#7b976d;border-radius:9px;width:35px;height:35px}.stat-icon.peach{background:#fbf2e9;color:#c39767}.stat-card strong{font-size:33px;display:block;margin-top:21px;font-weight:550;letter-spacing:-.7px}.stat-card strong small{font-size:14px;color:#a3aa9f;font-weight:400}.stat-card strong.category-value{font-size:23px;margin-top:29px}.stat-card p{font-size:11px;color:#9aA194;margin-top:10px}.tabs-row{display:flex;justify-content:space-between;align-items:center;margin-bottom:19px}.main-tabs{background:#eaf0e5!important;height:42px!important;padding:4px!important;gap:4px;border-radius:8px!important}.main-tabs button{font-size:12px;padding:9px 14px;color:#7b8875;border-radius:5px}.main-tabs button[data-state=active]{background:#fff!important;color:#335b40!important;box-shadow:0 1px 4px #1f352316}.export{display:flex;align-items:center;gap:8px;color:#7c8775;font-size:12px;padding:10px}.overview-grid{display:grid;grid-template-columns:1.6fr 1fr;gap:20px}.panel{background:#fff;border:1px solid #e4e8df;border-radius:13px;padding:24px;min-width:0}.section-heading{display:flex;justify-content:space-between;align-items:center;gap:12px}h2{font-size:15px;font-weight:650;letter-spacing:-.15px}.section-heading p{font-size:11px;color:#97a08f;margin-top:6px}.subtle{font-size:11px;color:#96a08f;font-weight:400}.empty{min-height:255px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px;text-align:center;padding:20px}.empty-icon{display:grid;place-items:center;border-radius:50%;background:#f1f5eb;color:#8ea77b;width:65px;height:65px;margin-bottom:5px}.empty h3{font-size:16px;font-weight:600}.empty p{color:#97a08e;font-size:12px;line-height:1.7;max-width:260px}.empty .primary{margin-top:7px;font-size:12px;padding:10px 17px}.chart{display:flex;align-items:flex-end;justify-content:space-between;height:176px;margin-top:20px;padding:10px 0 0;border-bottom:1px solid #eef0e9}.chart-column{height:100%;flex:1;display:flex;justify-content:flex-end;align-items:center;flex-direction:column;gap:10px}.bar{width:65%;background:#d9e5ce;border-radius:3px 3px 0 0;min-width:10px}.bar.active{background:#387354}.chart-column small{color:#9da594;font-size:10px;padding-bottom:8px}.year-total{display:flex;justify-content:space-between;margin-top:16px;font-size:12px;color:#8d9884}.year-total strong{color:#42613f}.tip{display:flex;align-items:center;gap:13px;background:#f3f6ec;color:#8eaa6d;margin-top:19px;border-radius:7px;padding:12px}.tip p{font-size:10px;line-height:1.7;color:#8b977d}.tip strong{font-weight:400;color:#647b52}.recent{margin-top:20px}.text-button{font-size:11px;color:#467147;padding:9px}.quiet-empty{padding:28px 0 12px;font-size:12px;color:#a0a899}.expense-row{display:flex;gap:12px;align-items:center;padding:17px 0;border-bottom:1px solid #edf0e7}.expense-row:last-child{border:0}.expense-icon{background:#f2f5eb;color:#7f9870;padding:11px;border-radius:10px}.expense-row>div{flex:1;min-width:0}.expense-row b{font-size:13px;font-weight:500}.expense-row p{font-size:11px;color:#9aa18f;margin-top:6px;overflow-wrap:anywhere}.expense-row strong{font-size:13px;white-space:nowrap}.icon-button{width:36px;height:40px;display:grid;place-items:center;color:#819374;border-radius:6px}.icon-button:hover{background:#f1f5eb}.delete{color:#b88171}.search{display:flex;align-items:center;gap:10px;background:#f8faf5;border:1px solid #e7ecdf;padding:10px 13px;border-radius:8px;margin-top:20px;color:#98a58e}.search input{background:none;outline:none;width:100%;font-size:13px}.breakdown{display:flex;align-items:center;gap:28px;padding:30px 0}.donut{width:180px;height:180px;border-radius:50%;padding:21px;flex-shrink:0}.donut>div{background:#fff;border-radius:50%;height:100%;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:9px}.donut small{font-size:9px;color:#99a38e;letter-spacing:1px}.donut strong{font-size:20px}.legend{flex:1;min-width:0}.legend>div{display:flex;align-items:center;gap:8px;font-size:11px;margin:15px 0}.legend b{margin-left:auto;white-space:nowrap;font-weight:500}.legend small{color:#9da58f;width:28px;text-align:right}.dot{width:8px;height:8px;border-radius:50%;flex-shrink:0}.matrix{min-width:1100px;margin-top:22px;font-size:12px}.matrix th,.matrix td{text-align:right;padding:14px 12px;color:#718166}.matrix th:first-child,.matrix td:first-child{text-align:left;position:sticky;left:0;background:white;min-width:150px;color:#3d5534;z-index:1}.matrix th{font-size:11px}.matrix tfoot td{font-weight:bold;background:#f3f6ee}.table-hint{font-size:11px;color:#9aa58b;margin-top:20px}footer{display:flex;justify-content:space-between;align-items:center;color:#a8b09e;font-size:10px;padding:29px 0}.brand-mini{display:flex;gap:6px;font-size:13px;font-weight:bold}.mobile-add{display:none}.expense-dialog{border-radius:16px!important;background:#fff;max-height:92dvh;overflow-y:auto}.expense-dialog form{display:grid;gap:18px}.expense-dialog label{display:grid;gap:8px;font-size:12px;font-weight:600}.expense-dialog input{width:100%;min-height:44px;background:#fafbf8;border:1px solid #dde5d5;border-radius:7px;padding:10px 13px;font-size:16px;font-weight:400}.amount-input{display:flex;align-items:center;border:1px solid #dde5d5;background:#fafbf8;border-radius:9px;padding-left:18px}.amount-input span{font-size:27px;color:#8c9d7c}.amount-input input{border:0;font-size:32px;background:none}.form-select{width:100%!important;height:44px!important;font-size:14px!important}.save{width:100%;margin-top:6px}.error{font-size:12px;color:#9d4338;background:#fff0eb;border-radius:8px;padding:13px;margin-bottom:16px}.error button{text-decoration:underline;font-weight:bold}
 @media(max-width:1180px){.app main{margin:0 28px}}@media(max-width:800px){.overview-grid{grid-template-columns:1fr}.breakdown{justify-content:center}.summary{gap:12px}.total-card,.stat-card{padding:20px}.top-note{display:none}.profile{margin-left:auto}}@media(max-width:600px){.topbar{height:70px;padding:0 20px}.brand{font-size:26px}.brand-icon{width:35px;height:35px}.app main{margin:0;padding:28px 18px 80px}.eyebrow{font-size:9px}h1{font-size:30px}.page-heading{margin-bottom:24px}.page-heading p{font-size:12px}.desktop-add{display:none}.currency span{display:none}.month-picker{gap:4px}.month-picker input{width:154px;font-size:13px}.summary{grid-template-columns:1fr 1fr;gap:11px;margin-bottom:24px}.total-card{grid-column:1/-1;min-height:176px;padding:22px}.big-number{font-size:42px}.stat-card{min-height:145px;padding:16px}.stat-icon{width:27px;height:27px}.stat-icon svg{width:16px}.stat-card .card-label{font-size:10px;max-width:80px}.stat-card strong{margin-top:17px;font-size:28px}.stat-card strong.category-value{font-size:18px;margin-top:23px}.stat-card p{font-size:10px;line-height:1.5;max-width:128px}.tabs-row{gap:3px;margin-bottom:13px}.main-tabs{gap:0;width:100%;height:44px!important}.main-tabs button{font-size:11px;padding:8px;gap:5px}.main-tabs button svg{width:13px}.export{padding:10px 6px}.export span{display:none}.panel{padding:19px;border-radius:12px}.section-heading h2{font-size:14px}.section-heading>.subtle{font-size:10px}.overview-grid{gap:15px}.empty{min-height:250px;padding:20px 5px}.empty h3{font-size:15px}.mobile-add{display:flex;position:fixed;bottom:max(18px,env(safe-area-inset-bottom));left:50%;transform:translateX(-50%);z-index:20;min-width:170px;border-radius:25px;box-shadow:0 5px 25px #173e3a33}.breakdown{flex-direction:column;gap:15px}.legend{width:100%}.expense-row{gap:7px}.expense-icon{display:none}.expense-row strong{font-size:12px}.icon-button{width:30px;flex-shrink:0}.expense-row p{font-size:10px}.matrix th:first-child,.matrix td:first-child{min-width:130px}.expense-dialog{max-height:90dvh;padding:22px!important}footer{margin-top:5px}}
@@ -218,3 +220,128 @@ html[data-private] :is(.matrix td:not(:first-child),.matrix th:last-child){filte
 .taxyear>.text-button{margin-top:10px}
 @media(max-width:800px){.taxyear-grid{grid-template-columns:1fr}}
 .text-button>svg{display:inline-block;vertical-align:-2px;margin-right:4px}
+/* ===== 2026 refresh: flag green, cool paper, Bricolage Grotesque amounts, Hind Siliguri text. Overrides the rules above. ===== */
+:root{--ink:#10241d;--ink-2:#4f625a;--ink-3:#7d8d86;--paper:#f3f6f4;--card:#fff;--line:#e1e8e4;--green:#006a4e;--green-deep:#003d2e;--mint:#d8f3e6;--red:#d63a44;--display:'Bricolage Grotesque',ui-sans-serif,system-ui,sans-serif;--text:'Hind Siliguri',ui-sans-serif,system-ui,sans-serif;--background:#f3f6f4;--foreground:#10241d;--primary:#006a4e;--ring:#006a4e;--accent:#d8f3e6;--accent-foreground:#006a4e;--border:#e1e8e4}
+body{background:var(--paper);color:var(--ink);font-family:var(--text);font-size:15px}
+button:focus-visible,a:focus-visible,input:focus-visible{outline-color:var(--green)}
+h1,h2,h3,.brand,.big-number,.stat-card strong,.income-stats strong,.expense-row strong,.account-row strong,.history-row strong,.bill-row strong,.upcoming-row strong,.networth-head strong,.account-balance strong,.zakat-due strong,.donut strong,.year-total strong,.legend b,.goal-label span,.year-category-label span,.taxyear-row b,.matrix td,.upcoming-date b{font-family:var(--display);font-variant-numeric:tabular-nums}
+.topbar{background:var(--paper);border-bottom:1px solid var(--line);height:76px}
+.brand{font-size:27px;letter-spacing:-.8px;font-weight:700}
+.brand-icon{background:var(--green);border-radius:11px;width:38px;height:38px}
+.brand-dot{color:var(--red)}
+h1 span{color:var(--green)}
+.top-note{color:var(--ink-3);font-size:14px}
+.profile{background:var(--mint);color:var(--green)}
+.theme-toggle{color:var(--ink-2)}
+.theme-toggle:hover{background:var(--mint)}
+.app main{padding-top:36px}
+.eyebrow{font-size:14px;font-weight:500;letter-spacing:0;color:var(--ink-3);margin-bottom:6px}
+h1{font-size:44px;letter-spacing:-1.6px;font-weight:650;line-height:1.05}
+.page-heading p{font-size:15px;color:var(--ink-2);margin-top:10px}
+.primary{background:var(--green);border-radius:12px;font-size:14px;box-shadow:none}
+.primary:hover{background:var(--green-deep)}
+.month-picker button{border-color:var(--line);border-radius:10px;background:var(--card)}
+.month-picker input{color:var(--ink);font-size:15px;font-family:var(--display)}
+.currency{color:var(--ink-2)}
+.currency span{color:var(--ink-3)}
+/* The memorable element: net worth as a taka note (fine guilloche lines and a ৳ watermark). */
+.total-card{position:relative;overflow:hidden;isolation:isolate;border-radius:22px;background:radial-gradient(circle at 105% -20%,transparent 0 38%,#ffffff0d 38.2% 38.6%,transparent 38.8% 46%,#ffffff0d 46.2% 46.6%,transparent 46.8% 54%,#ffffff0d 54.2% 54.6%,transparent 54.8%),repeating-linear-gradient(115deg,#ffffff06 0 2px,transparent 2px 9px),linear-gradient(150deg,#007a5a,var(--green-deep) 75%)}
+.total-card::before{content:'\09F3';position:absolute;right:-6px;bottom:-62px;font-family:var(--text);font-size:230px;font-weight:700;line-height:1;color:#ffffff10;z-index:-1;pointer-events:none}
+.total-card .card-label{color:#cfe9dd;font-size:14px}
+.big-number{font-size:46px;font-weight:600;letter-spacing:-1.5px}
+.worth-split{color:#cfe9dd;font-size:13px}
+.card-bottom{color:#a9d3c0;font-size:12px}
+.total-card .pill{background:#ffffff1f;border-radius:999px;padding:5px 11px}
+.stat-card{border:1px solid var(--line);border-radius:18px;background:var(--card)}
+.stat-card .card-label{color:var(--ink-2);font-size:13px}
+.stat-icon{background:var(--mint);color:var(--green);border-radius:10px}
+.stat-icon.peach{background:#eef2f0;color:var(--ink-2)}
+.donut small{font-size:12px;letter-spacing:0;color:var(--ink-3)}
+.stat-card strong.money-value{font-size:30px;font-weight:600;letter-spacing:-.8px}
+.stat-card p{color:var(--ink-3);font-size:13px}
+.main-tabs{background:#e4ebe7!important;border-radius:14px!important;height:46px!important}
+.main-tabs button{font-size:14px;color:var(--ink-2);border-radius:10px;font-weight:500}
+.main-tabs button[data-state=active]{color:var(--green)!important;box-shadow:0 1px 2px #10241d14}
+.export{color:var(--ink-2);font-size:13px}
+.panel{border-color:var(--line);border-radius:18px;padding:26px}
+h2{font-size:19px;font-weight:600;letter-spacing:-.3px}
+.section-heading p,.subtle{font-size:13px;color:var(--ink-3)}
+.text-button{color:var(--green);font-size:13px;font-weight:500}
+.scope-toggle{background:#e4ebe7;border-radius:11px}
+.scope-toggle button{font-size:13px;color:var(--ink-2);border-radius:8px}
+.scope-toggle button[aria-pressed=true]{color:var(--green)}
+.expense-row b,.account-row b,.history-row b,.bill-row b,.upcoming-row>div b{font-size:15px;font-weight:500}
+.expense-row p,.account-row small,.history-row small,.bill-row small,.upcoming-row>div small{font-size:12.5px;color:var(--ink-3)}
+.expense-row strong,.account-row strong,.bill-row strong,.upcoming-row strong{font-size:15px;font-weight:600}
+.expense-row,.account-row,.bill-row,.upcoming-row,.history-row,.compare-row,.category-row{border-color:var(--line)}
+.expense-icon,.account-icon{border-radius:12px}
+.account-icon,.empty-icon{background:var(--mint);color:var(--green)}
+.icon-button{color:var(--ink-3);border-radius:9px}
+.icon-button:hover{background:#e9f0ec;color:var(--ink)}
+.icon-button.delete:hover{background:#fde9ea;color:var(--red)}
+.income-stats>div{background:var(--paper);border-radius:14px}
+.income-stats small,.zakat-result span{font-size:12px;color:var(--ink-2)}
+.income-stats strong{font-size:20px;font-weight:600}
+.income-stats .net{background:var(--mint)}
+.income-stats .net strong,.income-amount,.up-in,.history-row strong.up{color:var(--green)}
+.income-stats .net.negative{background:#fde9ea}
+.income-stats .net.negative strong,.account-row strong.owed,.up-out,.change.up,.terms-warning,.bill-row.overdue small,.upcoming-row.overdue>div small,.goal-status.late,.zakat-row.debt strong{color:var(--red)}
+.change.down{color:var(--green)}
+.budget-bar{background:#e9efeb}
+.budget-fill{background:var(--green)}
+.budget-fill.over{background:var(--red)}
+.bar{background:#d5e6dd;border-radius:6px 6px 0 0}
+.bar.active{background:var(--green)}
+.legend div{font-size:14px}
+.donut strong{font-size:22px}
+.year-total{font-size:14px;color:var(--ink-2)}
+.year-total strong{color:var(--ink)}
+.search{background:var(--card);border-color:var(--line);border-radius:12px}
+.search input{font-size:15px}
+.quiet-empty{font-size:14px;color:var(--ink-3)}
+.empty p{font-size:14px;color:var(--ink-3)}
+.empty h3{font-family:var(--display);font-size:20px}
+.expense-dialog{border-radius:22px!important}
+.expense-dialog input,.amount-input{border-color:var(--line);background:var(--paper);border-radius:12px}
+.expense-dialog label{font-size:13px}
+.amount-input input{font-family:var(--display);font-variant-numeric:tabular-nums}
+.account-terms,.zakat-result{background:var(--paper);border-radius:14px}
+.account-buttons button{border-color:var(--line);border-radius:10px;color:var(--green)}
+footer{color:var(--ink-3);font-size:12px}
+.mobile-add{box-shadow:0 8px 24px #003d2e40}
+@media(prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
+@media(max-width:600px){
+ body{font-size:14px}
+ .topbar{height:64px;padding:0 18px}.top-note{display:none}.brand{font-size:24px;margin-right:auto}
+ .app main{padding:22px 16px 160px}
+ h1{font-size:34px}.eyebrow{font-size:13px}
+ .total-card{border-radius:20px;min-height:0;padding:22px}
+ .big-number{font-size:40px;margin:12px 0 14px}
+ .stat-card{border-radius:16px;min-height:0;padding:15px}
+ .stat-card .card-label{font-size:12px;max-width:none}
+ .stat-card strong.money-value{font-size:21px}
+ .stat-card p{font-size:12px;max-width:none}
+ .panel{border-radius:16px;padding:18px}
+ h2,.section-heading h2{font-size:17px}
+ /* Tabs become a bottom navigation bar. */
+ .main-tabs{position:fixed!important;left:0;right:0;bottom:0;z-index:30;height:calc(64px + env(safe-area-inset-bottom))!important;padding:6px 8px calc(6px + env(safe-area-inset-bottom))!important;border-radius:0!important;background:var(--card)!important;border-top:1px solid var(--line);justify-content:space-around!important;overflow:visible}
+ .main-tabs button{flex:1 1 0!important;flex-direction:column;gap:3px;font-size:11.5px;padding:6px 4px!important;height:100%;border-radius:12px}
+ .main-tabs button svg{display:block!important;width:20px!important;height:20px}
+ .main-tabs button[data-state=active]{background:var(--mint)!important;box-shadow:none}
+ .tabs-row{justify-content:flex-end;margin-bottom:8px;min-height:0}
+ .add-group.mobile-add{bottom:calc(76px + env(safe-area-inset-bottom));border-radius:999px}
+ .expense-row b,.account-row b,.bill-row b,.upcoming-row>div b{font-size:14.5px}
+ .expense-row p{font-size:12px}
+ .expense-row strong{font-size:14px}
+}
+@media(max-width:600px){.tabs-row{margin:0}}
+/* Dialog fields: one box for the amount, and "(optional)" stays beside its label. */
+.expense-dialog .amount-input input{border:0!important;background:none!important;box-shadow:none;outline:none;padding-left:8px}
+.expense-dialog .amount-input:focus-within{outline:2px solid var(--green);outline-offset:2px}
+.amount-input input::-webkit-inner-spin-button,.amount-input input::-webkit-outer-spin-button{-webkit-appearance:none;margin:0}
+.amount-input input{-moz-appearance:textfield;appearance:textfield}
+.expense-dialog label:not(.check-row){display:flex;flex-wrap:wrap;align-items:baseline;column-gap:5px;row-gap:8px}
+.expense-dialog label:not(.check-row)>:not(.subtle){flex:0 0 100%;min-width:0}
+.account-group h3{text-transform:none;letter-spacing:0;font-size:15px;font-weight:600;color:var(--ink-2);border-color:var(--line)}.account-group h3 span{font-family:var(--display);font-variant-numeric:tabular-nums;color:var(--ink-2)}
+.filters label{font-size:12px;font-weight:500;color:var(--ink-2);letter-spacing:0}
+.filters select,.filters input{height:40px;border-color:var(--line);background:var(--card);border-radius:10px;font-size:14px;color:var(--ink)}

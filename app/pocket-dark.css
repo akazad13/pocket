@@ -132,3 +132,47 @@ html[data-theme=dark] .upcoming-icon.out{background:#33291f;color:#d9ab78}
 html[data-theme=dark] .upcoming-icon.move{background:#222b33;color:#9db4c8}
 html[data-theme=dark] :is(.taxyear-grid h3,.taxyear-row){border-color:#26312b}
 html[data-theme=dark] .taxyear-row small{color:#8d9a91}
+/* ===== 2026 refresh, dark: same tokens re-stepped for a deep green-black surface. Overrides the rules above. ===== */
+html[data-theme=dark]{--ink:#e6efe9;--ink-2:#b2c2ba;--ink-3:#8a9c94;--paper:#0c1612;--card:#131f1a;--line:#22322b;--green:#3ccf91;--green-deep:#00543d;--mint:#173a2c;--red:#ff6b73;--background:#0c1612;--foreground:#e6efe9;--primary:#087a58;--ring:#3ccf91;--border:#22322b}
+html[data-theme=dark] body{background:var(--paper);color:var(--ink)}
+html[data-theme=dark] .topbar{background:var(--paper);border-color:var(--line)}
+html[data-theme=dark] .brand-icon{background:#087a58}
+html[data-theme=dark] :is(.panel,.stat-card,.month-picker button,.search){background:var(--card);border-color:var(--line)}
+html[data-theme=dark] :is(h1,h2,h3,.brand,.month-picker input,.stat-card strong,.income-stats strong,.year-total strong){color:var(--ink)}
+html[data-theme=dark] :is(.eyebrow,.top-note,.section-heading p,.subtle,.stat-card p,.quiet-empty,.empty p,.expense-row p,.account-row small,.history-row small,.bill-row small,.upcoming-row>div small,footer,.currency span){color:var(--ink-3)}
+html[data-theme=dark] :is(.page-heading p,.stat-card .card-label,.currency,.year-total,.income-stats small,.main-tabs button,.scope-toggle button,.theme-toggle){color:var(--ink-2)}
+html[data-theme=dark] .primary{background:#087a58;color:#fff}
+html[data-theme=dark] .primary:hover{background:#0a8a63}
+html[data-theme=dark] .total-card{background:radial-gradient(circle at 105% -20%,transparent 0 38%,#ffffff0b 38.2% 38.6%,transparent 38.8% 46%,#ffffff0b 46.2% 46.6%,transparent 46.8% 54%,#ffffff0b 54.2% 54.6%,transparent 54.8%),repeating-linear-gradient(115deg,#ffffff05 0 2px,transparent 2px 9px),linear-gradient(150deg,#0a6e51,#032a20 75%)}
+html[data-theme=dark] :is(.stat-icon,.account-icon,.empty-icon){background:var(--mint);color:var(--green)}
+html[data-theme=dark] .stat-icon.peach{background:#1d2a25;color:var(--ink-2)}
+html[data-theme=dark] .main-tabs{background:#17241f!important}
+html[data-theme=dark] .main-tabs button[data-state=active]{background:var(--card)!important;color:var(--green)!important}
+html[data-theme=dark] .scope-toggle{background:#17241f}
+html[data-theme=dark] .scope-toggle button[aria-pressed=true]{background:var(--card);color:var(--green)}
+html[data-theme=dark] :is(.text-button,.export,.profile,.account-buttons button){color:var(--green)}
+html[data-theme=dark] .profile{background:var(--mint)}
+html[data-theme=dark] :is(.expense-row,.account-row,.bill-row,.upcoming-row,.history-row,.compare-row,.category-row,.account-group h3,.bill-row,.goal-row){border-color:var(--line)}
+html[data-theme=dark] :is(.income-stats>div,.account-terms,.zakat-result){background:#17241f}
+html[data-theme=dark] .income-stats .net{background:var(--mint)}
+html[data-theme=dark] :is(.income-stats .net strong,.income-amount,.up-in,.history-row strong.up,.change.down){color:var(--green)}
+html[data-theme=dark] .income-stats .net.negative{background:#3a1d20}
+html[data-theme=dark] :is(.income-stats .net.negative strong,.account-row strong.owed,.up-out,.change.up,.terms-warning,.bill-row.overdue small,.upcoming-row.overdue>div small,.goal-status.late,.zakat-row.debt strong){color:var(--red)}
+html[data-theme=dark] .budget-bar{background:#1d2a25}
+html[data-theme=dark] .budget-fill{background:#2fa872}
+html[data-theme=dark] .budget-fill.over{background:var(--red)}
+html[data-theme=dark] .bar{background:#22352c}
+html[data-theme=dark] .bar.active{background:#2fa872}
+html[data-theme=dark] .icon-button{color:var(--ink-3)}
+html[data-theme=dark] .icon-button:hover{background:#1d2a25;color:var(--ink)}
+html[data-theme=dark] .icon-button.delete:hover{background:#3a1d20;color:var(--red)}
+html[data-theme=dark] .expense-dialog{background:var(--card)}
+html[data-theme=dark] :is(.expense-dialog input,.amount-input){background:var(--paper);border-color:var(--line);color:var(--ink)}
+html[data-theme=dark] .donut div{background:var(--card)}
+html[data-theme=dark] .mobile-add{box-shadow:0 8px 24px #00000080}
+@media(max-width:600px){
+ html[data-theme=dark] .main-tabs{background:var(--card)!important;border-color:var(--line)}
+ html[data-theme=dark] .main-tabs button[data-state=active]{background:var(--mint)!important}
+}
+html[data-theme=dark] .account-group h3,html[data-theme=dark] .account-group h3 span{color:var(--ink-2)}
+html[data-theme=dark] :is(.filters select,.filters input){background:var(--paper);border-color:var(--line);color:var(--ink)}html[data-theme=dark] .filters label{color:var(--ink-2)}

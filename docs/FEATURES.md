@@ -37,7 +37,7 @@ Keep this file current: move an idea to "Implemented" when it ships.
 | Feature | Details |
 |---|---|
 | Month navigation | Previous/next buttons and a native month picker. |
-| Summary cards | Net worth (own / owe, link to Accounts), money in this month with saved amount and rate, money out this month with % change vs last month and the top category. |
+| Summary cards | Net worth on a banknote-style card (own / owe, link to Accounts), money in this month with saved amount and rate, money out this month with % change vs last month and the top category. |
 | Overview tab | Donut chart of spending by category with legend, amounts and percentages; 12-month bar chart for the year, with a money-in bar beside each month's spending once the year has income (click a bar to jump to that month); year total; income & savings, budgets, month comparison; 6 most recent entries of the month across spending, income and transfers. |
 | Transactions tab | Spending, income and transfers in one list for the selected month or all time, newest first, with an All / Spending / Income / Transfers switch and in/out totals. Text search also matches sources and account names; category and payment-method filters apply to spending only. Logic in `lib/activity.ts` (unit tested). Expense filters as before: Search by category or note; filter by category, amount range and (all time) date range; live count and total of the results; Clear filters. On mobile the filters collapse behind a Filters button showing how many are active. Logic in `lib/filter.ts` (unit tested). |
 | Month-over-month comparison | Total card shows the % change vs the previous month. "Compared with <month>" panel on Overview lists each category's last month → this month and % change ("New" when there was nothing before), biggest changes first, top 6 with Show all. Increases in warm red, decreases in green. Logic in `lib/compare.ts` (unit tested). |
@@ -53,7 +53,7 @@ Keep this file current: move an idea to "Implemented" when it ships.
 | Balance updates | Set a new balance or amount owed for interest, profit, fees or a new market value; the difference is stored as a signed adjustment. Deletable with Undo. `/api/accounts/adjustments`. |
 | Linked expenses and income | Expenses have an optional "Paid from" account and income an optional "Received in" account; both change that account's balance. New entries default to the most recently used open account. Unlinked entries never affect balances. |
 | Reports: tax year | Bangladesh tax year (1 July to 30 June) with previous/next: total income and income by source, money invested (transfers into DPS, FD, Sanchayapatra, shares and mutual funds from other accounts), tax paid (the "Tax" category) and total spent, plus a CSV download. No tax rules are applied; a note points to the current NBR rules. `app/taxyear.tsx`, `lib/taxyear.ts` (unit tested). |
-| CSV export | Downloads `pocket-<year>.csv` with the category-by-month totals table. |
+| CSV export | "Download <year> CSV" in Reports > Monthly table: the category-by-month totals table. |
 | Backup and restore | "Backup & restore" dialog: download a full JSON backup (categories, budgets, recurring rules, expenses), export every expense as CSV, and restore from a backup (accounts, transfers, balance updates, goals and bills included). Restore only adds what is missing (expenses by ID, categories case-insensitively, budgets for categories without one) and never changes or deletes data. The whole file is validated before anything is written. Tested with 6,000 expenses. `app/backup.tsx`, `/api/backup`. |
 | Recurring items | "Recurring" dialog to add, edit and stop monthly rules of three kinds: expenses (category, optional Paid from account), income (source, optional Received in account) and transfers between two accounts (e.g. DPS instalment, loan EMI). Each has an amount, day 1 to 31, note and start month. Due occurrences are added automatically before expenses, income or accounts load, catching up missed months; day 29 to 31 falls on the last day of shorter months. Generated entries show a repeat icon and behave like normal ones; deleting one does not bring it back. Edits apply to months not yet added. Categories and accounts used by a rule cannot be deleted. Included in backups. `app/recurring.tsx`, `/api/recurring`, `lib/rules.ts` (unit tested), `lib/recurring.ts`. |
 | Next 30 days | Overview panel listing what is expected in the next 30 days: recurring income, expenses and transfers, unpaid bills (overdue first), loan EMIs and repayments (skipped when a recurring transfer already covers that loan) and savings maturities, with expected money in and out (bills without a usual amount are counted separately). `app/upcoming.tsx`, `lib/forecast.ts` (unit tested). |
@@ -64,6 +64,7 @@ Keep this file current: move an idea to "Implemented" when it ships.
 ### Platform and quality
 | Feature | Details |
 |---|---|
+| Visual design | Flag green (#006a4e) on cool paper (#f3f6f4), red reserved for debt, overdue and overspending. Bricolage Grotesque for headings and all amounts (tabular figures), Hind Siliguri (Bangla-ready) for text, loaded from Google Fonts. Net worth card styled as a taka note. On phones the tabs become a bottom navigation bar with the Add button above it. Dates in lists show as "6 Oct". |
 | Privacy mode | Eye button in the header hides every amount (shown as BDT ••••; the monthly table is blurred) so the app can be used in public. Remembered on this device. `app/privacy.tsx`, `lib/format.ts`. |
 | Storage | Cloudflare D1 (SQLite); amounts stored as integer cents. Local dev persists in `.wrangler/state`. |
 | Dark mode | Theme switch in the top bar cycles System, Light and Dark (saved per browser). System follows the OS live. Applied before first paint, so no flash. Toasts follow the theme. | `app/theme.tsx`, `app/pocket-dark.css`, `lib/theme-script.ts` |
@@ -88,7 +89,6 @@ Proposed, not yet prioritised. Size: S = under an hour, M = a few hours, L = a d
 
 | # | Idea | Why | Size |
 |---|---|---|---|
-| 13 | **Receipt photo attachment** stored in R2 | Proof for medical, tax, and business expenses | L |
 | 14 | **Installable PWA** with offline entry queued until online | Feels like a native phone app | L |
 
 ## Decisions
@@ -96,4 +96,4 @@ Record ideas that were rejected or deferred, with the reason, so they are not pr
 
 | Idea | Decision | Reason |
 |---|---|---|
-| | | |
+| #13 Receipt photos in R2 | Excluded for now (2026-10-06) | Needs file storage and deployment changes the hosting may not support. |
