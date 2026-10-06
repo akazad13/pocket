@@ -184,6 +184,7 @@ async function run() {
   await recurringKindChecks();
   await termsChecks();
   await goalChecks();
+  await billChecks();
 }
 
 async function incomeChecks() {
@@ -417,6 +418,33 @@ async function goalChecks() {
   await call("DELETE", "/api/accounts", { id: bankId });
 }
 
+async function billChecks() {
+  const cat = `${tag} bills`, cat2 = `${tag} bills2`, id = `${expenseId}-bill`;
+  await call("POST", "/api/categories", { name: cat });
+  const bill = { id, name: `${tag} Electricity`, category: cat, amount: "", day: 10, account: "", note: "" };
+  let r = await call("POST", "/api/bills", { ...bill, category: `${tag} nope` });
+  check("POST bill with an unknown category is rejected (400)", r.status === 400, r);
+  r = await call("POST", "/api/bills", { ...bill, day: 0 });
+  check("POST bill with day 0 is rejected (400)", r.status === 400, r);
+  r = await call("POST", "/api/bills", bill);
+  check("POST bill creates it with a varying amount", r.status === 201 && r.json?.bill?.cents === 0 && r.json.bill.paidMonth === "", r);
+  r = await call("PUT", "/api/bills", { ...bill, amount: "1500", paidMonth: dhakaToday.slice(0, 7) });
+  check("PUT bill marks it paid", r.status === 200 && r.json?.bill?.paidMonth === dhakaToday.slice(0, 7) && r.json.bill.cents === 150000, r);
+  r = await call("DELETE", "/api/categories", { name: cat });
+  check("DELETE category used by a bill is rejected (409)", r.status === 409, r);
+  r = await call("PUT", "/api/categories", { name: cat2, previous: cat });
+  r = await call("GET", "/api/bills");
+  check("Category rename cascades to bills", r.json?.bills?.find((b) => b.id === id)?.category === cat2, r.json);
+  const backup = await (await fetch(base + "/api/backup")).json();
+  check("Backup includes bills", backup.bills?.some((b) => b.id === id));
+  await call("DELETE", "/api/bills", { id });
+  r = await call("POST", "/api/backup", { app: "pocket", version: 1, exportedAt: "", categories: [], budgets: {}, expenses: [], bills: backup.bills.filter((b) => b.id === id) });
+  check("Restore adds the bill", r.status === 200 && r.json?.billsAdded === 1, r);
+  r = await call("DELETE", "/api/bills", { id });
+  check("DELETE bill succeeds", r.status === 200, r);
+  await call("DELETE", "/api/categories", { name: cat2 });
+}
+
 async function generated() {
   const { json } = await call("GET", "/api/expenses");
   return json.expenses.filter((e) => e.id.startsWith(`rec-${ruleId}-`));
@@ -533,6 +561,8 @@ async function cleanup() {
   await call("DELETE", "/api/income", { id: `rec-${recKinds.income}-${month}` }).catch(() => {});
   await call("DELETE", "/api/accounts/transfers", { id: `rec-${recKinds.transfer}-${month}` }).catch(() => {});
   await call("DELETE", "/api/goals", { id: `${expenseId}-goal` }).catch(() => {});
+  await call("DELETE", "/api/bills", { id: `${expenseId}-bill` }).catch(() => {});
+  for (const name of [`${tag} bills`, `${tag} bills2`]) await call("DELETE", "/api/categories", { name }).catch(() => {});
   for (const id of [recKinds.dps, recKinds.bank, `${expenseId}-terms`, `${expenseId}-gold`, `${expenseId}-goal-bank`]) await call("DELETE", "/api/accounts", { id }).catch(() => {});
   await call("DELETE", "/api/accounts/transfers", { id: accIds.transfer }).catch(() => {});
   await call("DELETE", "/api/accounts/adjustments", { id: accIds.adjustment }).catch(() => {});

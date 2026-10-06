@@ -12,6 +12,7 @@ export async function missingAccount(...ids:string[]){
  const r=await database().prepare(`SELECT COUNT(*) AS n FROM accounts WHERE id IN (${want.map(()=>'?').join(',')})`).bind(...want).first<{n:number}>();
  return (r?.n??0)<want.length;
 }
+export const BILL_SELECT='SELECT id, name, category, cents, day, account, note, paid_month AS paidMonth FROM bills';
 export const GOAL_SELECT='SELECT id, name, target, target_date AS targetDate, accounts, saved, note FROM goals';
 export type GoalRow=Omit<Goal,'accounts'>&{accounts:string};
 // accounts is stored as a JSON array of ids.

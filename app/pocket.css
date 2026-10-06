@@ -170,3 +170,19 @@ html[data-private] :is(.matrix td:not(:first-child),.matrix th:last-child){filte
 .budget-fill.done{background:#13805a}
 @media(max-width:600px){.goals{margin-top:15px}}
 .section-heading>.text-button{display:inline-flex;align-items:center;gap:5px}
+.bills{margin-top:20px}
+.bill-list{margin-top:10px}
+.bill-row{display:flex;align-items:center;gap:10px;padding:12px 0;border-bottom:1px solid #edf0e7}
+.bill-row:last-child{border:0}
+.bill-row>div{flex:1;min-width:0}
+.bill-row b{display:block;font-size:13px;font-weight:500}
+.bill-row small{display:block;font-size:11px;color:#9aa18f;margin-top:4px}
+.bill-row strong{font-size:13px;white-space:nowrap}
+.bill-icon{display:grid;place-items:center;width:32px;height:32px;flex-shrink:0;border-radius:9px;background:#f2f5eb;color:#7f9870}
+.bill-row.overdue .bill-icon{background:#fbece7;color:#a8493b}
+.bill-row.overdue small{color:#a8493b}
+.bill-row.soon .bill-icon{background:#fbf2e9;color:#b07a3e}
+.bill-row.paid .bill-icon{background:#e6f1e0;color:#2f6b43}
+.bill-row.paid :is(b,strong){color:#7a8873}
+.bill-row .text-button{font-weight:600}
+@media(max-width:600px){.bills{margin-top:15px}.bill-row{gap:7px}.bill-icon{display:none}}

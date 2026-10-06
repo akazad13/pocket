@@ -12,8 +12,8 @@ async function mutate(request:Request,method:string){
   if(typeof p.id!=='string'||! /^[a-zA-Z0-9-]{1,64}$/.test(p.id))return Response.json({error:'Invalid ID.'},{status:400});
   try{
    // Only accounts without any history or recurring rules can be deleted; others are closed instead.
-   const r=await db.prepare('DELETE FROM accounts WHERE id = ?1 AND NOT EXISTS (SELECT 1 FROM expenses WHERE account = ?1) AND NOT EXISTS (SELECT 1 FROM income WHERE account = ?1) AND NOT EXISTS (SELECT 1 FROM transfers WHERE from_account = ?1 OR to_account = ?1) AND NOT EXISTS (SELECT 1 FROM adjustments WHERE account = ?1) AND NOT EXISTS (SELECT 1 FROM recurring WHERE account = ?1 OR to_account = ?1)').bind(p.id).run();
-   if(!r.meta.changes){const exists=await db.prepare('SELECT 1 FROM accounts WHERE id = ?').bind(p.id).first();return Response.json({error:exists?'This account has transactions or recurring items. Close it instead to hide it.':'Account no longer exists. Please refresh.'},{status:exists?409:404});}
+   const r=await db.prepare('DELETE FROM accounts WHERE id = ?1 AND NOT EXISTS (SELECT 1 FROM expenses WHERE account = ?1) AND NOT EXISTS (SELECT 1 FROM income WHERE account = ?1) AND NOT EXISTS (SELECT 1 FROM transfers WHERE from_account = ?1 OR to_account = ?1) AND NOT EXISTS (SELECT 1 FROM adjustments WHERE account = ?1) AND NOT EXISTS (SELECT 1 FROM recurring WHERE account = ?1 OR to_account = ?1) AND NOT EXISTS (SELECT 1 FROM bills WHERE account = ?1)').bind(p.id).run();
+   if(!r.meta.changes){const exists=await db.prepare('SELECT 1 FROM accounts WHERE id = ?').bind(p.id).first();return Response.json({error:exists?'This account has transactions, recurring items or bills. Close it instead to hide it.':'Account no longer exists. Please refresh.'},{status:exists?409:404});}
    return Response.json({ok:true});
   }catch(e){console.error(e);return failure();}
  }
