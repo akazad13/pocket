@@ -516,4 +516,36 @@ footer{color:var(--ink-3);font-size:12px}
 .virtual-row-wrapper:last-child .expense-row{border-bottom:0}
 .virtual-spacer{pointer-events:none;width:100%;user-select:none}
 
+/* Spending Velocity & Month-End Forecast */
+.velocity-panel{margin-top:20px}
+.velocity-header-badge{display:flex;align-items:center}
+.velocity-badge{display:inline-flex;align-items:center;gap:5px;font-size:11px;font-weight:600;padding:4px 9px;border-radius:20px;border:1px solid transparent}
+.velocity-badge.on-track{background:#eaf5ea;color:#2f6e45;border-color:#c8e6ce}
+.velocity-badge.over-pace{background:#fdf0ed;color:#a8493b;border-color:#f5cbc4}
+.velocity-badge.neutral{background:#f2f5ee;color:#5a6e5b;border-color:#dde5d6}
+.velocity-stats-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-top:16px}
+.velocity-stat-box{background:#f8faf6;border:1px solid #e5ede0;border-radius:10px;padding:14px 16px;display:flex;flex-direction:column;gap:4px}
+.velocity-stat-box small{font-size:11px;color:#788c7a;font-weight:600;letter-spacing:.2px}
+.velocity-stat-box strong{font-size:22px;font-weight:700;color:#233a2e;letter-spacing:-.4px}
+.velocity-stat-box span{font-size:11px;color:#859687;line-height:1.4}
+.velocity-stat-box.primary{background:#eff6ed;border-color:#d4e5ce}
+.velocity-stat-box.primary strong{color:#215d3f}
+.velocity-stat-box.highlight{background:#fdf8ee;border-color:#f1e4c8}
+.velocity-stat-box.highlight strong{color:#8f6517}
+.velocity-progress-container{margin-top:16px;padding-top:14px;border-top:1px solid #edf1ea}
+.velocity-bar-header{display:flex;justify-content:space-between;align-items:center;font-size:11px;color:#728574;margin-bottom:6px}
+.velocity-bar-header b{color:#284033}
+.velocity-bar-track{height:9px;background:#e7ede2;border-radius:5px;display:flex;overflow:hidden;position:relative}
+.velocity-bar-fill{height:100%;transition:width .25s ease}
+.velocity-bar-fill.actual{background:#327a55;border-radius:5px 0 0 5px}
+.velocity-bar-fill.projected{background:#8ec49f;opacity:.85;border-radius:0 5px 5px 0}
+.velocity-insights{margin-top:10px}
+.velocity-insights p{font-size:11px;line-height:1.5;color:#496150;margin:0}
+.velocity-insights p.warn{color:#a43c2c}
+.velocity-insights b{font-weight:600}
+@media (max-width:680px){
+  .velocity-stats-grid{grid-template-columns:1fr}
+  .velocity-stat-box strong{font-size:20px}
+}
+
 

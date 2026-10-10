@@ -14,6 +14,7 @@ type Props = {
   onNotice: (text: string) => void;
   items?: Expense[];
   month?: string;
+  onBudgetsChange?: (budgets: Record<string, number>) => void;
 };
 
 export default function Budgets({
@@ -24,6 +25,7 @@ export default function Budgets({
   onNotice,
   items = [],
   month = '',
+  onBudgetsChange,
 }: Props) {
   const [budgets, setBudgets] = useState<Record<string, number>>({});
   const [failed, setFailed] = useState(false);
@@ -43,6 +45,7 @@ export default function Budgets({
         if (live) {
           setBudgets(j.budgets);
           setFailed(false);
+          onBudgetsChange?.(j.budgets);
         }
       })
       .catch(() => {
@@ -51,7 +54,7 @@ export default function Budgets({
     return () => {
       live = false;
     };
-  }, [categoriesKey, version]);
+  }, [categoriesKey, version, onBudgetsChange]);
 
   const history = useMemo(() => {
     if (!month || Object.keys(budgets).length === 0) return null;
@@ -97,6 +100,7 @@ export default function Budgets({
       const result = (await r.json()) as { budgets: Record<string, number>; error: string };
       if (!r.ok) throw Error(result.error);
       setBudgets(result.budgets);
+      onBudgetsChange?.(result.budgets);
       setOpen(false);
       onNotice('Budgets saved');
     } catch (e) {

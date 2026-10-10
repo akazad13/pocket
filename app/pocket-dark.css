@@ -260,3 +260,24 @@ html[data-theme=dark] .split-card{background:#151d18;border-color:#28352c}
 html[data-theme=dark] .split-num-badge{color:#768d7e}
 html[data-theme=dark] .split-remove{color:#768d7e}
 
+/* Spending Velocity & Month-End Forecast Dark Mode */
+html[data-theme=dark] .velocity-badge.on-track{background:#183626;color:#85cca0;border-color:#254f38}
+html[data-theme=dark] .velocity-badge.over-pace{background:#381c1d;color:#f08c8c;border-color:#54292b}
+html[data-theme=dark] .velocity-badge.neutral{background:#1e2922;color:#9cb5a5;border-color:#2e3e34}
+html[data-theme=dark] .velocity-stat-box{background:#151d18;border-color:#26342b}
+html[data-theme=dark] .velocity-stat-box small{color:#768e7d}
+html[data-theme=dark] .velocity-stat-box strong{color:#e6f1ea}
+html[data-theme=dark] .velocity-stat-box span{color:#829989}
+html[data-theme=dark] .velocity-stat-box.primary{background:#172b1e;border-color:#264733}
+html[data-theme=dark] .velocity-stat-box.primary strong{color:#79d7a2}
+html[data-theme=dark] .velocity-stat-box.highlight{background:#2a2314;border-color:#483a1e}
+html[data-theme=dark] .velocity-stat-box.highlight strong{color:#e8c66e}
+html[data-theme=dark] .velocity-progress-container{border-top-color:#223027}
+html[data-theme=dark] .velocity-bar-header{color:#7e9686}
+html[data-theme=dark] .velocity-bar-header b{color:#dce9e0}
+html[data-theme=dark] .velocity-bar-track{background:#223127}
+html[data-theme=dark] .velocity-bar-fill.actual{background:#43a675}
+html[data-theme=dark] .velocity-bar-fill.projected{background:#2d694b;opacity:.9}
+html[data-theme=dark] .velocity-insights p{color:#8fa797}
+html[data-theme=dark] .velocity-insights p.warn{color:#f08c8c}
+
