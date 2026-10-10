@@ -73,6 +73,7 @@ Keep this file current: move an idea to "Implemented" when it ships.
 | Error handling | Load failure shows a banner with Retry; API failures return friendly messages; buttons disable while saving. |
 | Request safety | Cross-origin mutation requests rejected (403); parameterised SQL everywhere. |
 | AI tool access | Registers a read-only `read_expenses` tool via WebMCP (`document.modelContext`) so a browser assistant can read the data. |
+| Command palette | Global Ctrl+K / Cmd+K command palette and topbar search shortcut: jump to tabs, reports, filter by category, view accounts, or trigger quick entry actions. Powered by cmdk. `app/palette.tsx`. |
 | Access | Single owner, protected by the hosting platform's access gate. No in-app accounts. |
 
 ## Known limitations
