@@ -9,6 +9,7 @@ import {UNITS,unitName,qtyText,ACCOUNT_TYPES,GROUPS,typeInfo,isDebt,values,shown
 import type {Expense} from '@/lib/expenses';
 import Zakat from './zakat';
 import NetWorthChart from './networth';
+import {StockPortfolioDialog} from './portfolio';
 import {SAVING_TYPES,LOAN_TYPES,hasTerms,maturity,upcomingMaturities,ratePct,loanInfo} from '@/lib/terms';
 import type {Income} from '@/lib/income';
 type Setter<T>=React.Dispatch<React.SetStateAction<T[]>>;
@@ -47,8 +48,9 @@ export function TransferRow({x,accounts,onEdit,onDelete}:{x:Transfer;accounts:Ac
  return <div className="expense-row"><span className="expense-icon"><ArrowLeftRight size={18}/></span><div><b>{name(x.from)} → {name(x.to)}</b><p>{x.id.startsWith('rec-')&&<Repeat size={11} className="recurring-mark" aria-label="Recurring"/>}{shortDate(x.date)}{x.note?` · ${x.note}`:''}</p></div><strong className="transfer-amount">{money(x.cents)}</strong><button className="icon-button" aria-label={`Edit transfer from ${name(x.from)} to ${name(x.to)}`} onClick={onEdit}><Pencil size={16}/></button><button className="icon-button delete" aria-label={`Delete transfer of ${money(x.cents)} on ${x.date}`} onClick={onDelete}><Trash2 size={16}/></button></div>;
 }
 export default function Accounts({accounts,transfers,adjustments,items,income,today,setAccounts,setAdjustments,onTransfer,onDeleteTransfer,onNotice}:Props){
- const[form,setForm]=useState<null|{isNew:boolean;id:string;name:string;type:AccountType;opening:string;note:string;closed:boolean;startDate:string;maturityDate:string;rate:string;instalment:string;quantity:string;unit:string}>(null),[update,setUpdate]=useState<null|{id:string;balance:string;date:string;note:string;price:string}>(null),[detail,setDetail]=useState<string|null>(null),[showClosed,setShowClosed]=useState(false),[saving,setSaving]=useState(false),[error,setError]=useState('');
+ const[form,setForm]=useState<null|{isNew:boolean;id:string;name:string;type:AccountType;opening:string;note:string;closed:boolean;startDate:string;maturityDate:string;rate:string;instalment:string;quantity:string;unit:string}>(null),[update,setUpdate]=useState<null|{id:string;balance:string;date:string;note:string;price:string}>(null),[detail,setDetail]=useState<string|null>(null),[showClosed,setShowClosed]=useState(false),[saving,setSaving]=useState(false),[error,setError]=useState(''),[showPortfolio,setShowPortfolio]=useState(false);
  const v=values(accounts,items,income,transfers,adjustments),t=totals(accounts,v),byId=Object.fromEntries(accounts.map(a=>[a.id,a])),name=(id:string)=>byId[id]?.name??'Deleted account',bal=(a:Account)=>shown(a,v[a.id]??0);
+ async function syncPortfolioAccount(accountId:string,newTotalCents:number){const a=byId[accountId];if(!a)return;const currentBal=bal(a);const diff=adjustmentFor(a,currentBal,newTotalCents);if(!diff)return;const{adjustment}=await send<{adjustment:Adjustment}>('/api/accounts/adjustments','POST',{id:crypto.randomUUID(),account:a.id,amount:diff,date:today,note:'Stock portfolio valuation sync'});setAdjustments(old=>[adjustment,...old]);onNotice('Account synced to portfolio value');}
  const used=(id:string)=>items.some(e=>e.account===id)||income.some(e=>e.account===id)||transfers.some(x=>x.from===id||x.to===id)||adjustments.some(x=>x.account===id),open=accounts.filter(a=>!a.closed),closed=accounts.filter(a=>a.closed);
  function startAccount(a?:Account){setError('');setDetail(null);setForm(a?{isNew:false,id:a.id,name:a.name,type:a.type,opening:String(a.opening/100),note:a.note,closed:a.closed,startDate:a.startDate,maturityDate:a.maturityDate,rate:a.rate?String(a.rate/100):'',instalment:a.instalment?String(a.instalment/100):'',quantity:a.quantity?String(a.quantity/1000):'',unit:a.unit}:{isNew:true,id:crypto.randomUUID(),name:'',type:'bank',opening:'',note:'',closed:false,startDate:'',maturityDate:'',rate:'',instalment:'',quantity:'',unit:''});}
  function startMove(x?:Transfer,preset:Omit<TransferTarget,'transfer'>={}){setDetail(null);onTransfer({transfer:x,...preset});}
@@ -74,7 +76,7 @@ export default function Accounts({accounts,transfers,adjustments,items,income,to
  const upcoming=upcomingMaturities(accounts,bal,today),loans=open.filter(a=>LOAN_TYPES.includes(a.type)).map(a=>({a,l:loanInfo(a,bal(a),today)!}));
  const current=detail?byId[detail]:undefined,updating=update?byId[update.id]:undefined;
  return <>
- <section className="panel accounts"><div className="section-heading"><div><h2>Accounts &amp; net worth</h2><p>What you own and owe across cash, banks, savings and loans</p></div><div className="account-actions">{accounts.length>0&&<Zakat accounts={accounts} shown={bal}/>}{open.length>1&&<button className="text-button" onClick={()=>startMove()}><ArrowLeftRight size={14}/> Transfer</button>}<button className="text-button" onClick={()=>startAccount()}><Plus size={14}/> Add account</button></div></div>
+ <section className="panel accounts"><div className="section-heading"><div><h2>Accounts &amp; net worth</h2><p>What you own and owe across cash, banks, savings and loans</p></div><div className="account-actions">{accounts.length>0&&<Zakat accounts={accounts} shown={bal}/>}<button type="button" className="text-button" onClick={()=>setShowPortfolio(true)}><ChartCandlestick size={14}/> Stock portfolio</button>{open.length>1&&<button className="text-button" onClick={()=>startMove()}><ArrowLeftRight size={14}/> Transfer</button>}<button className="text-button" onClick={()=>startAccount()}><Plus size={14}/> Add account</button></div></div>
  {!accounts.length?<div className="empty"><span className="empty-icon"><Landmark size={28}/></span><h3>Bring your money together</h3><p>Add cash, bank accounts, DPS, FD, Sanchayapatra, mutual funds and loans to see your net worth.</p><button className="primary" onClick={()=>startAccount()}><Plus size={18}/> Add an account</button></div>:<>
  <div className="income-stats net-worth"><div><small>Assets</small><strong>{money(t.assets)}</strong></div><div><small>Owed</small><strong>{money(t.debts)}</strong></div><div className={t.net<0?'net negative':'net'}><small>Net worth</small><strong>{money(t.net)}</strong></div></div>
  {GROUPS.map(g=>{const xs=open.filter(a=>typeInfo(a.type).group===g.key);return xs.length>0&&<div className="account-group" key={g.key}><h3>{g.label}<span>{money(xs.reduce((s,a)=>s+(v[a.id]??0),0))}</span></h3>{xs.map(row)}</div>;})}
@@ -111,5 +113,6 @@ export default function Accounts({accounts,transfers,adjustments,items,income,to
   {error&&<p role="alert" className="error">{error}</p>}
   <button type="submit" className="primary save" disabled={saving}>{saving?'Saving…':'Update balance'}</button>
  </form>}</DialogContent></Dialog>
+ {showPortfolio&&<StockPortfolioDialog open={showPortfolio} onClose={()=>setShowPortfolio(false)} accounts={accounts} onSyncAccount={syncPortfolioAccount}/>}
  </>;
 }

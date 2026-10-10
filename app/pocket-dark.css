@@ -224,3 +224,25 @@ html[data-theme=dark] .budget-month-fill.under,html[data-theme=dark] .budget-mon
 html[data-theme=dark] .budget-month-fill.over{background:#e05252}
 html[data-theme=dark] .budget-history-footer{border-top-color:#223027;color:#7a9182}
 html[data-theme=dark] .budget-history-footer b{color:#a9c2b2}
+html[data-theme=dark] .portfolio-badge{background:#183626;color:#85cca0}
+html[data-theme=dark] .portfolio-stat-box{background:#18221b;border-color:#2a382f}
+html[data-theme=dark] .portfolio-stat-box strong{color:#e2ece5}
+html[data-theme=dark] .portfolio-stat-box.primary{background:#182b20;border-color:#2b4737}
+html[data-theme=dark] .portfolio-stat-box.primary strong{color:#76d6a2}
+html[data-theme=dark] .portfolio-stat-box.gain{background:#172e21;border-color:#294936}
+html[data-theme=dark] .portfolio-stat-box.gain strong,html[data-theme=dark] .portfolio-stat-box.gain span{color:#82cca0}
+html[data-theme=dark] .portfolio-stat-box.loss{background:#2e1819;border-color:#4a2729}
+html[data-theme=dark] .portfolio-stat-box.loss strong,html[data-theme=dark] .portfolio-stat-box.loss span{color:#f08c8c}
+html[data-theme=dark] .portfolio-sync-card{background:#18231d;border-color:#2b3a30}
+html[data-theme=dark] .portfolio-account-select{background:#141c17;border-color:#34423a;color:#d8e8dc}
+html[data-theme=dark] .portfolio-form{background:#16201a;border-color:#29372e}
+html[data-theme=dark] .portfolio-form h3{color:#d8e6dc}
+html[data-theme=dark] .portfolio-holding-card{background:#151d18;border-color:#28352c}
+html[data-theme=dark] .portfolio-card-header b{color:#e2ebe4}
+html[data-theme=dark] .portfolio-weight-badge{background:#233027;color:#96b59f}
+html[data-theme=dark] .portfolio-holding-value{color:#e6f0e8}
+html[data-theme=dark] .portfolio-gain-badge.gain{background:#183626;color:#85cca0}
+html[data-theme=dark] .portfolio-gain-badge.loss{background:#381c1d;color:#f08c8c}
+html[data-theme=dark] .portfolio-card-details{background:#1a231d;border-color:#28362d}
+html[data-theme=dark] .portfolio-card-details small{color:#7e9686}
+html[data-theme=dark] .portfolio-card-details b{color:#dae6dd}

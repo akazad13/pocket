@@ -23,6 +23,7 @@ import {
   Tag,
   Wallet,
   Coins,
+  ChartCandlestick,
 } from 'lucide-react';
 import type {Account} from '@/lib/accounts';
 
@@ -40,6 +41,7 @@ type Props = {
   onManageCategories: () => void;
   onRecurring: () => void;
   onOpenRemittance?: () => void;
+  onOpenPortfolio?: () => void;
 };
 
 export default function Palette({
@@ -56,6 +58,7 @@ export default function Palette({
   onManageCategories,
   onRecurring,
   onOpenRemittance,
+  onOpenPortfolio,
 }: Props) {
   useEffect(() => {
     const down = (e: KeyboardEvent) => {
@@ -88,6 +91,11 @@ export default function Palette({
           {onOpenRemittance && (
             <CommandItem onSelect={() => run(onOpenRemittance)}>
               <Coins className="mr-2" size={16} /> Remittance / FX Calculator
+            </CommandItem>
+          )}
+          {onOpenPortfolio && (
+            <CommandItem onSelect={() => run(onOpenPortfolio)}>
+              <ChartCandlestick className="mr-2" size={16} /> Stock Portfolio
             </CommandItem>
           )}
           <CommandItem onSelect={() => run(onAddTransfer)}>

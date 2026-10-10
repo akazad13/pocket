@@ -430,3 +430,40 @@ footer{color:var(--ink-3);font-size:12px}
 .budget-month-fill.no_spend{background:transparent}
 .budget-history-footer{display:flex;justify-content:space-between;align-items:center;font-size:11px;color:#889485;border-top:1px solid #f0f3ed;padding-top:8px}
 .budget-history-footer b{color:#495e51}
+
+/* Stock Portfolio */
+.portfolio-dialog{max-width:620px!important}
+.portfolio-badge{font-size:10px;font-weight:700;letter-spacing:.5px;text-transform:uppercase;background:#e7f3ec;color:#256a53;padding:2px 8px;border-radius:12px;margin-left:6px}
+.portfolio-content{display:grid;gap:16px;margin-top:12px}
+.portfolio-stats-grid{display:grid;grid-template-columns:1.2fr 1fr 1fr;gap:10px}
+.portfolio-stat-box{background:#f8faf6;border:1px solid #e1e7dc;border-radius:10px;padding:12px 14px;display:flex;flex-direction:column;gap:3px}
+.portfolio-stat-box small{font-size:10px;text-transform:uppercase;letter-spacing:.5px;color:#839384}
+.portfolio-stat-box strong{font-size:18px;font-family:var(--display);color:#243a2c;letter-spacing:-.5px}
+.portfolio-stat-box span{font-size:11px;color:#839384}
+.portfolio-stat-box.primary{background:#eef6f0;border-color:#c8decfa0}
+.portfolio-stat-box.primary strong{color:#1e5e41}
+.portfolio-stat-box.gain{background:#edf7f0;border-color:#cbe5d4}
+.portfolio-stat-box.gain strong,.portfolio-stat-box.gain span{color:#256a53}
+.portfolio-stat-box.loss{background:#fdf2f2;border-color:#f5d0d0}
+.portfolio-stat-box.loss strong,.portfolio-stat-box.loss span{color:#cf3c3c}
+.portfolio-sync-card{display:flex;justify-content:space-between;align-items:center;padding:10px 14px;background:#f3f7f2;border:1px solid #dde5d5;border-radius:9px}
+.portfolio-account-select{background:#fff;border:1px solid #c9d8cb;border-radius:6px;padding:3px 8px;font-size:12px;color:#2c4435}
+.portfolio-form{background:#fbfcf9;border:1px solid #e3e8df;border-radius:10px;padding:16px;display:grid;gap:14px}
+.portfolio-form h3{font-size:14px;font-weight:700;color:#22382e}
+.portfolio-inputs-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.portfolio-inputs-grid.three{grid-template-columns:1fr 1fr 1fr}
+.portfolio-form-actions{display:flex;align-items:center;gap:10px;margin-top:6px}
+.portfolio-holdings-list{display:grid;gap:10px}
+.portfolio-holding-card{background:#fff;border:1px solid #e2e7dd;border-radius:10px;padding:14px;display:grid;gap:10px;transition:border-color .15s}
+.portfolio-card-header{display:flex;justify-content:space-between;align-items:flex-start}
+.portfolio-card-header b{font-size:15px;font-weight:700;color:#1c3124}
+.portfolio-card-header small{font-size:11px;color:#859483;display:block;margin-top:2px}
+.portfolio-weight-badge{font-size:10px;font-weight:600;background:#f0f4ec;color:#637965;padding:1px 6px;border-radius:4px}
+.portfolio-holding-value{font-size:16px;font-family:var(--display);color:#22382e;display:block}
+.portfolio-gain-badge{display:inline-block;font-size:11px;font-weight:600;padding:1px 6px;border-radius:4px;margin-top:2px}
+.portfolio-gain-badge.gain{background:#edf7f0;color:#256a53}
+.portfolio-gain-badge.loss{background:#fdf2f2;color:#cf3c3c}
+.portfolio-card-details{display:grid;grid-template-columns:repeat(4,1fr) auto;gap:8px;align-items:center;background:#f8faf6;border:1px solid #edf1ea;border-radius:8px;padding:8px 12px}
+.portfolio-card-details small{font-size:10px;text-transform:uppercase;color:#8a9988;display:block}
+.portfolio-card-details b{font-size:12px;font-family:var(--display);color:#334839}
+.portfolio-card-actions{display:flex;align-items:center;gap:4px}

@@ -5,7 +5,7 @@ export type AccountType='cash'|'bank'|'wallet'|'dps'|'fd'|'mutual_fund'|'sanchay
 // Terms (optional, '' / 0 when unset): startDate, maturityDate (end date for loans), rate in basis points (9.5% = 950), instalment in cents per month.
 // Gold and property may record how much is held: quantity in thousandths of `unit` (12.5 vori = 12500).
 export type Account={id:string;name:string;type:AccountType;opening:number;note:string;closed:boolean;startDate:string;maturityDate:string;rate:number;instalment:number;quantity:number;unit:string};
-export const UNITS:Partial<Record<AccountType,{key:string;label:string}[]>>={gold:[{key:'vori',label:'vori (bhori)'},{key:'gram',label:'gram'}],property:[{key:'katha',label:'katha'},{key:'decimal',label:'decimal (shatak)'},{key:'bigha',label:'bigha'},{key:'sqft',label:'sq ft'}]};
+export const UNITS:Partial<Record<AccountType,{key:string;label:string}[]>>={gold:[{key:'vori',label:'vori (bhori)'},{key:'gram',label:'gram'}],property:[{key:'katha',label:'katha'},{key:'decimal',label:'decimal (shatak)'},{key:'bigha',label:'bigha'},{key:'sqft',label:'sq ft'}],shares:[{key:'shares',label:'shares'}],mutual_fund:[{key:'units',label:'units'}]};
 export const unitName=(u:string)=>u==='sqft'?'sq ft':u;
 export const qtyText=(a:Pick<Account,'quantity'|'unit'>)=>a.quantity?`${(a.quantity/1000).toLocaleString('en',{maximumFractionDigits:3})} ${unitName(a.unit)}`:'';
 export type Transfer={id:string;from:string;to:string;cents:number;date:string;note:string};
