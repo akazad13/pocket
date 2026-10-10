@@ -81,7 +81,6 @@ Keep this file current: move an idea to "Implemented" when it ships.
 
 ## Known limitations
 These are the gaps the ideas below address.
-- Starting balances have no date, so net worth history before you began tracking shows those balances.
 - All expenses are loaded on every page load (no pagination); fine for years of personal data, but unbounded.
 - Backups are manual (prompted with 30-day overdue indicator on device).
 - Unstyled categories share a 12-colour palette by position, so two can look alike until you pick colours.
@@ -91,7 +90,6 @@ Proposed, not yet prioritised. Size: S = under an hour, M = a few hours, L = a d
 
 | # | Idea | Why | Size |
 |---|---|---|---|
-| 31 | **Dated Starting Balances** | Net worth history only counts accounts from their true starting date | S |
 | 32 | **Split Expenses** | Split a single receipt into multiple categories | M |
 | 33 | **Virtualized Transactions View** | Effortless scrolling for 10,000+ entries | M |
 

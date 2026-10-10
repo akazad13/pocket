@@ -20,3 +20,14 @@ test('net worth at each month end uses entries dated up to that day', () => {
   assert.deepEqual(s.map((x) => x.net), [-40000, -42000, -12000, -11900]);
   assert.deepEqual([s[2].assets, s[2].debts], [33000, 45000], 'an EMI moves money out of assets and lowers what is owed');
 });
+
+test('net worth series respects account startDate for dated starting balances', () => {
+  const bank = acc('bank', 'bank', 10000);
+  const dps = { ...acc('dps', 'dps', 50000), startDate: '2026-10-01' };
+  const s = netWorthSeries([bank, dps], [], [], [], [], ['2026-08', '2026-09', '2026-10']);
+  // In 2026-08 and 2026-09, DPS was not yet opened, so net worth is only bank (10000)
+  // In 2026-10, DPS is active, so net worth is 10000 + 50000 = 60000
+  assert.equal(s[0].net, 10000);
+  assert.equal(s[1].net, 10000);
+  assert.equal(s[2].net, 60000);
+});
