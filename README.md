@@ -26,3 +26,16 @@ Registered as a private Site, but not published: the installed Sites plugin's pu
 ## Verified
 
 Production build and TypeScript check passed. Local create/read-after-reload/update/delete and rejection of negative amounts passed. Desktop and 390px mobile layouts inspected. Browser structured read tool verified with valid and invalid input. Temporary test entries removed.
+
+## Agent-Driven Development (ADD)
+
+Pocket is fully configured for autonomous and pair-programming AI agents (Antigravity, Gemini, Claude, Cursor, Windsurf):
+
+- [AGENTS.md](AGENTS.md) - Primary agent instructions, core invariants, and safety directives.
+- [GEMINI.md](GEMINI.md) - Google Antigravity & Gemini runtime guidelines.
+- [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) - System architecture, runtime stack, component boundaries, and security model.
+- [docs/DATA_MODEL.md](docs/DATA_MODEL.md) - Complete SQLite schema, computed balance logic, and migration runbook.
+- [docs/AGENT_PLAYBOOK.md](docs/AGENT_PLAYBOOK.md) - Step-by-step SOPs, recipes, and 10 agent pitfalls to avoid.
+- [docs/TESTING.md](docs/TESTING.md) - Test pyramid: static typechecking, unit tests, and API smoke testing.
+- [docs/FEATURES.md](docs/FEATURES.md) - Feature catalog and implementation backlog.
+- [CLAUDE.md](CLAUDE.md) - Claude Code reference and commands.
