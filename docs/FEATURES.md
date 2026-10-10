@@ -95,6 +95,7 @@ All initial backlog items (#1 to #33) have been implemented. Keep this section u
 |---|---|---|---|---|
 | 32 | **Split Expenses** | Split a single receipt into multiple categories | M | Implemented |
 | 33 | **Virtualized Transactions View** | Effortless scrolling for 10,000+ entries | M | Implemented |
+| 34 | **Spending Velocity & Month-End Forecast** | Real-time burn-rate, month-end spend projection vs last month & budget, with safe daily allowance | S | Implemented |
 
 ## Decisions
 Record ideas that were rejected or deferred, with the reason, so they are not proposed again.
