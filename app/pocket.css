@@ -510,3 +510,10 @@ footer{color:var(--ink-3);font-size:12px}
   .split-card-inputs{grid-template-columns:1fr}
 }
 
+/* Virtualized Transactions View */
+.virtual-list-container{width:100%;position:relative}
+.virtual-row-wrapper{content-visibility:auto;contain-intrinsic-size:auto none auto 62px}
+.virtual-row-wrapper:last-child .expense-row{border-bottom:0}
+.virtual-spacer{pointer-events:none;width:100%;user-select:none}
+
+

@@ -41,7 +41,7 @@ Keep this file current: move an idea to "Implemented" when it ships.
 | Month navigation | Previous/next buttons and a native month picker. |
 | Summary cards | Net worth on a banknote-style card (own / owe, link to Accounts), money in this month with saved amount and rate, money out this month with % change vs last month and the top category. |
 | Overview tab | Donut chart of spending by category with legend, amounts and percentages; 12-month bar chart for the year, with a money-in bar beside each month's spending once the year has income (click a bar to jump to that month); year total; income & savings, budgets, month comparison; 6 most recent entries of the month across spending, income and transfers. |
-| Transactions tab | Spending, income and transfers in one list for the selected month or all time, newest first, with an All / Spending / Income / Transfers switch and in/out totals. Text search also matches sources and account names; category and payment-method filters apply to spending only. Logic in `lib/activity.ts` (unit tested). Expense filters as before: Search by category or note; filter by category, amount range and (all time) date range; live count and total of the results; Clear filters. On mobile the filters collapse behind a Filters button showing how many are active. Logic in `lib/filter.ts` (unit tested). |
+| Transactions tab & virtualization | Spending, income and transfers in one list for the selected month or all time, newest first, with an All / Spending / Income / Transfers switch and in/out totals. Text search matches categories, notes, sources and account names. Uses windowed DOM virtualization paired with modern CSS `content-visibility: auto` to render only visible viewport entries plus overscan, guaranteeing effortless 60fps scrolling and instantaneous filter reactivity even with 10,000+ records. Logic in `lib/activity.ts`, `lib/filter.ts`, `lib/virtual.ts` (unit tested), `app/virtual-list.tsx`. |
 | Month-over-month comparison | Total card shows the % change vs the previous month. "Compared with <month>" panel on Overview lists each category's last month → this month and % change ("New" when there was nothing before), biggest changes first, top 6 with Show all. Increases in warm red, decreases in green. Logic in `lib/compare.ts` (unit tested). |
 | Payment channel breakdown | "Payment channels" panel on Overview: visual proportional bar and list of spending by payment method (bKash, Nagad, Cash, Card, Bank transfer) with expense count, amount in BDT and percentage share. Logic in `lib/method-breakdown.ts` (unit tested). `app/method-breakdown.tsx`. |
 | Reports: monthly table | Categories down, months across, row and column totals for the selected year. Sticky first column, horizontal scroll on mobile. |
@@ -88,11 +88,12 @@ These are the gaps the ideas below address.
 - Unstyled categories share a 12-colour palette by position, so two can look alike until you pick colours.
 
 ## Feature ideas
-Proposed, not yet prioritised. Size: S = under an hour, M = a few hours, L = a day or more. Nothing here connects to a bank.
+All initial backlog items (#1 to #33) have been implemented. Keep this section updated as new ideas are proposed.
 
-| # | Idea | Why | Size |
-|---|---|---|---|
-| 33 | **Virtualized Transactions View** | Effortless scrolling for 10,000+ entries | M |
+| # | Idea | Why | Size | Status |
+|---|---|---|---|---|
+| 32 | **Split Expenses** | Split a single receipt into multiple categories | M | Implemented |
+| 33 | **Virtualized Transactions View** | Effortless scrolling for 10,000+ entries | M | Implemented |
 
 ## Decisions
 Record ideas that were rejected or deferred, with the reason, so they are not proposed again.
