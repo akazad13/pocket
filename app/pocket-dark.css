@@ -179,3 +179,11 @@ html[data-theme=dark] :is(.filters select,.filters input){background:var(--paper
 html[data-theme=dark] .backup-status{background:#1a221d;border-color:#2a352e;color:#8f9c93}
 html[data-theme=dark] .backup-status.overdue{background:#2a1c1d;border-color:#482326;color:#f0a08c}
 html[data-theme=dark] .backup-dot{background:#e05252}
+html[data-theme=dark] .method-bar-track{background:#161d18}
+html[data-theme=dark] .seg-0,html[data-theme=dark] .dot-0{background:#3cb381}
+html[data-theme=dark] .seg-1,html[data-theme=dark] .dot-1{background:#59cca0}
+html[data-theme=dark] .seg-2,html[data-theme=dark] .dot-2{background:#7ae0bd}
+html[data-theme=dark] .seg-3,html[data-theme=dark] .dot-3{background:#a2edd3}
+html[data-theme=dark] .seg-4,html[data-theme=dark] .dot-4{background:#78a892}
+html[data-theme=dark] .seg-5,html[data-theme=dark] .dot-5{background:#597a6b}
+html[data-theme=dark] .method-row{border-color:var(--line,#2a352e)}
