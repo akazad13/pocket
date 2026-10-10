@@ -176,3 +176,6 @@ html[data-theme=dark] .mobile-add{box-shadow:0 8px 24px #00000080}
 }
 html[data-theme=dark] .account-group h3,html[data-theme=dark] .account-group h3 span{color:var(--ink-2)}
 html[data-theme=dark] :is(.filters select,.filters input){background:var(--paper);border-color:var(--line);color:var(--ink)}html[data-theme=dark] .filters label{color:var(--ink-2)}
+html[data-theme=dark] .backup-status{background:#1a221d;border-color:#2a352e;color:#8f9c93}
+html[data-theme=dark] .backup-status.overdue{background:#2a1c1d;border-color:#482326;color:#f0a08c}
+html[data-theme=dark] .backup-dot{background:#e05252}
