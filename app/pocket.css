@@ -467,3 +467,46 @@ footer{color:var(--ink-3);font-size:12px}
 .portfolio-card-details small{font-size:10px;text-transform:uppercase;color:#8a9988;display:block}
 .portfolio-card-details b{font-size:12px;font-family:var(--display);color:#334839}
 .portfolio-card-actions{display:flex;align-items:center;gap:4px}
+
+/* Split Expenses */
+.split-dialog{max-width:580px!important}
+.split-dialog-title{display:flex;align-items:center;gap:8px}
+.split-title-icon{color:var(--green)}
+.split-banner{background:#006a4e12;border:1px solid #006a4e30;color:var(--green);border-radius:8px;padding:8px 12px;font-size:13px;margin:2px 0 10px}
+.split-form{display:grid;gap:12px}
+.split-receipt-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.split-account-label{margin:0}
+.split-progress-box{background:#f8faf6;border:1px solid #e1e7dc;border-radius:10px;padding:10px 14px}
+.split-progress-info{display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px}
+.split-meta-label{font-size:12px;color:#7a8a7a;margin-right:6px}
+.split-allocated-amt{font-size:17px;font-family:var(--display);color:#243a2c}
+.split-target-ref{font-size:13px;color:#889786}
+.split-progress-helpers{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.split-unallocated{display:flex;align-items:center;gap:6px}
+.split-badge{display:inline-flex;align-items:center;gap:4px;font-size:11px;font-weight:600;padding:2px 8px;border-radius:999px}
+.split-badge.match{background:#edf7f0;color:#256a53;border:1px solid #cbe5d4}
+.split-badge.remaining{background:#fef9c3;color:#854d0e;border:1px solid #fef08a}
+.split-badge.over{background:#fdf2f2;color:#cf3c3c;border:1px solid #f5d0d0}
+.fill-btn,.split-even-btn{font-size:12px;padding:2px 6px;color:var(--green)}
+.split-items-container{display:grid;gap:8px;margin-top:2px}
+.split-items-header{display:flex;justify-content:space-between;align-items:center}
+.split-items-header h3{font-size:13px;font-weight:600;color:#2c4435}
+.add-split-btn{font-size:13px;color:var(--green)}
+.split-items-list{display:grid;gap:8px;max-height:300px;overflow-y:auto;padding-right:2px}
+.split-card{background:#fff;border:1px solid #e2e7dd;border-radius:9px;padding:10px 12px;display:grid;gap:8px}
+.split-card-header{display:flex;align-items:center;gap:8px}
+.split-num-badge{font-size:11px;font-weight:700;color:#859483;min-width:22px}
+.split-category-select{flex:1}
+.split-select{height:36px;width:100%}
+.split-select-val,.split-select-item{display:flex;align-items:center;gap:6px}
+.split-remove{width:28px;height:28px;color:#859483}
+.split-card-inputs{display:grid;grid-template-columns:130px 1fr;gap:8px}
+.split-input-amt,.split-input-note{margin:0}
+.split-footer-actions{display:flex;justify-content:flex-end;align-items:center;gap:10px;margin-top:8px}
+.expense-dialog-extra{text-align:center;margin:-2px 0 6px}
+.split-from-edit{font-size:12px;color:var(--green)}
+@media (max-width:520px){
+  .split-receipt-grid{grid-template-columns:1fr}
+  .split-card-inputs{grid-template-columns:1fr}
+}
+

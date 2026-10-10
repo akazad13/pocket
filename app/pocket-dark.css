@@ -246,3 +246,17 @@ html[data-theme=dark] .portfolio-gain-badge.loss{background:#381c1d;color:#f08c8
 html[data-theme=dark] .portfolio-card-details{background:#1a231d;border-color:#28362d}
 html[data-theme=dark] .portfolio-card-details small{color:#7e9686}
 html[data-theme=dark] .portfolio-card-details b{color:#dae6dd}
+
+html[data-theme=dark] .split-banner{background:#162b20;border-color:#2a4a37;color:#7ad4a5}
+html[data-theme=dark] .split-progress-box{background:#17221b;border-color:#28362d}
+html[data-theme=dark] .split-meta-label{color:#82998a}
+html[data-theme=dark] .split-allocated-amt{color:#e6f1ea}
+html[data-theme=dark] .split-target-ref{color:#768e7d}
+html[data-theme=dark] .split-badge.match{background:#183626;color:#85cca0;border-color:#254f38}
+html[data-theme=dark] .split-badge.remaining{background:#302914;color:#ebd18a;border-color:#4d4020}
+html[data-theme=dark] .split-badge.over{background:#381c1d;color:#f08c8c;border-color:#54292b}
+html[data-theme=dark] .split-items-header h3{color:#d6e6dc}
+html[data-theme=dark] .split-card{background:#151d18;border-color:#28352c}
+html[data-theme=dark] .split-num-badge{color:#768d7e}
+html[data-theme=dark] .split-remove{color:#768d7e}
+

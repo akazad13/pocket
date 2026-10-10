@@ -24,6 +24,7 @@ import {
   Wallet,
   Coins,
   ChartCandlestick,
+  Split,
 } from 'lucide-react';
 import type {Account} from '@/lib/accounts';
 
@@ -42,6 +43,7 @@ type Props = {
   onRecurring: () => void;
   onOpenRemittance?: () => void;
   onOpenPortfolio?: () => void;
+  onOpenSplit?: () => void;
 };
 
 export default function Palette({
@@ -59,6 +61,7 @@ export default function Palette({
   onRecurring,
   onOpenRemittance,
   onOpenPortfolio,
+  onOpenSplit,
 }: Props) {
   useEffect(() => {
     const down = (e: KeyboardEvent) => {
@@ -85,6 +88,11 @@ export default function Palette({
           <CommandItem onSelect={() => run(onAddExpense)}>
             <Plus className="mr-2" size={16} /> Add expense
           </CommandItem>
+          {onOpenSplit && (
+            <CommandItem onSelect={() => run(onOpenSplit)}>
+              <Split className="mr-2" size={16} /> Split expense
+            </CommandItem>
+          )}
           <CommandItem onSelect={() => run(onAddIncome)}>
             <TrendingUp className="mr-2" size={16} /> Add income
           </CommandItem>

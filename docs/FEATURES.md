@@ -16,6 +16,7 @@ Keep this file current: move an idea to "Implemented" when it ships.
 | Quick add | The add dialog shows up to 5 chips for your most frequent expenses of the last 60 days (same category, amount and note), most used first. Tapping one fills amount, category, payment method and note; date stays today. Not shown when editing. | `lib/quick.ts` (unit tested) |
 | Smart defaults | New entries default to the Groceries category and to today (Asia/Dhaka) when viewing the current month, otherwise the 1st of the viewed month. After saving, the view jumps to the expense's month. | `start()`, `today()` |
 | Server validation | Positive amount, at most 2 decimals and 9 digits; real calendar date from 1900 onward; category must exist; note trimmed. Friendly error messages shown in the form. | `lib/expenses.ts` `validateExpense()` |
+| Split expenses | "Split expense" dialog accessible from the Add menu, Ctrl+K command palette, expense row Split button, and within the Add/Edit expense dialog. Break down a single receipt or bill across multiple categories while sharing date, payment method, and source account. Features optional target receipt amount with live allocation & remaining indicator, "Fill remaining" and "Split evenly" helpers. Splitting an existing expense replaces it atomically in a batch transaction. Toast with Undo allows reverting the entire split in one click. | `app/split-dialog.tsx`, `lib/splits.ts` (unit tested), `POST /api/expenses/split` |
 
 ### Income
 | Feature | Details | Code |
@@ -91,7 +92,6 @@ Proposed, not yet prioritised. Size: S = under an hour, M = a few hours, L = a d
 
 | # | Idea | Why | Size |
 |---|---|---|---|
-| 32 | **Split Expenses** | Split a single receipt into multiple categories | M |
 | 33 | **Virtualized Transactions View** | Effortless scrolling for 10,000+ entries | M |
 
 ## Decisions

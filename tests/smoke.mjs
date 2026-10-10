@@ -124,6 +124,38 @@ async function run() {
   r = await call("PUT", "/api/expenses", { id: expenseId, category, amount: "50", date: "2026-01-16", note: "edited" });
   check("PUT expense updates it", r.status === 200 && r.json?.expense?.cents === 5000, r);
 
+  // Split expenses
+  const split1Id = `${expenseId}-sp1`;
+  const split2Id = `${expenseId}-sp2`;
+  r = await call("POST", "/api/expenses/split", {
+    date: "2026-01-15",
+    method: "Card",
+    memo: "Superstore run",
+    splits: [
+      { id: split1Id, category, amount: "60.00", note: "Groceries" },
+      { id: split2Id, category, amount: "40.00", note: "Treats" },
+    ],
+  });
+  check("POST split expenses creates multiple records (201)", r.status === 201 && r.json?.expenses?.length === 2 && r.json?.totalCents === 10000, r);
+
+  r = await call("POST", "/api/expenses/split", {
+    date: "2026-01-15",
+    splits: [{ category, amount: "50.00" }],
+  });
+  check("POST split with fewer than 2 items is rejected (400)", r.status === 400, r);
+
+  r = await call("POST", "/api/expenses/split", {
+    date: "2026-01-15",
+    splits: [
+      { id: split1Id, category, amount: "60.00" },
+      { id: split2Id, category, amount: "40.00" },
+    ],
+  }, { Origin: "http://evil.example" });
+  check("POST split from foreign origin is rejected (403)", r.status === 403, r);
+
+  await call("DELETE", "/api/expenses", { id: split1Id });
+  await call("DELETE", "/api/expenses", { id: split2Id });
+
   r = await call("PUT", "/api/expenses", { id: `${expenseId}-missing`, category, amount: "1", date: "2026-01-15", note: "" });
   check("PUT missing expense returns 404", r.status === 404, r);
 
@@ -569,7 +601,7 @@ async function cleanup() {
   await call("DELETE", "/api/income", { id: accIds.income }).catch(() => {});
   for (const id of incomeIds) await call("DELETE", "/api/income", { id }).catch(() => {});
   const leftovers = await generated().catch(() => []);
-  for (const id of [expenseId, `${expenseId}-m`, ...importIds, ...mergeIds, accIds.expense, ...leftovers.map((e) => e.id)]) await call("DELETE", "/api/expenses", { id }).catch(() => {});
+  for (const id of [expenseId, `${expenseId}-m`, `${expenseId}-sp1`, `${expenseId}-sp2`, ...importIds, ...mergeIds, accIds.expense, ...leftovers.map((e) => e.id)]) await call("DELETE", "/api/expenses", { id }).catch(() => {});
   for (const name of [category, renamed, baseCat, importedCat, recCat, recRenamed, mergeFrom, mergeInto]) await call("DELETE", "/api/categories", { name }).catch(() => {});
   for (const id of Object.values(acc)) await call("DELETE", "/api/accounts", { id }).catch(() => {});
 }
