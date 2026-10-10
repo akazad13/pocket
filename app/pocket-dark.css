@@ -203,3 +203,24 @@ html[data-theme=dark] .remittance-row{color:#9cb5a5}
 html[data-theme=dark] .remittance-row.incentive{color:#80d69f}
 html[data-theme=dark] .remittance-total strong{color:#e8f1eb}
 html[data-theme=dark] .remittance-note-preview code{background:#1c2720;color:#c0ded0}
+html[data-theme=dark] .budget-pip{background:#2a362f}
+html[data-theme=dark] .budget-pip.under,html[data-theme=dark] .budget-pip.exact{background:#48b080}
+html[data-theme=dark] .budget-pip.over{background:#e05252}
+html[data-theme=dark] .budget-pip.no_spend{background:#253029}
+html[data-theme=dark] .budget-history-summary-bar{background:#17221b;border-color:#2a3830;color:#a3baa9}
+html[data-theme=dark] .budget-history-summary-bar b{color:#64cf97}
+html[data-theme=dark] .budget-history-row{background:#151d18;border-color:#26342b}
+html[data-theme=dark] .budget-history-limit{color:#768c7e}
+html[data-theme=dark] .budget-streak-badge{background:#2d1e10;color:#e89f58}
+html[data-theme=dark] .budget-adherence-badge.good{background:#183626;color:#85cca0}
+html[data-theme=dark] .budget-adherence-badge.warn{background:#302914;color:#e8c66e}
+html[data-theme=dark] .budget-adherence-badge.bad{background:#301819;color:#f08c8c}
+html[data-theme=dark] .budget-history-month-cell{background:#18221b;border-color:#26352c}
+html[data-theme=dark] .budget-history-month-cell small{color:#7a9182}
+html[data-theme=dark] .budget-history-month-cell b{color:#d6e6dc}
+html[data-theme=dark] .budget-history-month-cell.over b{color:#f08c8c}
+html[data-theme=dark] .budget-month-bar{background:#25342a}
+html[data-theme=dark] .budget-month-fill.under,html[data-theme=dark] .budget-month-fill.exact{background:#48b080}
+html[data-theme=dark] .budget-month-fill.over{background:#e05252}
+html[data-theme=dark] .budget-history-footer{border-top-color:#223027;color:#7a9182}
+html[data-theme=dark] .budget-history-footer b{color:#a9c2b2}

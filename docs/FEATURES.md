@@ -61,7 +61,7 @@ Keep this file current: move an idea to "Implemented" when it ships.
 | Next 30 days | Overview panel listing what is expected in the next 30 days: recurring income, expenses and transfers, unpaid bills (overdue first), loan EMIs and repayments (skipped when a recurring transfer already covers that loan) and savings maturities, with expected money in and out (bills without a usual amount are counted separately). `app/upcoming.tsx`, `lib/forecast.ts` (unit tested). |
 | Bills and due dates | "Bills" panel on Overview for monthly bills paid by hand (electricity, gas, credit card): name, category, usual amount or "Varies", due day and usual account. Sorted overdue, due soon (7 days), upcoming, then paid. "Pay" records the expense (amount, date, account) and marks the month paid; "Already recorded" just marks it paid. Bills follow category renames and merges; categories and accounts used by a bill cannot be deleted. Included in backups. `app/bills.tsx`, `/api/bills`, `lib/bills.ts` (unit tested). |
 | Savings goals | "Savings goals" panel on Overview: add goals with a target, optional date and the accounts that hold the money (or a manual "saved so far" amount). Each shows progress, amount left, and how much a month is needed to reach the date (rounded up to whole taka); reached and overdue goals are marked. Included in backups. `app/goals.tsx`, `/api/goals`, `lib/goals.ts` (unit tested). |
-| Monthly budgets | Optional monthly limit per category (same every month). Overview panel shows spent vs budget with a progress bar, amount left or over, and a count of over-budget categories. Edit all budgets in one dialog; blank removes a budget. Budgets follow category renames and are removed with the category. `app/budgets.tsx`, `/api/budgets`. |
+| Monthly budgets & consistency trends | Optional monthly limit per category. Overview panel shows spent vs budget with a progress bar, amount left or over, count of over-budget categories, 6-month status pip indicator on each row, and an expandable 6-month trend view with multi-month adherence rates (0-100%), streaks, and averages. Edit all budgets in one dialog; blank removes a budget. Logic in `lib/budget-history.ts` (unit tested). `app/budgets.tsx`, `/api/budgets`. |
 
 ### Platform and quality
 | Feature | Details |
@@ -91,7 +91,9 @@ Proposed, not yet prioritised. Size: S = under an hour, M = a few hours, L = a d
 
 | # | Idea | Why | Size |
 |---|---|---|---|
-| 30 | **Budget History & Consistency Trend** | Track multi-month category budget adherence | M |
+| 31 | **Dated Starting Balances** | Net worth history only counts accounts from their true starting date | S |
+| 32 | **Split Expenses** | Split a single receipt into multiple categories | M |
+| 33 | **Virtualized Transactions View** | Effortless scrolling for 10,000+ entries | M |
 
 ## Decisions
 Record ideas that were rejected or deferred, with the reason, so they are not proposed again.
