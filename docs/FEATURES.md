@@ -81,7 +81,6 @@ Keep this file current: move an idea to "Implemented" when it ships.
 ## Known limitations
 These are the gaps the ideas below address.
 - Starting balances have no date, so net worth history before you began tracking shows those balances.
-- Restore cannot import CSV files from other apps or banks (JSON backups only).
 - All expenses are loaded on every page load (no pagination); fine for years of personal data, but unbounded.
 - Backups are manual (prompted with 30-day overdue indicator on device).
 - Unstyled categories share a 12-colour palette by position, so two can look alike until you pick colours.
@@ -91,8 +90,8 @@ Proposed, not yet prioritised. Size: S = under an hour, M = a few hours, L = a d
 
 | # | Idea | Why | Size |
 |---|---|---|---|
-| 28 | **CSV Statement Importer** with interactive column mapping | Migrate from bKash, banks or Excel spreadsheets | M |
 | 29 | **Multi-currency / Remittance helper** (USD/EUR conversion to BDT) | Freelancers and expatriate remittances | S |
+| 30 | **Budget History & Consistency Trend** | Track multi-month category budget adherence | M |
 
 ## Decisions
 Record ideas that were rejected or deferred, with the reason, so they are not proposed again.
