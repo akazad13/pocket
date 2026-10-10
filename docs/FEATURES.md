@@ -78,7 +78,6 @@ Keep this file current: move an idea to "Implemented" when it ships.
 ## Known limitations
 These are the gaps the ideas below address.
 - Starting balances have no date, so net worth history before you began tracking shows those balances.
-- The all-expenses CSV does not include the account.
 - Restore cannot import CSV files from other apps or banks (JSON backups only).
 - All expenses are loaded on every page load (no pagination); fine for years of personal data, but unbounded.
 - Backups are manual; nothing is backed up automatically.
