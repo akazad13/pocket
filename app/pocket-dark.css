@@ -187,3 +187,19 @@ html[data-theme=dark] .seg-3,html[data-theme=dark] .dot-3{background:#a2edd3}
 html[data-theme=dark] .seg-4,html[data-theme=dark] .dot-4{background:#78a892}
 html[data-theme=dark] .seg-5,html[data-theme=dark] .dot-5{background:#597a6b}
 html[data-theme=dark] .method-row{border-color:var(--line,#2a352e)}
+html[data-theme=dark] .remittance-badge{background:#183626;color:#85cca0}
+html[data-theme=dark] .remittance-currency-btn{border-color:#2a3a31;background:#18221c}
+html[data-theme=dark] .remittance-currency-btn b{color:#d5e5db}
+html[data-theme=dark] .remittance-currency-btn.active{border-color:#489972;background:#1d3829}
+html[data-theme=dark] .remittance-currency-btn.active b{color:#a4e3bf}
+html[data-theme=dark] .remittance-incentive-box{border-color:#244231;background:#13261c}
+html[data-theme=dark] .remittance-checkbox-label strong{color:#aee0c2}
+html[data-theme=dark] .remittance-checkbox-label small{color:#76a88b}
+html[data-theme=dark] .remittance-rate-input{background:#161d19;border-color:#34423a}
+html[data-theme=dark] .remittance-rate-input input{color:#e3ebe5}
+html[data-theme=dark] .remittance-result-card{background:#141c17;border-color:#26362d}
+html[data-theme=dark] .remittance-breakdown{border-bottom-color:#26362d}
+html[data-theme=dark] .remittance-row{color:#9cb5a5}
+html[data-theme=dark] .remittance-row.incentive{color:#80d69f}
+html[data-theme=dark] .remittance-total strong{color:#e8f1eb}
+html[data-theme=dark] .remittance-note-preview code{background:#1c2720;color:#c0ded0}

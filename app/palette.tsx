@@ -22,6 +22,7 @@ import {
   Repeat,
   Tag,
   Wallet,
+  Coins,
 } from 'lucide-react';
 import type {Account} from '@/lib/accounts';
 
@@ -38,6 +39,7 @@ type Props = {
   onAddTransfer: () => void;
   onManageCategories: () => void;
   onRecurring: () => void;
+  onOpenRemittance?: () => void;
 };
 
 export default function Palette({
@@ -53,6 +55,7 @@ export default function Palette({
   onAddTransfer,
   onManageCategories,
   onRecurring,
+  onOpenRemittance,
 }: Props) {
   useEffect(() => {
     const down = (e: KeyboardEvent) => {
@@ -65,9 +68,9 @@ export default function Palette({
     return () => document.removeEventListener('keydown', down);
   }, [open, onOpenChange]);
 
-  const run = (action: () => void) => {
+  const run = (action?: () => void) => {
     onOpenChange(false);
-    action();
+    action?.();
   };
 
   return (
@@ -82,6 +85,11 @@ export default function Palette({
           <CommandItem onSelect={() => run(onAddIncome)}>
             <TrendingUp className="mr-2" size={16} /> Add income
           </CommandItem>
+          {onOpenRemittance && (
+            <CommandItem onSelect={() => run(onOpenRemittance)}>
+              <Coins className="mr-2" size={16} /> Remittance / FX Calculator
+            </CommandItem>
+          )}
           <CommandItem onSelect={() => run(onAddTransfer)}>
             <ArrowLeftRight className="mr-2" size={16} /> Transfer money
           </CommandItem>

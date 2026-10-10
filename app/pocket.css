@@ -367,3 +367,35 @@ footer{color:var(--ink-3);font-size:12px}
 .method-count{font-size:11px}
 .method-cents{font-family:var(--display);font-variant-numeric:tabular-nums;text-align:right}
 .method-pct{text-align:right;color:var(--ink-2);font-weight:600}
+
+/* Remittance & FX helper */
+.remittance-dialog{max-width:480px!important}
+.remittance-badge{font-size:10px;font-weight:700;letter-spacing:.5px;text-transform:uppercase;background:#e9f5ed;color:#256a53;padding:2px 8px;border-radius:12px;margin-left:6px}
+.remittance-content{display:grid;gap:16px;margin-top:12px}
+.remittance-currencies{display:grid;grid-template-columns:repeat(6,1fr);gap:6px}
+.remittance-currency-btn{display:flex;flex-direction:column;align-items:center;justify-content:center;padding:8px 4px;border:1px solid #dde5d5;border-radius:8px;background:#fafbf8;transition:all .15s}
+.remittance-currency-btn b{font-size:12px;color:#22382e}
+.remittance-currency-btn small{font-size:10px;color:#8c9d7c}
+.remittance-currency-btn.active{border-color:#256a53;background:#eaf3ed}
+.remittance-currency-btn.active b{color:#256a53}
+.remittance-form-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.remittance-incentive-box{display:flex;align-items:center;justify-content:space-between;padding:12px;border:1px solid #d4e7da;background:#f3f9f5;border-radius:10px;gap:12px}
+.remittance-checkbox-label{display:flex;align-items:center;gap:10px;cursor:pointer}
+.remittance-checkbox-label input{width:18px;height:18px;accent-color:#256a53;cursor:pointer}
+.remittance-checkbox-label strong{display:block;font-size:12px;color:#1e4d3a}
+.remittance-checkbox-label small{display:block;font-size:10px;color:#5c7d6b}
+.remittance-rate-input{display:flex;align-items:center;gap:4px;background:#fff;border:1px solid #c7decb;border-radius:6px;padding:2px 6px}
+.remittance-rate-input input{width:42px;border:0;background:none;font-size:12px;font-weight:bold;text-align:right;padding:2px;outline:none}
+.remittance-rate-input span{font-size:11px;color:#6b8b78}
+.remittance-result-card{background:#f8faf6;border:1px solid #dde5d5;border-radius:10px;padding:14px;display:grid;gap:10px}
+.remittance-breakdown{display:grid;gap:6px;border-bottom:1px dashed #dde5d5;padding-bottom:8px}
+.remittance-row{display:flex;justify-content:space-between;align-items:center;font-size:12px;color:#5a6d60}
+.remittance-row.incentive{color:#256a53;font-weight:600}
+.remittance-row.fee{color:#ba5d4d}
+.remittance-total{display:flex;justify-content:space-between;align-items:center}
+.remittance-total small{font-size:10px;text-transform:uppercase;letter-spacing:.5px;color:#7a8c7e;display:block}
+.remittance-total strong{font-size:24px;font-family:var(--display);color:#22382e;letter-spacing:-.5px}
+.remittance-note-preview{font-size:11px;color:#7a8c7e}
+.remittance-note-preview small{display:block;margin-bottom:2px}
+.remittance-note-preview code{display:block;background:#ecefe8;padding:6px 8px;border-radius:6px;font-size:11px;word-break:break-all;color:#334d3d}
+.remittance-actions{display:flex;align-items:center;gap:10px}

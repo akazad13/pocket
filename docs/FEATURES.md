@@ -22,6 +22,7 @@ Keep this file current: move an idea to "Implemented" when it ships.
 |---|---|---|
 | Income entries | Add from the Add menu or the "Income & savings" panel; edit and delete (with Undo) from the panel or Transactions. Amount, source (suggestions from defaults and past sources), date, optional account and note. | `app/income.tsx` (`IncomeDialog`, `deleteIncome`); `/api/income` |
 | Net savings | Panel shows the month's income, spent, saved or overspent, and savings rate. Monthly table and CSV export add Income and Net rows when any income exists. Included in backups. | `lib/income.ts` |
+| Remittance & FX helper | Convert foreign payouts and remittances (USD, EUR, GBP, SAR, AED, etc.) to BDT with official Bangladesh Government 2.5% cash incentive and deductions. Quick one-click populate in Income dialog, copy BDT, or launch anytime via Ctrl+K. | `lib/remittance.ts` (unit tested), `app/remittance.tsx`, `app/income.tsx`, `app/palette.tsx` |
 
 ### Categories
 | Feature | Details | Code |
@@ -90,7 +91,6 @@ Proposed, not yet prioritised. Size: S = under an hour, M = a few hours, L = a d
 
 | # | Idea | Why | Size |
 |---|---|---|---|
-| 29 | **Multi-currency / Remittance helper** (USD/EUR conversion to BDT) | Freelancers and expatriate remittances | S |
 | 30 | **Budget History & Consistency Trend** | Track multi-month category budget adherence | M |
 
 ## Decisions
