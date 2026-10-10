@@ -1,0 +1,19 @@
+{
+  "name": "Pocket · Personal Finance",
+  "short_name": "Pocket",
+  "description": "Mobile-first personal expense tracker and net worth manager in BDT",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "background_color": "#f3f6f4",
+  "theme_color": "#006a4e",
+  "orientation": "portrait-primary",
+  "icons": [
+    {
+      "src": "/pocket.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ]
+}
