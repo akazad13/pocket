@@ -300,4 +300,7 @@ html[data-theme=dark] .tag-card-bar-fill{background:#43a675}
 html[data-theme=dark] .tag-card-meta{color:#7e9686}
 html[data-theme=dark] .tag-view-link{color:#7ad4a5}
 html[data-theme=dark] .tag-cat-chip{background:#1e2922;color:#9cb5a5}
+html[data-theme=dark] .export-transactions-btn{background:#182b20;color:#85cca3;border-color:#2a4836}
+html[data-theme=dark] .export-transactions-btn:hover:not(:disabled){background:#1f382a;color:#a2dfbc}
+
 

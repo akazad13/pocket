@@ -578,4 +578,14 @@ footer{color:var(--ink-3);font-size:12px}
 .tag-categories-list{display:flex;flex-wrap:wrap;gap:4px;margin-top:2px}
 .tag-cat-chip{font-size:10px;padding:2px 6px;border-radius:4px;background:#f2f5ed;color:#677868}
 
+/* Transaction Export */
+.transactions-heading-actions{display:flex;align-items:center;gap:10px}
+.export-transactions-btn{display:inline-flex;align-items:center;gap:5px;padding:6px 10px;border-radius:6px;font-size:12px;font-weight:600;background:#edf3ea;color:#286b4f;border:1px solid #d2e2cd;cursor:pointer}
+.export-transactions-btn:hover:not(:disabled){background:#dfedd9;color:#1d533d}
+.export-transactions-btn:disabled{opacity:.45;cursor:not-allowed}
+@media (max-width:640px){
+  .transactions-heading-actions{flex-wrap:wrap;justify-content:flex-end}
+}
+
+
 
