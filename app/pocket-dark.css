@@ -322,5 +322,47 @@ html[data-theme=dark] .runway-pill.badge-warning{background:#3b2912;color:#fcd34
 html[data-theme=dark] .runway-pill.badge-success{background:#133320;color:#86efac;border-color:#1c4d30}
 html[data-theme=dark] .runway-pill.badge-strong{background:#1e1e42;color:#a5b4fc;border-color:#2e2e66}
 
+/* Monthly Calendar Schedule Dark Mode */
+html[data-theme=dark] .cal-stat-card{background:#151d18;border-color:#26342b}
+html[data-theme=dark] .cal-stat-card small{color:#768e7d}
+html[data-theme=dark] .cal-stat-card strong{color:#e6f1ea}
+html[data-theme=dark] .cal-stat-card span{color:#829989}
+html[data-theme=dark] .cal-grid-panel{background:#151d18;border-color:#26342b}
+html[data-theme=dark] .cal-title-row h3{color:#e6f1ea}
+html[data-theme=dark] .cal-nav-buttons button{background:#1a251e;border-color:#28382d;color:#9cb5a5}
+html[data-theme=dark] .cal-nav-buttons button:hover{background:#233529}
+html[data-theme=dark] .cal-legend-row{color:#7e9686}
+html[data-theme=dark] .cal-weekday-label{color:#6c8474}
+html[data-theme=dark] .cal-cell{background:#16201a;border-color:#233027}
+html[data-theme=dark] .cal-cell:hover:not(.blank){border-color:#43a675}
+html[data-theme=dark] .cal-cell.selected{outline-color:#43a675;background:#1e2d24}
+html[data-theme=dark] .cal-cell.intensity-1{background:#18281e}
+html[data-theme=dark] .cal-cell.intensity-2{background:#2b2214}
+html[data-theme=dark] .cal-cell.intensity-3{background:#301818;border-color:#4e2222}
+html[data-theme=dark] .cal-day-number{color:#cce0d4}
+html[data-theme=dark] .cal-cell.today .cal-day-number{color:#7ad4a5}
+html[data-theme=dark] .today-badge{background:#327e57;color:#fff}
+html[data-theme=dark] .cell-spend-val{color:#9cb5a5}
+html[data-theme=dark] .cal-cell.intensity-3 .cell-spend-val{color:#f87171}
+html[data-theme=dark] .cal-cell.intensity-2 .cell-spend-val{color:#fbbf24}
+html[data-theme=dark] .cal-inspector-panel{background:#151d18;border-color:#26342b}
+html[data-theme=dark] .inspector-header{border-bottom-color:#25342a}
+html[data-theme=dark] .inspector-header h4{color:#e6f1ea}
+html[data-theme=dark] .inspector-header p{color:#7e9686}
+html[data-theme=dark] .inspector-total-box{background:#1a241e;border-color:#28382d}
+html[data-theme=dark] .inspector-total-box small{color:#768e7d}
+html[data-theme=dark] .inspector-total-box strong{color:#e6f1ea}
+html[data-theme=dark] .inspector-total-box strong.text-spent{color:#f87171}
+html[data-theme=dark] .inspector-total-box strong.text-income{color:#82cca0}
+html[data-theme=dark] .inspector-section h5{color:#768e7d}
+html[data-theme=dark] .inspector-row{border-bottom-color:#223027}
+html[data-theme=dark] .inspector-row b{color:#dce9e1}
+html[data-theme=dark] .inspector-row small{color:#768e7d}
+html[data-theme=dark] .inspector-row.bill{background:#231830}
+html[data-theme=dark] .inspector-row.recurring{background:#162438}
+html[data-theme=dark] .inspector-empty{color:#6c8474}
+html[data-theme=dark] .inspector-empty-placeholder{color:#6c8474}
+
+
 
 

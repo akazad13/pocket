@@ -25,6 +25,7 @@ import {
   Coins,
   ChartCandlestick,
   Split,
+  CalendarDays,
 } from 'lucide-react';
 import type {Account} from '@/lib/accounts';
 
@@ -34,7 +35,7 @@ type Props = {
   categories: string[];
   accounts: Account[];
   onSelectTab: (tab: 'overview' | 'transactions' | 'accounts' | 'reports') => void;
-  onSelectReport: (report: 'year' | 'table' | 'tax') => void;
+  onSelectReport: (report: 'year' | 'table' | 'tax' | 'tags' | 'calendar') => void;
   onFilterCategory: (category: string) => void;
   onAddExpense: () => void;
   onAddIncome: () => void;
@@ -135,6 +136,12 @@ export default function Palette({
           </CommandItem>
           <CommandItem onSelect={() => run(() => { onSelectTab('reports'); onSelectReport('tax'); })}>
             <ReceiptText className="mr-2" size={16} /> Reports: Bangladesh Tax Year
+          </CommandItem>
+          <CommandItem onSelect={() => run(() => { onSelectTab('reports'); onSelectReport('calendar'); })}>
+            <CalendarDays className="mr-2" size={16} /> Reports: Monthly Calendar &amp; Schedule
+          </CommandItem>
+          <CommandItem onSelect={() => run(() => { onSelectTab('reports'); onSelectReport('tags'); })}>
+            <Tag className="mr-2" size={16} /> Reports: Tag Spending Breakdown
           </CommandItem>
         </CommandGroup>
         {categories.length > 0 && (

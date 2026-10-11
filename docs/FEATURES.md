@@ -100,8 +100,8 @@ All initial backlog items (#1 to #33) have been implemented. Keep this section u
 | 35 | **Transaction Hashtags & Tag Breakdown** | Group spending across categories with #tags in notes & dedicated Reports view | S | Implemented |
 | 36 | **Export Filtered Transactions to CSV** | Export all active search, category, type, and date-range filtered transactions to clean CSV format | S | Implemented |
 | 37 | **Net Worth Asset Allocation & Liquidity Ratio** | Visual asset allocation across Liquid, Savings, Equities, Physical & Debts, with runway months | M | Implemented |
-| 38 | **Monthly Calendar Heatmap & Due Schedule** | Visual calendar grid of daily spending, income, recurring items, and bill due dates | M | In progress |
-| 39 | **Spending Anomaly & Spike Detector** | Automatically identify non-routine large expenses (>3x category median) on Overview & Reports | S | Planned |
+| 38 | **Monthly Calendar Heatmap & Due Schedule** | Visual calendar grid of daily spending, income, recurring items, and bill due dates | M | Implemented |
+| 39 | **Spending Anomaly & Spike Detector** | Automatically identify non-routine large expenses (>3x category median) on Overview & Reports | S | In progress |
 | 40 | **Username and Password Authentication** | Protect the app with secure login gate/session | M | Planned |
 
 
