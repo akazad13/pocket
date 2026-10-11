@@ -10,7 +10,7 @@ Pocket uses **Cloudflare D1** (serverless SQLite at the edge) in production and 
 
 - **Primary Schema Definition**: [db/schema.ts](file:///d:/Practice/Projects/Financial/pocket/db/schema.ts) (Drizzle ORM syntax used for migration generation).
 - **Runtime Access**: Raw prepared statements via `database()` in [lib/database.ts](file:///d:/Practice/Projects/Financial/pocket/lib/database.ts).
-- **Migration Files**: [drizzle/](file:///d:/Practice/Projects/Financial/pocket/drizzle/) containing versioned SQL scripts `0000_*.sql` through `0013_*.sql`.
+- **Migration Files**: [drizzle/](file:///d:/Practice/Projects/Financial/pocket/drizzle/) containing versioned SQL scripts `0000_*.sql` through `0014_dear_zemo.sql`.
 
 ---
 
@@ -178,6 +178,28 @@ CREATE TABLE recurring (
   last_month TEXT                -- Last month generated 'YYYY-MM' (nullable)
 );
 ```
+
+### 2.5 Multi-Tenant Architecture & Users
+
+#### `users`
+Stores user authentication records.
+```sql
+CREATE TABLE users (
+  id TEXT PRIMARY KEY,           -- User ID / username
+  username TEXT NOT NULL UNIQUE, -- Normalized username (lowercase, 3-30 chars)
+  password_hash TEXT NOT NULL,   -- PBKDF2-SHA256 hex digest (100,000 iterations)
+  salt TEXT NOT NULL,            -- 16-byte random cryptographic salt (hex)
+  name TEXT NOT NULL,            -- User display name
+  created_at TEXT NOT NULL       -- ISO-8601 registration timestamp
+);
+```
+
+#### Multi-Tenant Data Isolation
+Each transactional and configuration table (`expenses`, `income`, `accounts`, `transfers`, `adjustments`, `recurring`, `budgets`, `custom_categories`, `goals`, `bills`) includes a `user_id TEXT NOT NULL DEFAULT 'admin'` column.
+
+- **Request Context**: `getAuthenticatedUser(request)` extracts the authenticated username from the HMAC-signed `pocket_session` cookie (or defaults to `'admin'` for unauthenticated or legacy local tests).
+- **Tenant Scoping**: All SQL reads and writes filter strictly by `WHERE user_id = ?`.
+- **Budgets and Category Namespacing**: Non-admin users have their category names and budget keys prefixed with `${userId}:` at the database primary key level to avoid SQLite primary key collisions across tenants, while seamlessly presenting clean display names to the client.
 
 ---
 

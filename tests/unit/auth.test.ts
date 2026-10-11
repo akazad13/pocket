@@ -6,13 +6,56 @@ import {
   verifySessionToken,
   getCookieValue,
   makeCookieHeader,
+  validateUsername,
+  validatePassword,
+  generateSalt,
+  hashPassword,
+  verifyUserPassword,
+  getAuthenticatedUser,
+  AUTH_COOKIE_NAME,
   DEFAULT_USERNAME,
   DEFAULT_PASSWORD
 } from '../../lib/auth';
 
+test('validateUsername validates valid usernames and rejects invalid formats', () => {
+  assert.equal(validateUsername('kalam'), 'kalam');
+  assert.equal(validateUsername('Alice_99'), 'alice_99');
+  assert.equal(validateUsername('user-one'), 'user-one');
+
+  assert.throws(() => validateUsername(''), /between 3 and 30/);
+  assert.throws(() => validateUsername('ab'), /between 3 and 30/);
+  assert.throws(() => validateUsername('a'.repeat(35)), /between 3 and 30/);
+  assert.throws(() => validateUsername('kalam@email'), /letters, numbers/);
+  assert.throws(() => validateUsername('user space'), /letters, numbers/);
+  assert.throws(() => validateUsername(null), /required/);
+});
+
+test('validatePassword validates length requirements', () => {
+  assert.equal(validatePassword('secret123'), 'secret123');
+  assert.throws(() => validatePassword('12345'), /at least 6 characters/);
+  assert.throws(() => validatePassword(null), /required/);
+  assert.throws(() => validatePassword('a'.repeat(150)), /exceed 128/);
+});
+
+test('generateSalt, hashPassword, and verifyUserPassword work correctly', async () => {
+  const salt = generateSalt();
+  assert.equal(typeof salt, 'string');
+  assert.equal(salt.length, 32); // 16 bytes in hex = 32 chars
+
+  const hash = await hashPassword('my-strong-password', salt);
+  assert.equal(typeof hash, 'string');
+  assert.equal(hash.length, 64); // 256 bits = 32 bytes in hex = 64 chars
+
+  const matches = await verifyUserPassword('my-strong-password', salt, hash);
+  assert.equal(matches, true);
+
+  const wrong = await verifyUserPassword('wrong-password', salt, hash);
+  assert.equal(wrong, false);
+});
+
 test('verifyCredentials validates default credentials and rejects wrong inputs', () => {
   assert.equal(verifyCredentials(DEFAULT_USERNAME, DEFAULT_PASSWORD), true);
-  assert.equal(verifyCredentials('ADMIN', DEFAULT_PASSWORD), true); // case insensitive username
+  assert.equal(verifyCredentials('ADMIN', DEFAULT_PASSWORD), true);
   assert.equal(verifyCredentials(DEFAULT_USERNAME, 'wrongpassword'), false);
   assert.equal(verifyCredentials('unknownuser', DEFAULT_PASSWORD), false);
   assert.equal(verifyCredentials('', ''), false);
@@ -32,10 +75,20 @@ test('verifySessionToken rejects tampered and expired tokens', () => {
   assert.equal(verifySessionToken('invalid.token').valid, false);
   assert.equal(verifySessionToken(null).valid, false);
 
-  // Expired token
   const pastMs = Date.now() - 1000000;
   const expiredToken = createSessionToken('kalam', pastMs - 8 * 24 * 60 * 60 * 1000);
   assert.equal(verifySessionToken(expiredToken).valid, false);
+});
+
+test('getAuthenticatedUser extracts username or falls back to admin', () => {
+  const token = createSessionToken('alice');
+  const reqWithAuth = new Request('http://127.0.0.1/api/expenses', {
+    headers: { cookie: `${AUTH_COOKIE_NAME}=${token}` }
+  });
+  assert.equal(getAuthenticatedUser(reqWithAuth), 'alice');
+
+  const reqWithoutAuth = new Request('http://127.0.0.1/api/expenses');
+  assert.equal(getAuthenticatedUser(reqWithoutAuth), DEFAULT_USERNAME);
 });
 
 test('getCookieValue extracts cookie accurately', () => {

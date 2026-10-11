@@ -1,43 +1,75 @@
 "use client";
 import React, {useState} from 'react';
-import {Wallet,Lock,KeyRound,Eye,EyeOff,ArrowRight,ShieldCheck} from 'lucide-react';
+import {Wallet,Lock,KeyRound,Eye,EyeOff,ArrowRight,ShieldCheck,UserPlus,LogIn,User} from 'lucide-react';
 import {toast} from 'sonner';
 
 interface LoginScreenProps {
-  onAuthenticated: (user: {username: string}) => void;
+  onAuthenticated: (user: {username: string; name?: string}) => void;
 }
 
 export default function LoginScreen({onAuthenticated}: LoginScreenProps) {
+  const [mode, setMode] = useState<'login' | 'register'>('login');
   const [username, setUsername] = useState('admin');
+  const [name, setName] = useState('');
   const [password, setPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
 
-  async function handleLogin(e: React.FormEvent) {
+  async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     setError('');
+
+    const cleanUser = username.trim().toLowerCase();
+    if (!cleanUser) {
+      setError('Please enter a username.');
+      return;
+    }
+
+    if (mode === 'register') {
+      if (password.length < 6) {
+        setError('Password must be at least 6 characters.');
+        return;
+      }
+      if (password !== confirmPassword) {
+        setError('Passwords do not match.');
+        return;
+      }
+    }
+
     setLoading(true);
 
     try {
-      const res = await fetch('/api/auth/login', {
+      const endpoint = mode === 'register' ? '/api/auth/register' : '/api/auth/login';
+      const payload = mode === 'register'
+        ? {username: cleanUser, password, name: name.trim()}
+        : {username: cleanUser, password};
+
+      const res = await fetch(endpoint, {
         method: 'POST',
         headers: {'Content-Type': 'application/json'},
-        body: JSON.stringify({username, password})
+        body: JSON.stringify(payload)
       });
 
-      const data = await res.json() as {ok?: boolean; user?: {username: string}; error?: string};
+      const data = await res.json() as {ok?: boolean; user?: {username: string; name?: string}; error?: string};
 
       if (!res.ok || !data.ok) {
-        throw new Error(data.error || 'Invalid credentials');
+        throw new Error(data.error || (mode === 'register' ? 'Registration failed' : 'Invalid credentials'));
       }
 
-      toast.success(`Welcome back, ${data.user?.username || username}!`);
+      const displayName = data.user?.name || data.user?.username || cleanUser;
+      if (mode === 'register') {
+        toast.success(`Account created! Welcome to Pocket, ${displayName}!`);
+      } else {
+        toast.success(`Welcome back, ${displayName}!`);
+      }
+
       if (data.user) {
         onAuthenticated(data.user);
       }
     } catch (err) {
-      const msg = err instanceof Error ? err.message : 'Login failed';
+      const msg = err instanceof Error ? err.message : 'Authentication failed';
       setError(msg);
       toast.error(msg);
     } finally {
@@ -46,6 +78,7 @@ export default function LoginScreen({onAuthenticated}: LoginScreenProps) {
   }
 
   function fillDemo() {
+    setMode('login');
     setUsername('admin');
     setPassword('pocket2026');
     setError('');
@@ -62,7 +95,28 @@ export default function LoginScreen({onAuthenticated}: LoginScreenProps) {
           <p>Everything you have, earn and spend · Secure Access</p>
         </div>
 
-        <form className="login-form" onSubmit={handleLogin}>
+        <div className="login-tabs" role="tablist">
+          <button
+            type="button"
+            role="tab"
+            aria-selected={mode === 'login'}
+            className={mode === 'login' ? 'login-tab active' : 'login-tab'}
+            onClick={() => { setMode('login'); setError(''); }}
+          >
+            <LogIn size={15} /> Sign In
+          </button>
+          <button
+            type="button"
+            role="tab"
+            aria-selected={mode === 'register'}
+            className={mode === 'register' ? 'login-tab active' : 'login-tab'}
+            onClick={() => { setMode('register'); setError(''); if (username === 'admin') setUsername(''); }}
+          >
+            <UserPlus size={15} /> Create Account
+          </button>
+        </div>
+
+        <form className="login-form" onSubmit={handleSubmit}>
           {error && (
             <div className="login-error-alert" role="alert">
               {error}
@@ -77,13 +131,29 @@ export default function LoginScreen({onAuthenticated}: LoginScreenProps) {
                 type="text"
                 required
                 autoFocus
-                placeholder="admin"
+                placeholder={mode === 'register' ? 'e.g. kalam' : 'admin'}
                 value={username}
                 onChange={e => setUsername(e.target.value)}
                 autoComplete="username"
               />
             </div>
           </label>
+
+          {mode === 'register' && (
+            <label className="login-field">
+              <span>Display Name <small>(optional)</small></span>
+              <div className="login-input-wrap">
+                <span className="login-input-icon"><User size={16} /></span>
+                <input
+                  type="text"
+                  placeholder="e.g. Kalam"
+                  value={name}
+                  onChange={e => setName(e.target.value)}
+                  autoComplete="name"
+                />
+              </div>
+            </label>
+          )}
 
           <label className="login-field">
             <span>Password</span>
@@ -92,10 +162,10 @@ export default function LoginScreen({onAuthenticated}: LoginScreenProps) {
               <input
                 type={showPassword ? 'text' : 'password'}
                 required
-                placeholder="••••••••"
+                placeholder={mode === 'register' ? 'At least 6 characters' : '••••••••'}
                 value={password}
                 onChange={e => setPassword(e.target.value)}
-                autoComplete="current-password"
+                autoComplete={mode === 'register' ? 'new-password' : 'current-password'}
               />
               <button
                 type="button"
@@ -108,26 +178,45 @@ export default function LoginScreen({onAuthenticated}: LoginScreenProps) {
             </div>
           </label>
 
+          {mode === 'register' && (
+            <label className="login-field">
+              <span>Confirm Password</span>
+              <div className="login-input-wrap">
+                <span className="login-input-icon"><KeyRound size={16} /></span>
+                <input
+                  type={showPassword ? 'text' : 'password'}
+                  required
+                  placeholder="Repeat your password"
+                  value={confirmPassword}
+                  onChange={e => setConfirmPassword(e.target.value)}
+                  autoComplete="new-password"
+                />
+              </div>
+            </label>
+          )}
+
           <button
             type="submit"
             className="primary login-submit-btn"
-            disabled={loading || !username.trim() || !password}
+            disabled={loading || !username.trim() || !password || (mode === 'register' && !confirmPassword)}
           >
-            {loading ? 'Authenticating…' : 'Unlock Pocket'}
+            {loading ? (mode === 'register' ? 'Creating account…' : 'Authenticating…') : (mode === 'register' ? 'Register & Unlock Pocket' : 'Unlock Pocket')}
             {!loading && <ArrowRight size={16} />}
           </button>
 
-          <div className="login-demo-helper">
-            <span>Default setup credentials:</span>
-            <button type="button" className="demo-chip-btn" onClick={fillDemo} title="Click to prefill demo login">
-              admin / pocket2026
-            </button>
-          </div>
+          {mode === 'login' && (
+            <div className="login-demo-helper">
+              <span>Default setup credentials:</span>
+              <button type="button" className="demo-chip-btn" onClick={fillDemo} title="Click to prefill demo login">
+                admin / pocket2026
+              </button>
+            </div>
+          )}
         </form>
 
         <div className="login-footer">
           <ShieldCheck size={14} />
-          <span>Protected with HMAC session authentication &amp; origin safety</span>
+          <span>Multi-tenant data isolation with salted PBKDF2 &amp; HMAC sessions</span>
         </div>
       </div>
     </div>

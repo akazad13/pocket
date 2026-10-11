@@ -1,4 +1,5 @@
-import {AUTH_COOKIE_NAME, getCookieValue, verifySessionToken} from '@/lib/auth';
+import {database} from '@/lib/database';
+import {AUTH_COOKIE_NAME, getCookieValue, verifySessionToken, DEFAULT_USERNAME} from '@/lib/auth';
 
 export async function GET(request: Request) {
   const cookieHeader = request.headers.get('cookie');
@@ -13,10 +14,21 @@ export async function GET(request: Request) {
     return Response.json({authenticated: false, user: null}, {headers: {'Cache-Control': 'no-store'}});
   }
 
+  let displayName = username;
+  try {
+    const db = database();
+    const row = await db.prepare('SELECT name FROM users WHERE username = ? COLLATE NOCASE').bind(username).first<{name: string}>();
+    if (row?.name) {
+      displayName = row.name;
+    } else if (username.toLowerCase() === DEFAULT_USERNAME.toLowerCase()) {
+      displayName = 'Admin';
+    }
+  } catch {}
+
   return Response.json(
     {
       authenticated: true,
-      user: {username}
+      user: {username, name: displayName}
     },
     {headers: {'Cache-Control': 'no-store'}}
   );

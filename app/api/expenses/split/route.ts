@@ -1,7 +1,8 @@
 import { database } from '@/lib/database';
 import { validateSplitExpense } from '@/lib/splits';
 import { getCategories } from '@/lib/categories';
-import { missingAccount, goneAccount } from '@/lib/account-db';
+import { missingUserAccount, goneAccount } from '@/lib/account-db';
+import { getAuthenticatedUser } from '@/lib/auth';
 
 const failure = () => Response.json({ error: 'Expenses are temporarily unavailable. Please try again.' }, { status: 503 });
 
@@ -19,9 +20,11 @@ export async function POST(request: Request) {
     return Response.json({ error: 'Invalid request.' }, { status: 400 });
   }
 
+  const userId = getAuthenticatedUser(request);
+
   let allowed: string[];
   try {
-    allowed = await getCategories();
+    allowed = await getCategories(userId);
   } catch (e) {
     console.error(e);
     return failure();
@@ -36,18 +39,18 @@ export async function POST(request: Request) {
 
   try {
     const account = plan.expenses[0]?.account;
-    if (account && (await missingAccount(account))) return goneAccount();
+    if (account && (await missingUserAccount(userId, account))) return goneAccount();
 
     const db = database();
     const stmts = [];
     if (plan.originalId) {
-      stmts.push(db.prepare('DELETE FROM expenses WHERE id = ?').bind(plan.originalId));
+      stmts.push(db.prepare('DELETE FROM expenses WHERE id = ? AND user_id = ?').bind(plan.originalId, userId));
     }
     for (const exp of plan.expenses) {
       stmts.push(
         db.prepare(
-          'INSERT INTO expenses (id, category, cents, date, note, method, account) VALUES (?, ?, ?, ?, ?, ?, ?)'
-        ).bind(exp.id, exp.category, exp.cents, exp.date, exp.note, exp.method, exp.account)
+          'INSERT INTO expenses (id, category, cents, date, note, method, account, user_id) VALUES (?, ?, ?, ?, ?, ?, ?, ?)'
+        ).bind(exp.id, exp.category, exp.cents, exp.date, exp.note, exp.method, exp.account, userId)
       );
     }
 

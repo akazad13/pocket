@@ -61,13 +61,19 @@ export default function Home(){
  async function saveStyle(name:string,style:{color:string;icon:string}){setManageError('');try{const r=await fetch('/api/categories/style',{method:'PUT',headers:{'Content-Type':'application/json'},body:JSON.stringify({name,...style})});const result=await r.json() as {error:string};if(!r.ok)throw Error(result.error);setStyles(old=>{const{[name]:_prev,...rest}=old;void _prev;return style.color||style.icon?{...rest,[name]:style}:rest;});}catch(e){setManageError(e instanceof Error?e.message:'Couldn’t save this style.');}}
  async function addCategory(){setCategorySaving(true);setCategoryError('');try{const r=await fetch('/api/categories',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({name:newCategory})});const result=await r.json() as {category:string;error:string};if(!r.ok)throw Error(result.error);setCategories(old=>[...old,result.category]);setCategory(result.category);setAddingCategory(false);setNewCategory('');setNotice('Category added');}catch(e){setCategoryError(e instanceof Error?e.message:'Couldn’t save category.');}finally{setCategorySaving(false);}}
   const [isAuthenticated, setIsAuthenticated] = useState<boolean | null>(null);
+  const [currentUser, setCurrentUser] = useState<{username: string; name?: string} | null>(null);
   useEffect(() => {
     async function checkAuth() {
       try {
         const res = await fetch('/api/auth/status');
         if (res.ok) {
-          const data = await res.json() as { authenticated: boolean; username: string };
-          setIsAuthenticated(Boolean(data.authenticated));
+          const data = await res.json() as { authenticated: boolean; user?: {username: string; name?: string} };
+          if (data.authenticated && data.user) {
+            setCurrentUser(data.user);
+            setIsAuthenticated(true);
+          } else {
+            setIsAuthenticated(false);
+          }
         } else {
           setIsAuthenticated(false);
         }
@@ -81,6 +87,7 @@ export default function Home(){
     try {
       await fetch('/api/auth/logout', { method: 'POST' });
     } catch {}
+    setCurrentUser(null);
     setIsAuthenticated(false);
     toast.success('Session locked');
   }
@@ -112,9 +119,9 @@ export default function Home(){
  function exportFilteredTransactionsCsv(){const content=entriesToCsv(entries,names);download(content,`pocket-transactions-${allTime?'all-time':month}${kind!=='all'?`-${kind}`:''}.csv`,'text/csv;charset=utf-8');toast.success(`Exported ${entries.length} transactions to CSV`);}
  const empty=<div className="empty"><span className="empty-icon"><ReceiptText size={28}/></span><h3>A fresh start for {monthName(month).split(' ')[0]}</h3><p>Add your first expense to see where your money goes.</p><button className="primary" onClick={()=>start()}><Plus size={18}/> Add an expense</button></div>;
  const row=(e:Expense)=>{const tags=extractTags(e.note);return <div className="expense-row" key={e.id}><span className="expense-icon" style={styles[e.category]?.color?{color:styles[e.category].color,background:styles[e.category].color+'1f'}:undefined}><CategoryIcon icon={styles[e.category]?.icon} size={18}/></span><div><b>{e.category}</b><p>{e.id.startsWith('rec-')&&<Repeat size={11} className="recurring-mark" aria-label="Recurring"/>}{shortDate(e.date)}{(()=>{const a=accounts.find(x=>x.id===e.account)?.name;return `${e.method&&e.method.toLowerCase()!==a?.toLowerCase()?` · ${e.method}`:''}${a?` · ${a}`:''}`;})()}{e.note?` · ${e.note}`:''}{tags.length>0&&<span className="row-tags">{tags.map(t=><button key={t} type="button" className="row-tag-badge" onClick={ev=>{ev.stopPropagation();setTab('transactions');setFilter('text','#'+t);}} title={`Filter by #${t}`}>#{t}</button>)}</span>}</p></div><strong>{money(e.cents)}</strong><button className="icon-button" aria-label={`Split ${e.category}`} title="Split expense" onClick={()=>{setSplittingExpense(e);setSplitOpen(true);}}><Split size={15}/></button><button className="icon-button" aria-label={`Edit ${e.category}`} onClick={()=>start(e)}><Pencil size={16}/></button><button className="icon-button delete" aria-label={`Delete ${e.category} ${money(e.cents)} on ${e.date}`} onClick={()=>void remove(e)}><Trash2 size={16}/></button></div>;};
- if(isAuthenticated===false){return <LoginScreen onAuthenticated={()=>{setIsAuthenticated(true);void load();}}/>;}
+ if(isAuthenticated===false){return <LoginScreen onAuthenticated={(user)=>{setCurrentUser(user);setIsAuthenticated(true);void load();}}/>;}
  if(isAuthenticated===null){return <div className="login-container"><div className="login-card login-loading-card"><div className="login-header"><div className="login-brand-icon"><Wallet size={28}/></div><h1>pocket<span className="brand-dot">.</span></h1><p>Checking security session…</p></div></div></div>;}
- return <div className="app"><header className="topbar"><Link href="/" className="brand"><span className="brand-icon"><Wallet size={23}/></span>pocket<span className="brand-dot">.</span></Link><span className="top-note">Everything you have, earn and spend.</span><button className="theme-toggle" onClick={()=>setPaletteOpen(true)} aria-label="Command palette (Ctrl+K)" title="Command palette (Ctrl+K)"><Search size={16}/></button><PrivacyToggle/><ThemeToggle/><button className="theme-toggle lock-btn" onClick={()=>void handleLogout()} aria-label="Lock pocket" title="Lock pocket session"><Lock size={16}/></button><span className="profile" title="Personal finances">K</span></header><main>
+ return <div className="app"><header className="topbar"><Link href="/" className="brand"><span className="brand-icon"><Wallet size={23}/></span>pocket<span className="brand-dot">.</span></Link><span className="top-note">Everything you have, earn and spend.</span><button className="theme-toggle" onClick={()=>setPaletteOpen(true)} aria-label="Command palette (Ctrl+K)" title="Command palette (Ctrl+K)"><Search size={16}/></button><PrivacyToggle/><ThemeToggle/><button className="theme-toggle lock-btn" onClick={()=>void handleLogout()} aria-label="Lock pocket" title="Lock pocket session"><Lock size={16}/></button><span className="profile" onClick={()=>void handleLogout()} title={currentUser ? `Signed in as ${currentUser.username}${currentUser.name ? ` (${currentUser.name})` : ''} · Click to lock` : 'Personal finances'} style={{cursor:'pointer'}}>{(currentUser?.name || currentUser?.username || 'K').slice(0, 1).toUpperCase()}</span></header><main>
  <div className="page-heading"><div><div className="eyebrow" suppressHydrationWarning>{new Date(today()+'T12:00:00').toLocaleDateString('en-GB',{weekday:'long',day:'numeric',month:'long'})}</div><h1>Your pocket<span>.</span></h1><p>What you have, what comes in, and where it goes.</p></div>{addButtons('desktop-add')}</div>
  <div className="toolbar"><div className="month-picker"><button aria-label="Previous month" onClick={()=>moveMonth(-1)}><ChevronLeft size={19}/></button><label><span className="sr-only">Select month</span><input type="month" value={month} onChange={e=>e.target.value&&setMonth(e.target.value)}/></label><button aria-label="Next month" onClick={()=>moveMonth(1)}><ChevronRight size={19}/></button></div><span className="currency">BDT <span>· Bangladeshi taka</span></span></div>
  {error&&<div className="error" role="alert">{error} <button onClick={retry}>Retry</button></div>}<span className="sr-only" role="status">{notice}</span>

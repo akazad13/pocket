@@ -14,7 +14,8 @@
     "db:generate": "drizzle-kit generate",
     "typecheck": "tsc --noEmit --incremental false",
     "test:unit": "node --experimental-strip-types --no-warnings --import ./tests/unit/register.mjs --test \"tests/unit/*.test.ts\"",
-    "smoke": "node tests/smoke.mjs"
+    "smoke": "node tests/smoke.mjs",
+    "smoke:multi-user": "node tests/multi-user-smoke.mjs"
   },
   "dependencies": {
     "@base-ui/react": "^1.7.0",

@@ -103,6 +103,7 @@ All initial backlog items (#1 to #33) have been implemented. Keep this section u
 | 38 | **Monthly Calendar Heatmap & Due Schedule** | Visual calendar grid of daily spending, income, recurring items, and bill due dates | M | Implemented |
 | 39 | **Spending Anomaly & Spike Detector** | Automatically identify non-routine large expenses (>3x category median) on Overview & Reports | S | Implemented |
 | 40 | **Username and Password Authentication** | Protect the app with secure login gate/session, session tokens, and lock control | M | Implemented |
+| 41 | **Multi-User Registration & Tenant Data Isolation** | Allow multiple family members or users to register and manage their own isolated expenses, accounts, budgets and reports | L | Implemented |
 
 
 ## Decisions
