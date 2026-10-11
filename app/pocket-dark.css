@@ -303,4 +303,24 @@ html[data-theme=dark] .tag-cat-chip{background:#1e2922;color:#9cb5a5}
 html[data-theme=dark] .export-transactions-btn{background:#182b20;color:#85cca3;border-color:#2a4836}
 html[data-theme=dark] .export-transactions-btn:hover:not(:disabled){background:#1f382a;color:#a2dfbc}
 
+/* Asset Allocation Dark Mode */
+html[data-theme=dark] .allocation-metric-card{background:#151d18;border-color:#26342b}
+html[data-theme=dark] .metric-label{color:#768e7d}
+html[data-theme=dark] .metric-value{color:#e6f1ea}
+html[data-theme=dark] .metric-value.debt-warn{color:#f87171}
+html[data-theme=dark] .metric-hint{color:#829989}
+html[data-theme=dark] .allocation-segmented-bar{background:#233027}
+html[data-theme=dark] .allocation-card{background:#151d18;border-color:#26342b}
+html[data-theme=dark] .cat-name{color:#dce9e1}
+html[data-theme=dark] .cat-pct{color:#85cca3}
+html[data-theme=dark] .allocation-card-amount{color:#f3f7f4}
+html[data-theme=dark] .allocation-mini-bar{background:#223027}
+html[data-theme=dark] .allocation-card-meta{color:#7e9686}
+html[data-theme=dark] .allocation-card-meta small{color:#728879}
+html[data-theme=dark] .runway-pill.badge-danger{background:#3b1414;color:#fca5a5;border-color:#5c1d1d}
+html[data-theme=dark] .runway-pill.badge-warning{background:#3b2912;color:#fcd34d;border-color:#5c3e16}
+html[data-theme=dark] .runway-pill.badge-success{background:#133320;color:#86efac;border-color:#1c4d30}
+html[data-theme=dark] .runway-pill.badge-strong{background:#1e1e42;color:#a5b4fc;border-color:#2e2e66}
+
+
 
