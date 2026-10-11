@@ -102,7 +102,7 @@ All initial backlog items (#1 to #33) have been implemented. Keep this section u
 | 37 | **Net Worth Asset Allocation & Liquidity Ratio** | Visual asset allocation across Liquid, Savings, Equities, Physical & Debts, with runway months | M | Implemented |
 | 38 | **Monthly Calendar Heatmap & Due Schedule** | Visual calendar grid of daily spending, income, recurring items, and bill due dates | M | Implemented |
 | 39 | **Spending Anomaly & Spike Detector** | Automatically identify non-routine large expenses (>3x category median) on Overview & Reports | S | Implemented |
-| 40 | **Username and Password Authentication** | Protect the app with secure login gate/session | M | In progress |
+| 40 | **Username and Password Authentication** | Protect the app with secure login gate/session, session tokens, and lock control | M | Implemented |
 
 
 ## Decisions
