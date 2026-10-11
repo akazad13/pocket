@@ -281,3 +281,23 @@ html[data-theme=dark] .velocity-bar-fill.projected{background:#2d694b;opacity:.9
 html[data-theme=dark] .velocity-insights p{color:#8fa797}
 html[data-theme=dark] .velocity-insights p.warn{color:#f08c8c}
 
+/* Transaction Tags Dark Mode */
+html[data-theme=dark] .row-tag-badge{background:#18281e;color:#82cca0;border-color:#2a4534}
+html[data-theme=dark] .row-tag-badge:hover{background:#1f3627}
+html[data-theme=dark] .quick-tags-label{color:#768d7e}
+html[data-theme=dark] .quick-tag-chip{background:#16201a;border-color:#29372e;color:#9cb5a5}
+html[data-theme=dark] .quick-tag-chip:hover{background:#1e2e24}
+html[data-theme=dark] .quick-tag-chip.active{background:#327e57;color:#fff;border-color:#327e57}
+html[data-theme=dark] .tags-stat{background:#151d18;border-color:#26342b}
+html[data-theme=dark] .tags-stat small{color:#768e7d}
+html[data-theme=dark] .tags-stat strong{color:#e6f1ea}
+html[data-theme=dark] .tags-stat span{color:#829989}
+html[data-theme=dark] .tag-card{background:#151d18;border-color:#26342b}
+html[data-theme=dark] .tag-pill-btn{background:#182b1f;color:#7ad4a5;border-color:#264733}
+html[data-theme=dark] .tag-card-amount{color:#e6f1ea}
+html[data-theme=dark] .tag-card-bar{background:#223027}
+html[data-theme=dark] .tag-card-bar-fill{background:#43a675}
+html[data-theme=dark] .tag-card-meta{color:#7e9686}
+html[data-theme=dark] .tag-view-link{color:#7ad4a5}
+html[data-theme=dark] .tag-cat-chip{background:#1e2922;color:#9cb5a5}
+

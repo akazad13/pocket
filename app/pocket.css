@@ -548,4 +548,34 @@ footer{color:var(--ink-3);font-size:12px}
   .velocity-stat-box strong{font-size:20px}
 }
 
+/* Transaction Tags */
+.row-tags{display:inline-flex;gap:4px;margin-left:6px;vertical-align:middle}
+.row-tag-badge{display:inline-flex;align-items:center;padding:1px 6px;border-radius:10px;font-size:10px;font-weight:600;background:#edf3ea;color:#356c49;border:1px solid #d4e3cf;cursor:pointer}
+.row-tag-badge:hover{background:#dfead9}
+.quick-tags-bar{display:flex;align-items:center;flex-wrap:wrap;gap:6px;margin-top:8px}
+.quick-tags-label{font-size:10px;font-weight:600;color:#7a8a76;letter-spacing:.3px}
+.quick-tag-chip{font-size:11px;font-weight:500;padding:3px 8px;border-radius:12px;background:#f2f6ee;border:1px solid #dbe4d5;color:#45604c;cursor:pointer}
+.quick-tag-chip:hover{background:#e7efe1}
+.quick-tag-chip.active{background:#256a53;color:#fff;border-color:#256a53}
+
+/* Tags Report */
+.tags-summary-bar{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:12px;margin:18px 0 14px}
+.tags-stat{background:#f8faf6;border:1px solid #e3eae0;border-radius:9px;padding:12px 14px;display:flex;flex-direction:column;gap:3px}
+.tags-stat small{font-size:11px;color:#788b7b;font-weight:600}
+.tags-stat strong{font-size:18px;font-weight:700;color:#233a2d}
+.tags-stat span{font-size:11px;color:#819484}
+.tags-search{margin-top:12px;margin-bottom:16px}
+.tags-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:14px}
+.tag-card{background:#fff;border:1px solid #e3e8de;border-radius:10px;padding:14px;display:flex;flex-direction:column;gap:8px}
+.tag-card-top{display:flex;justify-content:space-between;align-items:center}
+.tag-pill-btn{display:inline-flex;align-items:center;gap:4px;font-size:13px;font-weight:600;color:#256a53;background:#edf5eb;border:1px solid #cde0ca;padding:4px 9px;border-radius:14px}
+.tag-pill-btn:hover{background:#dbeed6}
+.tag-card-amount{font-size:15px;font-weight:700;color:#243c2e}
+.tag-card-bar{height:6px;background:#edf2e8;border-radius:3px;overflow:hidden}
+.tag-card-bar-fill{height:100%;background:#387354;border-radius:3px}
+.tag-card-meta{display:flex;justify-content:space-between;align-items:center;font-size:11px;color:#788d7d}
+.tag-view-link{display:inline-flex;align-items:center;gap:3px;font-size:11px;color:#256a53;font-weight:600}
+.tag-categories-list{display:flex;flex-wrap:wrap;gap:4px;margin-top:2px}
+.tag-cat-chip{font-size:10px;padding:2px 6px;border-radius:4px;background:#f2f5ed;color:#677868}
+
 
