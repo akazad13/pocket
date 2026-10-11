@@ -363,6 +363,24 @@ html[data-theme=dark] .inspector-row.recurring{background:#162438}
 html[data-theme=dark] .inspector-empty{color:#6c8474}
 html[data-theme=dark] .inspector-empty-placeholder{color:#6c8474}
 
+/* Spending Anomaly & Spike Detector Dark Mode */
+html[data-theme=dark] .anomaly-panel{background:#2a1912;border-color:#5c2d1b}
+html[data-theme=dark] .anomaly-icon-badge{background:#421d12;color:#fb923c}
+html[data-theme=dark] .anomaly-title-area h3{color:#fed7aa}
+html[data-theme=dark] .anomaly-title-area p{color:#fdba74}
+html[data-theme=dark] .anomaly-toggle-btn{color:#fb923c}
+html[data-theme=dark] .anomaly-list{border-top-color:#5c2d1b}
+html[data-theme=dark] .anomaly-item{background:#1e1410;border-color:#4a2317}
+html[data-theme=dark] .anomaly-item-title b{color:#f3f4f6}
+html[data-theme=dark] .spike-badge.spike-moderate{background:#3b2912;color:#fcd34d;border-color:#5c3e16}
+html[data-theme=dark] .spike-badge.spike-high{background:#421d12;color:#fb923c;border-color:#6c2e17}
+html[data-theme=dark] .spike-badge.spike-severe{background:#3b1414;color:#fca5a5;border-color:#5c1d1d}
+html[data-theme=dark] .anomaly-item-sub{color:#9ca3af}
+html[data-theme=dark] .anomaly-baseline-note{color:#fdba74}
+html[data-theme=dark] .anomaly-amount{color:#fb923c}
+html[data-theme=dark] .anomaly-jump-btn{color:#fb923c}
+
+
 
 
 
