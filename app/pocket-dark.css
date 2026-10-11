@@ -419,6 +419,27 @@ html[data-theme=dark] .input-disabled{background:#18221b!important;color:#6b8273
 html[data-theme=dark] .password-toggle{color:#768e7d}
 html[data-theme=dark] .password-toggle:hover{color:#a9c5b2}
 
+/* Financial Health & Wellness Dark Mode */
+html[data-theme=dark] .wellness-hero-card{background:#141e18;border-color:#26342b}
+html[data-theme=dark] .wellness-gauge-bg{stroke:#1a2820}
+html[data-theme=dark] .wellness-summary-text{color:#d5e5db}
+html[data-theme=dark] .quick-metric-item{background:#18251e}
+html[data-theme=dark] .qm-label{color:#8ea796}
+html[data-theme=dark] .qm-value{color:#e6f1ea}
+html[data-theme=dark] .wellness-breakdown-container{border-top-color:#26342b}
+html[data-theme=dark] .wellness-subheading{color:#e6f1ea}
+html[data-theme=dark] .wellness-pillar-card{background:#141e18;border-color:#26342b}
+html[data-theme=dark] .wellness-pillar-card:hover{border-color:#364c3f}
+html[data-theme=dark] .pillar-name-wrap{color:#e6f1ea}
+html[data-theme=dark] .pillar-score-badge strong{color:#e6f1ea}
+html[data-theme=dark] .pillar-progress-track{background:#1a2820}
+html[data-theme=dark] .pillar-detail-text{color:#8ea796}
+html[data-theme=dark] .pillar-metric-tag{background:#1a2820;color:#7ad4a5}
+html[data-theme=dark] .pillar-tip-box{background:#231a10;border-color:#453218;color:#fcd34d}
+html[data-theme=dark] .wellness-recommendations-card{background:#13261a;border-color:#224c30}
+html[data-theme=dark] .rec-header{color:#7ad4a5}
+html[data-theme=dark] .rec-item{color:#c5e3cf}
+
 
 
 

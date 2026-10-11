@@ -105,6 +105,7 @@ All initial backlog items (#1 to #33) have been implemented. Keep this section u
 | 40 | **Username and Password Authentication** | Protect the app with secure login gate/session, session tokens, and lock control | M | Implemented |
 | 41 | **Multi-User Registration & Tenant Data Isolation** | Allow multiple family members or users to register and manage their own isolated expenses, accounts, budgets and reports | L | Implemented |
 | 42 | **Account Settings & Profile Management** | User profile view, display name modification, secure password change, tenant metrics, and quick backup access | S | Implemented |
+| 43 | **Financial Health & Wellness Score** | Composite 0–100 index evaluating savings rate, emergency runway, budget adherence, and debt ratio with interactive circular gauge & action plan | M | Implemented |
 
 
 ## Decisions

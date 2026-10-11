@@ -785,6 +785,63 @@ footer{color:var(--ink-3);font-size:12px}
 .password-toggle{position:absolute;right:8px;border:none;background:transparent;color:#7a917e;display:grid;place-items:center;cursor:pointer;padding:4px}
 .password-toggle:hover{color:#2e4b36}
 
+/* Financial Health & Wellness Panel */
+.wellness-panel{display:flex;flex-direction:column;gap:18px}
+.wellness-header-title{display:flex;align-items:center;gap:8px}
+.wellness-heart-icon{color:#e11d48}
+.wellness-expand-btn{display:flex;align-items:center;gap:4px;font-size:12px;font-weight:600}
+.wellness-hero-card{display:flex;align-items:center;gap:24px;padding:20px 22px;background:#fbfcf9;border:1px solid #e2ebd9;border-radius:16px}
+.wellness-gauge-wrap{position:relative;width:104px;height:104px;flex-shrink:0;display:grid;place-items:center}
+.wellness-gauge{transform:rotate(-90deg)}
+.wellness-gauge-bg{fill:none;stroke:#edf2e8}
+.wellness-gauge-fill{fill:none;stroke-linecap:round;transition:stroke-dashoffset 1s ease}
+.wellness-score-center{position:absolute;display:flex;flex-direction:column;align-items:center;justify-content:center}
+.wellness-score-number{font-family:var(--display);font-size:26px;font-weight:800;line-height:1}
+.wellness-score-max{font-size:10px;font-weight:600;color:var(--ink-2,#748a78)}
+.wellness-summary-content{flex:1;display:flex;flex-direction:column;gap:8px}
+.wellness-badge-row{display:flex;align-items:center;gap:8px}
+.wellness-grade-badge{padding:3px 9px;border-radius:7px;font-size:12px;font-weight:700}
+.wellness-label-badge{padding:2px 8px;border-radius:6px;border:1px solid currentColor;font-size:11px;font-weight:600}
+.wellness-summary-text{margin:0;font-size:13px;color:var(--ink,#223c2a);line-height:1.45}
+.wellness-quick-metrics{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-top:4px}
+.quick-metric-item{padding:8px 10px;background:#f0f5ec;border-radius:9px;display:flex;flex-direction:column;gap:2px}
+.qm-label{font-size:10px;font-weight:600;color:var(--ink-2,#617b68);text-transform:uppercase;letter-spacing:.3px}
+.qm-value{font-family:var(--display);font-size:13px;font-weight:700;color:var(--ink,#1e3626)}
+.wellness-breakdown-container{display:flex;flex-direction:column;gap:14px;border-top:1px dashed #dce6d5;padding-top:16px}
+.wellness-subheading{font-family:var(--display);font-size:14px;font-weight:700;color:var(--ink,#1e3626);margin:0}
+.wellness-pillars-list{display:flex;flex-direction:column;gap:10px}
+.wellness-pillar-card{padding:14px 16px;background:#fff;border:1px solid #e1e9dc;border-radius:12px;display:flex;flex-direction:column;gap:8px;transition:all .15s ease}
+.wellness-pillar-card:hover{border-color:#b9cfb3}
+.pillar-top-row{display:flex;align-items:center;justify-content:space-between}
+.pillar-name-wrap{display:flex;align-items:center;gap:8px;color:var(--ink,#1e3626)}
+.pillar-name-wrap h4{margin:0;font-size:13px;font-weight:600}
+.pillar-score-badge{display:flex;align-items:baseline;gap:3px}
+.pillar-score-badge strong{font-family:var(--display);font-size:14px;font-weight:700;color:var(--ink,#1e3626)}
+.pillar-score-badge small{font-size:11px;color:var(--ink-2,#748a78)}
+.pillar-progress-track{height:6px;background:#edf3ea;border-radius:4px;overflow:hidden}
+.pillar-progress-bar{height:100%;border-radius:4px;background:#006a4e;transition:width .5s ease}
+.pillar-excellent .pillar-progress-bar{background:#006a4e}
+.pillar-good .pillar-progress-bar{background:#10b981}
+.pillar-warning .pillar-progress-bar{background:#f59e0b}
+.pillar-critical .pillar-progress-bar{background:#dc2626}
+.pillar-detail-row{display:flex;align-items:center;justify-content:space-between;gap:8px}
+.pillar-detail-text{margin:0;font-size:12px;color:var(--ink-2,#597260)}
+.pillar-metric-tag{font-size:11px;font-weight:700;padding:2px 7px;background:#eef5eb;border-radius:5px;color:#1e432c}
+.pillar-tip-box{display:flex;align-items:center;gap:6px;padding:6px 10px;background:#fefbf2;border:1px solid #fceec5;border-radius:8px;font-size:11px;color:#92400e}
+.pillar-tip-icon{color:#d97706;flex-shrink:0}
+.wellness-recommendations-card{padding:14px 16px;background:#f0fdf4;border:1px solid #bbf7d0;border-radius:12px;display:flex;flex-direction:column;gap:10px}
+.rec-header{display:flex;align-items:center;gap:6px;color:#166534}
+.rec-header h4{margin:0;font-size:13px;font-weight:700}
+.rec-sparkle{color:#16a34a}
+.rec-list{margin:0;padding:0;list-style:none;display:flex;flex-direction:column;gap:8px}
+.rec-item{display:flex;align-items:flex-start;gap:8px;font-size:12px;color:#14532d;line-height:1.4}
+.rec-bullet{width:18px;height:18px;border-radius:50%;background:#16a34a;color:#fff;font-size:10px;font-weight:700;display:grid;place-items:center;flex-shrink:0}
+@media (max-width: 680px){
+  .wellness-hero-card{flex-direction:column;text-align:center;gap:16px}
+  .wellness-badge-row{justify-content:center}
+  .wellness-quick-metrics{grid-template-columns:repeat(2,1fr)}
+}
+
 
 
 

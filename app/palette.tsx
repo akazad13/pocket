@@ -27,6 +27,7 @@ import {
   Split,
   CalendarDays,
   User,
+  HeartPulse,
 } from 'lucide-react';
 import type {Account} from '@/lib/accounts';
 
@@ -129,6 +130,9 @@ export default function Palette({
         <CommandGroup heading="Navigation">
           <CommandItem onSelect={() => run(() => onSelectTab('overview'))}>
             <ChartNoAxesCombined className="mr-2" size={16} /> Overview
+          </CommandItem>
+          <CommandItem onSelect={() => run(() => onSelectTab('overview'))}>
+            <HeartPulse className="mr-2" size={16} /> Financial Health &amp; Wellness
           </CommandItem>
           <CommandItem onSelect={() => run(() => onSelectTab('transactions'))}>
             <ReceiptText className="mr-2" size={16} /> Transactions
