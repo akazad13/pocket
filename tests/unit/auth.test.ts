@@ -8,6 +8,7 @@ import {
   makeCookieHeader,
   validateUsername,
   validatePassword,
+  validateDisplayName,
   generateSalt,
   hashPassword,
   verifyUserPassword,
@@ -107,4 +108,13 @@ test('makeCookieHeader generates compliant header string', () => {
   assert.match(cookie, /Max-Age=3600/);
   assert.match(cookie, /HttpOnly/);
   assert.match(cookie, /SameSite=Lax/);
+});
+
+test('validateDisplayName validates length and sanitizes whitespace', () => {
+  assert.equal(validateDisplayName('Kalam Khan'), 'Kalam Khan');
+  assert.equal(validateDisplayName('  Alice   Wonder  '), 'Alice Wonder');
+  assert.throws(() => validateDisplayName(''), /between 1 and 60/);
+  assert.throws(() => validateDisplayName('   '), /between 1 and 60/);
+  assert.throws(() => validateDisplayName(null), /required/);
+  assert.throws(() => validateDisplayName('a'.repeat(70)), /between 1 and 60/);
 });

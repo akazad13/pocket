@@ -104,6 +104,7 @@ All initial backlog items (#1 to #33) have been implemented. Keep this section u
 | 39 | **Spending Anomaly & Spike Detector** | Automatically identify non-routine large expenses (>3x category median) on Overview & Reports | S | Implemented |
 | 40 | **Username and Password Authentication** | Protect the app with secure login gate/session, session tokens, and lock control | M | Implemented |
 | 41 | **Multi-User Registration & Tenant Data Isolation** | Allow multiple family members or users to register and manage their own isolated expenses, accounts, budgets and reports | L | Implemented |
+| 42 | **Account Settings & Profile Management** | User profile view, display name modification, secure password change, tenant metrics, and quick backup access | S | Implemented |
 
 
 ## Decisions

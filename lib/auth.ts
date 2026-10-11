@@ -55,6 +55,20 @@ export function validatePassword(input: unknown): string {
 }
 
 /**
+ * Validates display name
+ */
+export function validateDisplayName(input: unknown): string {
+  if (typeof input !== 'string') {
+    throw new Error('Name is required.');
+  }
+  const clean = input.trim().replace(/\s+/g, ' ');
+  if (clean.length < 1 || clean.length > 60) {
+    throw new Error('Name must be between 1 and 60 characters.');
+  }
+  return clean;
+}
+
+/**
  * Generates a random cryptographic salt (hex string)
  */
 export function generateSalt(): string {

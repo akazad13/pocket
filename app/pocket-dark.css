@@ -403,6 +403,23 @@ html[data-theme=dark] .login-footer{border-top-color:#223027;color:#6c8474}
 html[data-theme=dark] .lock-btn{color:#8aa292}
 html[data-theme=dark] .lock-btn:hover{color:#f87171}
 
+/* Profile Dialog Dark Mode */
+html[data-theme=dark] .profile-stat-box{background:#18251e;border-color:#2a3a30}
+html[data-theme=dark] .stat-count{color:#e6f1ea}
+html[data-theme=dark] .stat-label{color:#8ea796}
+html[data-theme=dark] .profile-meta-info{background:#18251e}
+html[data-theme=dark] .meta-label{color:#8ea796}
+html[data-theme=dark] .meta-value{color:#e6f1ea}
+html[data-theme=dark] .badge-isolated{background:#133324;color:#7ad4a5}
+html[data-theme=dark] .profile-action-btn{background:#1a2820;border-color:#283a2f;color:#d5e5db}
+html[data-theme=dark] .profile-action-btn:hover{background:#23362b;border-color:#344a3d}
+html[data-theme=dark] .profile-action-btn.danger{background:#221616;border-color:#482323;color:#fca5a5}
+html[data-theme=dark] .profile-action-btn.danger:hover{background:#301b1b;border-color:#652c2c}
+html[data-theme=dark] .input-disabled{background:#18221b!important;color:#6b8273!important}
+html[data-theme=dark] .password-toggle{color:#768e7d}
+html[data-theme=dark] .password-toggle:hover{color:#a9c5b2}
+
+
 
 
 

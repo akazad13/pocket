@@ -158,7 +158,50 @@ async function run() {
   let u1StillHasExp = await api("GET", "/api/expenses", undefined, cookie1);
   check("Alice's expense is intact", u1StillHasExp.json?.expenses?.some((e) => e.id === u1ExpenseId));
 
-  // 10. Clean up created records
+  // 10. Test Profile & Account Settings
+  let u1Profile = await api("GET", "/api/auth/profile", undefined, cookie1);
+  check(
+    "User 1 profile returns accurate metadata and stats",
+    u1Profile.status === 200 &&
+      u1Profile.json?.user?.username === user1.username &&
+      u1Profile.json?.stats?.expenses >= 1 &&
+      u1Profile.json?.stats?.accounts >= 1,
+    u1Profile.json
+  );
+
+  // Update display name
+  let nameUpdate = await api("PUT", "/api/auth/profile", { name: "Alice Wonderland" }, cookie1);
+  check("User 1 updates display name (200)", nameUpdate.status === 200 && nameUpdate.json?.user?.name === "Alice Wonderland", nameUpdate.json);
+
+  let u1ProfileUpdated = await api("GET", "/api/auth/profile", undefined, cookie1);
+  check("User 1 profile reflects updated display name", u1ProfileUpdated.json?.user?.name === "Alice Wonderland");
+
+  // Password change validation
+  let wrongPass = await api(
+    "PUT",
+    "/api/auth/profile",
+    { currentPassword: "WrongPassword!", newPassword: "NewPassword123!" },
+    cookie1
+  );
+  check("Password change with wrong current password is rejected (400)", wrongPass.status === 400, wrongPass.json);
+
+  let changePass = await api(
+    "PUT",
+    "/api/auth/profile",
+    { currentPassword: user1.password, newPassword: "NewPassword123!" },
+    cookie1
+  );
+  check("Password change with correct current password succeeds (200)", changePass.status === 200, changePass.json);
+
+  // Verify login with old password fails
+  let loginOld = await api("POST", "/api/auth/login", { username: user1.username, password: user1.password });
+  check("Login with old password fails (401)", loginOld.status === 401);
+
+  // Verify login with new password succeeds
+  let loginNew = await api("POST", "/api/auth/login", { username: user1.username, password: "NewPassword123!" });
+  check("Login with new password succeeds (200)", loginNew.status === 200);
+
+  // 11. Clean up created records
   await api("DELETE", "/api/expenses", { id: u1ExpenseId }, cookie1);
   await api("DELETE", "/api/accounts", { id: u1AccountId }, cookie1);
   await api("DELETE", "/api/expenses", { id: u2ExpenseId }, cookie2);

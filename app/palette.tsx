@@ -26,6 +26,7 @@ import {
   ChartCandlestick,
   Split,
   CalendarDays,
+  User,
 } from 'lucide-react';
 import type {Account} from '@/lib/accounts';
 
@@ -45,6 +46,7 @@ type Props = {
   onOpenRemittance?: () => void;
   onOpenPortfolio?: () => void;
   onOpenSplit?: () => void;
+  onOpenProfile?: () => void;
 };
 
 export default function Palette({
@@ -63,6 +65,7 @@ export default function Palette({
   onOpenRemittance,
   onOpenPortfolio,
   onOpenSplit,
+  onOpenProfile,
 }: Props) {
   useEffect(() => {
     const down = (e: KeyboardEvent) => {
@@ -116,6 +119,11 @@ export default function Palette({
           <CommandItem onSelect={() => run(onRecurring)}>
             <Repeat className="mr-2" size={16} /> Recurring rules
           </CommandItem>
+          {onOpenProfile && (
+            <CommandItem onSelect={() => run(onOpenProfile)}>
+              <User className="mr-2" size={16} /> Account settings &amp; profile
+            </CommandItem>
+          )}
         </CommandGroup>
         <CommandSeparator />
         <CommandGroup heading="Navigation">
