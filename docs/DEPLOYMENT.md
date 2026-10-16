@@ -16,26 +16,26 @@ Pocket operates on Cloudflare's edge platform:
 ```mermaid
 flowchart TD
     subgraph Users ["Client Devices"]
-        Mobile["📱 Mobile PWA Browser"]
-        Desktop["💻 Desktop Browser"]
+        Mobile["Mobile PWA Browser"]
+        Desktop["Desktop Browser"]
     end
 
     subgraph CFGlobal ["Cloudflare Edge Infrastructure"]
-        DNS["Global DNS / Custom Domain Routing"]
-        EdgeWorker["⚡ Cloudflare Worker (/dist/server/index.js)"]
-        EdgeAssets["📦 Cloudflare Assets CDN (/dist/client)"]
-        AuthHandler["🔒 PBKDF2 & HMAC Cookie Gate"]
+        DNS["Global DNS and Custom Domain Routing"]
+        EdgeWorker["Cloudflare Worker - SSR and API Handlers"]
+        EdgeAssets["Cloudflare Assets CDN - Static Shell"]
+        AuthHandler["PBKDF2 and HMAC Cookie Gate"]
     end
 
     subgraph D1Storage ["Persistence Layer"]
-        D1[("🗄️ Cloudflare D1 Database (pocket-db)")]
-        Tables[("10 Multi-Tenant Tables")]
+        D1[("Cloudflare D1 Database")]
+        Tables[("Tenant-Isolated Tables")]
     end
 
     Mobile --> DNS
     Desktop --> DNS
-    DNS -->|Static Files (.js, .css, .svg)| EdgeAssets
-    DNS -->|Dynamic Routes & API (/api/*)| EdgeWorker
+    DNS -->|Static Files| EdgeAssets
+    DNS -->|Dynamic API Routes| EdgeWorker
     EdgeWorker --> AuthHandler
     AuthHandler -->|Bound DB Queries| D1
     D1 --- Tables
@@ -212,10 +212,10 @@ To host Pocket on your own branded domain (e.g. `pocket.yourdomain.com`):
 
 ```mermaid
 flowchart LR
-    D["Cloudflare Dashboard"] --> W["Workers & Pages > pocket"]
-    W --> S["Settings > Domains & Routes"]
-    S --> A["Add > Custom Domain"]
-    A --> SSL["Automatic Free TLS & DNS Configuration"]
+    D["Cloudflare Dashboard"] --> W["Workers and Pages - pocket"]
+    W --> S["Settings - Domains and Routes"]
+    S --> A["Add Custom Domain"]
+    A --> SSL["Automatic Free TLS and DNS"]
 ```
 
 1. Open [dash.cloudflare.com](https://dash.cloudflare.com/).

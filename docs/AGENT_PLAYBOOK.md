@@ -19,11 +19,11 @@
 
 ```mermaid
 flowchart TD
-    P1["🔍 Phase 1: Context Discovery & Scope Assessment<br/>• Inspect docs/FEATURES.md & data model<br/>• Check starter plumbing boundaries"]
-    P2["🛡️ Phase 2: Safety & Pre-Flight Checks<br/>• If DB schema change: BACKUP .wrangler/state<br/>• Confirm Node environment (>=22.13.0)"]
-    P3["⚡ Phase 3: Surgical Implementation<br/>• Pure functional logic in lib/<br/>• Parameterized edge API routes in app/api/<br/>• Dual-theme UI with 390px mobile checks"]
-    P4["🧪 Phase 4: Mandatory Verification Pipeline<br/>• npm run typecheck (~10s)<br/>• npm run test:unit (137 tests in ~1s)<br/>• npm run smoke (164 API checks)"]
-    P5["📝 Phase 5: Documentation & Git Cleanliness<br/>• Update docs/FEATURES.md<br/>• Clean temporary scratch files"]
+    P1["Phase 1: Context Discovery and Scope Assessment"]
+    P2["Phase 2: Safety and Pre-Flight Checks"]
+    P3["Phase 3: Surgical Implementation"]
+    P4["Phase 4: Mandatory Verification Pipeline"]
+    P5["Phase 5: Documentation and Git Cleanliness"]
 
     P1 --> P2
     P2 --> P3

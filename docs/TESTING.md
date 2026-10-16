@@ -12,10 +12,10 @@ Pocket uses a strict 4-tier verification pyramid to ensure rapid feedback cycles
 ```mermaid
 flowchart TD
     subgraph Pyramid ["Verification Pyramid"]
-        T4["👁️ Tier 4: Visual UI & Layout Review<br/>• Desktop (>=1180px) & 390px Mobile Viewport<br/>• Dual Theme (Light & Dark) Contrast Checks<br/>• Privacy Masking (data-private CSS Blur)"]
-        T3["⚡ Tier 3: API Smoke & Multi-User Suites<br/>• tests/smoke.mjs (164 API checks against dev server)<br/>• tests/multi-user-smoke.mjs (Tenant isolation checks)"]
-        T2["🧪 Tier 2: Pure Unit Tests<br/>• tests/unit/*.test.ts (137 tests in ~350ms)<br/>• Native node:test runner with --experimental-strip-types"]
-        T1["🔒 Tier 1: Static Typecheck<br/>• TypeScript 5.9 (tsc --noEmit --incremental false)<br/>• Strict null checks & zero type errors"]
+        T4["Tier 4: Visual UI and Layout Review"]
+        T3["Tier 3: API Smoke and Multi-User Suites"]
+        T2["Tier 2: Pure Unit Tests"]
+        T1["Tier 1: Static Typecheck"]
     end
 
     T1 --> T2

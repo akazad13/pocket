@@ -31,7 +31,7 @@ erDiagram
 
     accounts ||--o{ expenses : "pays"
     accounts ||--o{ income : "deposits"
-    accounts ||--o{ transfers : "from/to"
+    accounts ||--o{ transfers : "moves"
     accounts ||--o{ adjustments : "modifies"
 
     custom_categories ||--o{ expenses : "classifies"
@@ -332,11 +332,11 @@ $$\text{Net Worth} = \sum \text{Asset Balances} - \sum \text{Liability Balances}
 
 ```mermaid
 flowchart TD
-    B["1️⃣ Backup .wrangler/state"] --> S["2️⃣ Edit db/schema.ts"]
-    S --> G["3️⃣ npm run db:generate"]
-    G --> A["4️⃣ Apply locally with Wrangler"]
-    A --> Q["5️⃣ Update SQL in app/api/ & lib/"]
-    Q --> V["6️⃣ npm run typecheck && npm run test:unit"]
+    B["Step 1: Backup wrangler state"] --> S["Step 2: Edit db/schema.ts"]
+    S --> G["Step 3: npm run db:generate"]
+    G --> A["Step 4: Apply locally with Wrangler"]
+    A --> Q["Step 5: Update SQL in API and lib"]
+    Q --> V["Step 6: Run typecheck and test:unit"]
 ```
 
 ### Migration Steps:

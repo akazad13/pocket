@@ -171,8 +171,8 @@ sequenceDiagram
     Dev->>W: npm run build
     W->>W: Compile Worker (dist/server) + Assets (dist/client)
     Dev->>W: npx wrangler deploy
-    W->>Worker: Deploy Edge Worker & Upload Static Assets
-    Worker-->>Dev: Live URL (https://pocket.<subdomain>.workers.dev)
+    W->>Worker: Deploy Edge Worker and Upload Static Assets
+    Worker-->>Dev: Live Deployment URL (https://pocket.workers.dev)
 ```
 
 ### Deployment Steps Summary:
