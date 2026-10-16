@@ -108,6 +108,23 @@ Follow the exact protocol in [docs/DATA_MODEL.md](file:///d:/Practice/Projects/F
 5. Update SQL statements in `app/api/` and TypeScript types.
 6. Run `npm run typecheck` and `npm run smoke`.
 
+### 3.5 Recipe: Deploying to Cloudflare Workers & D1
+Follow the comprehensive protocol in [docs/DEPLOYMENT.md](DEPLOYMENT.md):
+1. Provision remote D1 database: `npx wrangler d1 create pocket-db`.
+2. Initialize schema: `npx wrangler d1 execute pocket-db --remote --file drizzle/schema.sql`.
+3. Configure `wrangler.json` with the generated `database_id`.
+4. Set production secrets:
+   ```bash
+   npx wrangler secret put POCKET_AUTH_SECRET
+   npx wrangler secret put POCKET_USERNAME
+   npx wrangler secret put POCKET_PASSWORD
+   ```
+5. Compile bundle and deploy:
+   ```bash
+   npm run build
+   npx wrangler deploy
+   ```
+
 ---
 
 ## 4. Top 10 Agent Traps & Anti-Patterns

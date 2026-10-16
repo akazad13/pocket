@@ -43,7 +43,7 @@ Pocket is a single-user, mobile-first personal financial management application 
 | **Runtime** | Node.js | `>=22.13` (tested on v22.13.1) | Required for `--experimental-strip-types` and package compat |
 | **Framework** | Next.js (App Router) | `16.3.4` | App routing & React 19 SSR |
 | **Dev / Build Engine** | Vinext + Vite | `1.0.0-beta.5` / `8.0.13` | Vite-based Next runtime compiling to Cloudflare Worker |
-| **Hosting Target** | Cloudflare Workers | Edge runtime | Private site deployment (see [docs/AGENT_PLAYBOOK.md](file:///d:/Practice/Projects/Financial/pocket/docs/AGENT_PLAYBOOK.md)) |
+| **Hosting Target** | Cloudflare Workers | Edge runtime | Production deployment on Cloudflare Workers with D1 and Assets (see [docs/DEPLOYMENT.md](DEPLOYMENT.md)) |
 | **Database** | Cloudflare D1 (SQLite) | Edge SQLite | Local development persists to `.wrangler/state` |
 | **ORM / Migration** | Drizzle ORM + Drizzle Kit | `0.45.2` / `0.31.10` | Schema definitions (`db/schema.ts`) and migration generation |
 | **UI Components** | Radix UI / shadcn | React 19 compatible | Headless primitives with custom classes in `components/ui` |
@@ -205,6 +205,7 @@ Pocket includes a privacy shield for public spaces:
 
 ## 5. Security & Isolation Invariants
 
-1. **Single-Owner Trust Boundary**: Pocket is designed for a single user behind a hosting access gate. There is no multi-tenant isolation or per-user authentication. Do not add multi-tenant features without adding proper auth middleware.
+1. **Multi-User Authentication & Tenant Data Isolation**: Multi-user registration and authentication is enforced at the edge. Users are authenticated via PBKDF2 SHA-256 password hashing with individual salts and signed session cookies (`pocket_session`). All SQL transactions and reads are strictly scoped to the authenticated tenant (`WHERE user_id = ?`).
 2. **Cross-Origin Request Forgery Protection**: Every mutation route handler (`POST`, `PUT`, `DELETE`) verifies the `Origin` header. If the origin does not match the request URL, the server responds immediately with `403 Forbidden`.
 3. **Database Protection**: Local development uses `.wrangler/state`. Because this database contains the owner's live personal financial records, destructive resets are strictly prohibited without an external backup.
+4. **Production Deployment**: Cloudflare Workers with Cloudflare D1 and Cloudflare Assets. See [docs/DEPLOYMENT.md](DEPLOYMENT.md) for full runbook.

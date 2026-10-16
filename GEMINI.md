@@ -26,11 +26,12 @@ Pocket is a single-user, mobile-first personal financial manager in BDT (`Asia/D
 
 ## 3. Essential Reference Documents
 
-- [docs/ARCHITECTURE.md](file:///d:/Practice/Projects/Financial/pocket/docs/ARCHITECTURE.md): System architecture, runtime details, and module boundaries.
-- [docs/DATA_MODEL.md](file:///d:/Practice/Projects/Financial/pocket/docs/DATA_MODEL.md): Full database schema, computed balances, and migration steps.
-- [docs/AGENT_PLAYBOOK.md](file:///d:/Practice/Projects/Financial/pocket/docs/AGENT_PLAYBOOK.md): Operational SOPs, 10 agent pitfalls, and implementation recipes.
-- [docs/TESTING.md](file:///d:/Practice/Projects/Financial/pocket/docs/TESTING.md): Verification pipeline: Typecheck, unit tests, and smoke tests.
-- [docs/FEATURES.md](file:///d:/Practice/Projects/Financial/pocket/docs/FEATURES.md): Current features and backlog.
+- [docs/DEPLOYMENT.md](file:///d:/Projects/Github/akazad13/pocket/pocket/docs/DEPLOYMENT.md): Production deployment guide for Cloudflare Workers & D1.
+- [docs/ARCHITECTURE.md](file:///d:/Projects/Github/akazad13/pocket/pocket/docs/ARCHITECTURE.md): System architecture, runtime details, and module boundaries.
+- [docs/DATA_MODEL.md](file:///d:/Projects/Github/akazad13/pocket/pocket/docs/DATA_MODEL.md): Full database schema, computed balances, and migration steps.
+- [docs/AGENT_PLAYBOOK.md](file:///d:/Projects/Github/akazad13/pocket/pocket/docs/AGENT_PLAYBOOK.md): Operational SOPs, 10 agent pitfalls, and implementation recipes.
+- [docs/TESTING.md](file:///d:/Projects/Github/akazad13/pocket/pocket/docs/TESTING.md): Verification pipeline: Typecheck, unit tests, and smoke tests.
+- [docs/FEATURES.md](file:///d:/Projects/Github/akazad13/pocket/pocket/docs/FEATURES.md): Current features and backlog.
 
 ---
 

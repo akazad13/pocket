@@ -30,13 +30,12 @@
 
 ## 2. Agent Documentation Suite
 
-For detailed engineering deep-dives, consult these companion guides:
-
-- [docs/ARCHITECTURE.md](file:///d:/Practice/Projects/Financial/pocket/docs/ARCHITECTURE.md): Runtime stack, request lifecycle, component boundaries, and security model.
-- [docs/DATA_MODEL.md](file:///d:/Practice/Projects/Financial/pocket/docs/DATA_MODEL.md): Complete schema for all 9 tables, invariants, computed balances, and migration steps.
-- [docs/AGENT_PLAYBOOK.md](file:///d:/Practice/Projects/Financial/pocket/docs/AGENT_PLAYBOOK.md): Step-by-step SOPs, 10 deadly agent traps, and implementation recipes.
-- [docs/TESTING.md](file:///d:/Practice/Projects/Financial/pocket/docs/TESTING.md): Typecheck, unit test suites, API smoke tests, and UI verification.
-- [docs/FEATURES.md](file:///d:/Practice/Projects/Financial/pocket/docs/FEATURES.md): Full feature status and roadmap backlog.
+- [docs/DEPLOYMENT.md](file:///d:/Projects/Github/akazad13/pocket/pocket/docs/DEPLOYMENT.md): Complete Cloudflare Workers and D1 production deployment guide.
+- [docs/ARCHITECTURE.md](file:///d:/Projects/Github/akazad13/pocket/pocket/docs/ARCHITECTURE.md): Runtime stack, request lifecycle, component boundaries, and security model.
+- [docs/DATA_MODEL.md](file:///d:/Projects/Github/akazad13/pocket/pocket/docs/DATA_MODEL.md): Complete schema for all 10 tables, invariants, computed balances, and migration steps.
+- [docs/AGENT_PLAYBOOK.md](file:///d:/Projects/Github/akazad13/pocket/pocket/docs/AGENT_PLAYBOOK.md): Step-by-step SOPs, 10 deadly agent traps, and implementation recipes.
+- [docs/TESTING.md](file:///d:/Projects/Github/akazad13/pocket/pocket/docs/TESTING.md): Typecheck, unit test suites, API smoke tests, and UI verification.
+- [docs/FEATURES.md](file:///d:/Projects/Github/akazad13/pocket/pocket/docs/FEATURES.md): Full feature status and roadmap backlog.
 
 ---
 

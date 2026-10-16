@@ -15,6 +15,7 @@ The project was scaffolded by the OpenAI "Sites" starter (`site-creator-vinext-s
 | Smoke test | `npm run smoke` | Needs `npm run dev` running. 164 API checks (CRUD, validation, rename cascade, origin check). Uses unique `Smoke ...` names and cleans up. Run after any change to `app/api/` or `lib/`. |
 | Lint | `npm run lint` | ~60s. Clean (0 errors); keep it that way. The React Compiler rule forbids synchronous setState inside effects: set state only after an `await`. |
 | Build | `npm run build` | Outputs `dist/` (Worker + client). |
+| Deploy | `npx wrangler deploy` | Deploys `dist/` to Cloudflare Workers and D1 (see `docs/DEPLOYMENT.md`). |
 | Run built app | `npm start` | wrangler dev against `dist/server/wrangler.json`. |
 | New migration | `npm run db:generate` | drizzle-kit, after editing `db/schema.ts`. |
 
@@ -92,6 +93,7 @@ lib/database.ts            database(): returns raw env.DB (D1Database); jsonChun
 db/schema.ts               Drizzle table definitions (source of truth for migrations only).
 drizzle/*.sql              Generated migrations 0000..0013.
 docs/FEATURES.md           Implemented features, known limitations, feature ideas backlog. Read before planning new work; update when a feature ships.
+docs/DEPLOYMENT.md         Cloudflare Workers and D1 production deployment guide.
 tests/smoke.mjs            API smoke test (plain Node fetch, no dependencies).
 tests/unit/*.test.ts       Unit tests for pure lib/ modules.
 .claude/settings.json      Pre-approved safe commands for Claude Code.
