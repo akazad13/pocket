@@ -1,69 +1,295 @@
-# Pocket Data Model & Persistence Guide
+# 🗄️ Pocket Data Model & Persistence Architecture
+### D1 SQLite Schema, Relational Model, Invariants & Migrations
 
-Comprehensive database schema documentation, data invariants, and migration protocols for Pocket.
-
----
-
-## 1. Storage Engine & Technology
-
-Pocket uses **Cloudflare D1** (serverless SQLite at the edge) in production and the Cloudflare Wrangler emulator (`.wrangler/state`) in local development.
-
-- **Primary Schema Definition**: [db/schema.ts](file:///d:/Practice/Projects/Financial/pocket/db/schema.ts) (Drizzle ORM syntax used for migration generation).
-- **Runtime Access**: Raw prepared statements via `database()` in [lib/database.ts](file:///d:/Practice/Projects/Financial/pocket/lib/database.ts).
-- **Migration Files**: [drizzle/](file:///d:/Practice/Projects/Financial/pocket/drizzle/) containing versioned SQL scripts `0000_*.sql` through `0014_dear_zemo.sql`.
+> Complete reference manual for Pocket's 10-table relational schema, dynamic balance math, multi-tenant isolation, and safe migration SOP.
 
 ---
 
-## 2. Relational Schema & Tables
+## 1. Storage Topology & Invariants
 
-### 2.1 Core Transactions & Spending
+Pocket uses **Cloudflare D1** (serverless SQLite at the edge) in production and the Cloudflare Wrangler emulator (`.wrangler/state`) during local development.
+
+- **Primary Schema Definition**: [db/schema.ts](file:///d:/Projects/Github/akazad13/pocket/pocket/db/schema.ts) (Drizzle ORM syntax used for migration generation).
+- **Consolidated Production Initializer**: [drizzle/schema.sql](file:///d:/Projects/Github/akazad13/pocket/pocket/drizzle/schema.sql) (One-command setup for remote D1).
+- **Runtime Execution**: Raw prepared statements via `database()` in [lib/database.ts](file:///d:/Projects/Github/akazad13/pocket/pocket/lib/database.ts).
+- **Versioned Migrations**: [drizzle/](file:///d:/Projects/Github/akazad13/pocket/pocket/drizzle/) containing migration scripts `0000_*.sql` through `0014_dear_zemo.sql`.
+
+---
+
+## 2. Entity-Relationship (ER) Diagram
+
+```mermaid
+erDiagram
+    users ||--o{ expenses : "owns"
+    users ||--o{ income : "owns"
+    users ||--o{ accounts : "owns"
+    users ||--o{ custom_categories : "configures"
+    users ||--o{ budgets : "allocates"
+    users ||--o{ recurring : "schedules"
+    users ||--o{ transfers : "executes"
+    users ||--o{ adjustments : "records"
+
+    accounts ||--o{ expenses : "pays"
+    accounts ||--o{ income : "deposits"
+    accounts ||--o{ transfers : "from/to"
+    accounts ||--o{ adjustments : "modifies"
+
+    custom_categories ||--o{ expenses : "classifies"
+    custom_categories ||--o{ budgets : "limits"
+    custom_categories ||--o{ recurring : "repeats"
+
+    users {
+        text id PK
+        text username UK
+        text password_hash
+        text salt
+        text name
+        text created_at
+    }
+
+    expenses {
+        text id PK
+        text category
+        integer cents
+        text date
+        text note
+        text method
+        text account
+        text user_id FK
+    }
+
+    income {
+        text id PK
+        text source
+        integer cents
+        text date
+        text note
+        text account
+        text user_id FK
+    }
+
+    accounts {
+        text id PK
+        text name
+        text type
+        integer opening
+        text note
+        integer closed
+        text start_date
+        text maturity_date
+        integer rate
+        integer instalment
+        integer quantity
+        text unit
+        text user_id FK
+    }
+
+    transfers {
+        text id PK
+        text from_account
+        text to_account
+        integer cents
+        text date
+        text note
+        text user_id FK
+    }
+
+    adjustments {
+        text id PK
+        text account
+        integer cents
+        text date
+        text note
+    }
+
+    custom_categories {
+        text key PK
+        text name
+        text color
+        text icon
+        text user_id FK
+    }
+
+    budgets {
+        text category PK
+        integer cents
+        text user_id FK
+    }
+
+    recurring {
+        text id PK
+        text kind
+        text category
+        text source
+        text account
+        text to_account
+        integer cents
+        integer day
+        text note
+        text start_month
+        text last_month
+        text user_id FK
+    }
+
+    app_state {
+        text key PK
+    }
+```
+
+---
+
+## 3. Relational Table Specifications
+
+### 3.1 Authentication & Tenant Management
+
+#### `users`
+Stores user authentication credentials, individual cryptographic salts, and profile metadata.
+```sql
+CREATE TABLE users (
+  id TEXT PRIMARY KEY,                 -- Unique user ID (UUID)
+  username TEXT NOT NULL,              -- Case-insensitive unique username
+  password_hash TEXT NOT NULL,         -- PBKDF2 SHA-256 derived hex string (100k iterations)
+  salt TEXT NOT NULL,                  -- 128-bit random hex salt
+  name TEXT NOT NULL DEFAULT '',       -- Display name (e.g. 'Abul Kalam')
+  created_at TEXT NOT NULL             -- ISO timestamp
+);
+CREATE UNIQUE INDEX users_username_unique ON users (username);
+```
+
+---
+
+### 3.2 Core Transactions & Spending
 
 #### `expenses`
 Stores individual expense records.
 ```sql
 CREATE TABLE expenses (
-  id TEXT PRIMARY KEY,           -- Client-generated UUID (^[a-zA-Z0-9-]{1,64}$)
-  category TEXT NOT NULL,        -- Category display name (matches custom_categories.name)
-  cents INTEGER NOT NULL,        -- Amount in integer cents (BDT)
-  date TEXT NOT NULL,            -- Calendar date 'YYYY-MM-DD' (>= 1900-01-01)
-  note TEXT NOT NULL DEFAULT '', -- Optional note (trimmed, max 200 chars)
-  method TEXT NOT NULL DEFAULT '',-- Payment method ('Cash', 'bKash', 'Card', etc.)
-  account TEXT NOT NULL DEFAULT ''-- Optional linked account id ('' = unlinked)
+  id TEXT PRIMARY KEY,                 -- Client UUID (^[a-zA-Z0-9-]{1,64}$)
+  category TEXT NOT NULL,              -- Category display name
+  cents INTEGER NOT NULL,              -- Amount in integer cents (BDT)
+  date TEXT NOT NULL,                  -- Calendar date 'YYYY-MM-DD'
+  note TEXT NOT NULL DEFAULT '',       -- Optional note (max 200 chars)
+  method TEXT NOT NULL DEFAULT '',     -- Payment method ('Cash', 'bKash', 'Card', etc.)
+  account TEXT NOT NULL DEFAULT '',    -- Linked account ID ('' = unlinked)
+  user_id TEXT NOT NULL DEFAULT 'admin'-- Tenant owner ID
 );
 ```
 
 #### `income`
-Stores money coming in. Operates independently of expense categories.
+Stores income and money inflows independently of expense categories.
 ```sql
 CREATE TABLE income (
-  id TEXT PRIMARY KEY,           -- Client-generated UUID
-  source TEXT NOT NULL,          -- Income source (e.g. 'Salary', 'Dividend')
-  cents INTEGER NOT NULL,        -- Amount in integer cents (> 0)
-  date TEXT NOT NULL,            -- Calendar date 'YYYY-MM-DD'
-  note TEXT NOT NULL DEFAULT '', -- Optional note
-  account TEXT NOT NULL DEFAULT ''-- Optional linked account id ('' = unlinked)
+  id TEXT PRIMARY KEY,                 -- Client UUID
+  source TEXT NOT NULL,                -- Income source ('Salary', 'Dividend', etc.)
+  cents INTEGER NOT NULL,              -- Amount in integer cents (> 0)
+  date TEXT NOT NULL,                  -- Calendar date 'YYYY-MM-DD'
+  note TEXT NOT NULL DEFAULT '',       -- Optional memo
+  account TEXT NOT NULL DEFAULT '',    -- Destination account ID ('' = unlinked)
+  user_id TEXT NOT NULL DEFAULT 'admin'-- Tenant owner ID
 );
 ```
 
-### 2.2 Classification & Budgets
+---
+
+### 3.3 Accounts, Balances & Transfers
+
+#### `accounts`
+Stores financial instruments, liquid accounts, debt facilities, and physical assets.
+```sql
+CREATE TABLE accounts (
+  id TEXT PRIMARY KEY,                 -- Account UUID
+  name TEXT NOT NULL,                  -- Account display name
+  type TEXT NOT NULL,                  -- Account type identifier (see list below)
+  opening INTEGER NOT NULL DEFAULT 0,  -- Opening balance in cents
+  note TEXT NOT NULL DEFAULT '',       -- Account description
+  closed INTEGER NOT NULL DEFAULT 0,   -- 1 = closed (hidden from pickers), 0 = active
+  start_date TEXT NOT NULL DEFAULT '', -- Opening date 'YYYY-MM-DD'
+  maturity_date TEXT NOT NULL DEFAULT '',-- Maturity date 'YYYY-MM-DD'
+  rate INTEGER NOT NULL DEFAULT 0,     -- Interest rate in basis points (e.g. 850 = 8.50%)
+  instalment INTEGER NOT NULL DEFAULT 0,-- Monthly payment in cents
+  quantity INTEGER NOT NULL DEFAULT 0, -- Asset quantity in thousandths (1500 = 1.500)
+  unit TEXT NOT NULL DEFAULT '',       -- Unit ('vori', 'gram', 'katha', 'decimal', 'shares')
+  user_id TEXT NOT NULL DEFAULT 'admin'-- Tenant owner ID
+);
+```
+
+*Supported `type` values:*
+- **Liquid Assets**: `cash`, `bank`, `wallet`
+- **Fixed Term & Savings**: `dps`, `fd`, `sanchayapatra`
+- **Equities & Investments**: `shares`, `mutual_fund`
+- **Tangible Assets**: `gold`, `property`
+- **Lending**: `loan_given`
+- **Debts / Liabilities**: `loan_taken`, `credit_card`
+- **Other**: `other`
+
+#### `transfers`
+Represents movement of funds between two accounts without altering net worth.
+```sql
+CREATE TABLE transfers (
+  id TEXT PRIMARY KEY,                 -- Transfer UUID
+  from_account TEXT NOT NULL,          -- Source account ID
+  to_account TEXT NOT NULL,            -- Destination account ID
+  cents INTEGER NOT NULL,              -- Amount in integer cents (> 0)
+  date TEXT NOT NULL,                  -- Date 'YYYY-MM-DD'
+  note TEXT NOT NULL DEFAULT '',       -- Optional transfer note
+  user_id TEXT NOT NULL DEFAULT 'admin'-- Tenant owner ID
+);
+```
+
+#### `adjustments`
+Signed balance updates for interest earned, service fees, or asset market value changes.
+```sql
+CREATE TABLE adjustments (
+  id TEXT PRIMARY KEY,                 -- Adjustment UUID
+  account TEXT NOT NULL,               -- Target account ID
+  cents INTEGER NOT NULL,              -- Signed value difference (positive or negative)
+  date TEXT NOT NULL,                  -- Date 'YYYY-MM-DD'
+  note TEXT NOT NULL DEFAULT ''        -- Reason / memo
+);
+```
+
+---
+
+### 3.4 Budgets, Categories & Recurring Rules
 
 #### `custom_categories`
-Stores category configuration, custom swatch colors, and icon choices.
+Stores custom user categories with visual swatches and icons.
 ```sql
 CREATE TABLE custom_categories (
-  key TEXT PRIMARY KEY,          -- Lowercase unique name: lower(name)
-  name TEXT NOT NULL,            -- Display name (1-50 characters)
-  color TEXT NOT NULL DEFAULT '',-- Hex code from PALETTE in lib/category-style.ts
-  icon TEXT NOT NULL DEFAULT ''  -- Lucide icon name from ICONS in lib/category-style.ts
+  key TEXT PRIMARY KEY,                -- Lowercase unique key: lower(name)
+  name TEXT NOT NULL,                  -- Category display name (1-50 chars)
+  color TEXT NOT NULL DEFAULT '',      -- Hex swatch code from PALETTE
+  icon TEXT NOT NULL DEFAULT '',       -- Lucide icon name from ICONS
+  user_id TEXT NOT NULL DEFAULT 'admin'-- Tenant owner ID
 );
 ```
 
 #### `budgets`
-Stores monthly budget allocations per category.
+Category spending caps per month.
 ```sql
 CREATE TABLE budgets (
-  category TEXT PRIMARY KEY,     -- Category display name
-  cents INTEGER NOT NULL         -- Monthly target in integer cents
+  category TEXT PRIMARY KEY,           -- Category display name (or tenant-prefixed key)
+  cents INTEGER NOT NULL,              -- Monthly budget limit in integer cents
+  user_id TEXT NOT NULL DEFAULT 'admin'-- Tenant owner ID
+);
+```
+
+#### `recurring`
+Scheduled generation rules for monthly expenses, income, and transfers.
+```sql
+CREATE TABLE recurring (
+  id TEXT PRIMARY KEY,                 -- Rule UUID
+  kind TEXT NOT NULL,                  -- 'expense' | 'income' | 'transfer'
+  category TEXT NOT NULL DEFAULT '',   -- Category for expense rules
+  source TEXT NOT NULL DEFAULT '',     -- Source for income rules
+  account TEXT NOT NULL DEFAULT '',    -- Source account
+  to_account TEXT NOT NULL DEFAULT '', -- Destination account for transfers
+  cents INTEGER NOT NULL,              -- Amount in integer cents (> 0)
+  day INTEGER NOT NULL,                -- Execution day of month (1-31)
+  note TEXT NOT NULL DEFAULT '',       -- Memo
+  start_month TEXT NOT NULL,           -- First month 'YYYY-MM'
+  last_month TEXT,                     -- Latest executed month 'YYYY-MM'
+  user_id TEXT NOT NULL DEFAULT 'admin'-- Tenant owner ID
 );
 ```
 
@@ -71,224 +297,60 @@ CREATE TABLE budgets (
 Flag table for one-time initialization triggers.
 ```sql
 CREATE TABLE app_state (
-  key TEXT PRIMARY KEY           -- e.g. 'categories_initialized'
+  key TEXT PRIMARY KEY                 -- e.g. 'categories_initialized'
 );
 ```
-
-### 2.3 Accounts, Net Worth & Transfers
-
-#### `accounts`
-Stores financial accounts, savings instruments, debts, and physical assets.
-```sql
-CREATE TABLE accounts (
-  id TEXT PRIMARY KEY,           -- Unique identifier (UUID)
-  name TEXT NOT NULL,            -- Account display name (case-insensitively unique)
-  type TEXT NOT NULL,            -- Member of ACCOUNT_TYPES in lib/accounts.ts
-  opening INTEGER NOT NULL,      -- Starting balance in cents (or initial debt amount)
-  note TEXT NOT NULL DEFAULT '', -- Account description or memo
-  closed INTEGER NOT NULL DEFAULT 0, -- 1 = closed (hidden from pickers), 0 = active
-  start_date TEXT NOT NULL DEFAULT '',-- Optional opening date 'YYYY-MM-DD'
-  maturity_date TEXT NOT NULL DEFAULT '',-- Optional maturity date 'YYYY-MM-DD'
-  rate INTEGER NOT NULL DEFAULT 0,   -- Annual interest rate in basis points (e.g. 850 = 8.50%)
-  instalment INTEGER NOT NULL DEFAULT 0,-- Monthly payment/instalment in cents
-  quantity INTEGER NOT NULL DEFAULT 0,  -- Quantity in thousandths (e.g. 1500 = 1.500)
-  unit TEXT NOT NULL DEFAULT ''      -- Unit of measure ('vori', 'gram', 'katha', 'decimal', etc.)
-);
-```
-
-*Supported `type` values:*
-- **Liquid Assets**: `cash`, `bank`, `wallet`
-- **Savings & Fixed Income**: `dps`, `fd`, `sanchayapatra`
-- **Investments**: `shares`, `mutual_fund`
-- **Physical Assets**: `gold`, `property`
-- **Lending**: `loan_given`
-- **Debts / Liabilities**: `loan_taken`, `credit_card`
-- **Other**: `other`
-
-#### `transfers`
-Represents movement of funds between two accounts (e.g. Bank to Cash, Bank to DPS).
-```sql
-CREATE TABLE transfers (
-  id TEXT PRIMARY KEY,
-  from_account TEXT NOT NULL,    -- Source account ID
-  to_account TEXT NOT NULL,      -- Destination account ID
-  cents INTEGER NOT NULL,        -- Amount moved (> 0)
-  date TEXT NOT NULL,            -- Date 'YYYY-MM-DD'
-  note TEXT NOT NULL DEFAULT ''
-);
-```
-
-#### `adjustments`
-Signed balance updates to account for market gains, interest, profit, or fee adjustments.
-```sql
-CREATE TABLE adjustments (
-  id TEXT PRIMARY KEY,
-  account TEXT NOT NULL,         -- Target account ID
-  cents INTEGER NOT NULL,        -- Signed value difference (positive or negative)
-  date TEXT NOT NULL,            -- Date 'YYYY-MM-DD'
-  note TEXT NOT NULL DEFAULT ''
-);
-```
-
-### 2.4 Planning, Automation & Obligations
-
-#### `bills`
-Monthly recurring bills paid manually (utilities, credit card dues, internet).
-```sql
-CREATE TABLE bills (
-  id TEXT PRIMARY KEY,
-  name TEXT NOT NULL,            -- Bill name (e.g. 'DESCO Electricity')
-  category TEXT NOT NULL,        -- Associated category display name
-  cents INTEGER NOT NULL DEFAULT 0,-- Usual amount in cents (0 = "Varies")
-  day INTEGER NOT NULL,          -- Due day of the month (1-31)
-  account TEXT NOT NULL DEFAULT '',-- Default account to pay from
-  note TEXT NOT NULL DEFAULT '',
-  paid_month TEXT NOT NULL DEFAULT ''-- 'YYYY-MM' of last payment (or '')
-);
-```
-
-#### `goals`
-Target savings goals with progress tracking against linked accounts.
-```sql
-CREATE TABLE goals (
-  id TEXT PRIMARY KEY,
-  name TEXT NOT NULL,
-  target INTEGER NOT NULL,       -- Target amount in cents (> 0)
-  target_date TEXT NOT NULL DEFAULT '',-- Optional completion deadline 'YYYY-MM-DD'
-  accounts TEXT NOT NULL DEFAULT '[]',-- JSON array of linked account IDs
-  saved INTEGER NOT NULL DEFAULT 0,  -- Manual saved amount if no accounts linked
-  note TEXT NOT NULL DEFAULT ''
-);
-```
-
-#### `recurring`
-Automated monthly rules that generate transactions on schedule.
-```sql
-CREATE TABLE recurring (
-  id TEXT PRIMARY KEY,
-  kind TEXT NOT NULL,            -- 'expense' | 'income' | 'transfer'
-  category TEXT NOT NULL DEFAULT '',-- Category for expense rules
-  source TEXT NOT NULL DEFAULT '',  -- Source for income rules
-  account TEXT NOT NULL DEFAULT '', -- Linked account / from_account
-  to_account TEXT NOT NULL DEFAULT '',-- Destination account for transfers
-  cents INTEGER NOT NULL,        -- Amount in cents (> 0)
-  day INTEGER NOT NULL,          -- Day of month (1-31)
-  note TEXT NOT NULL DEFAULT '',
-  start_month TEXT NOT NULL,     -- Starting month 'YYYY-MM'
-  last_month TEXT                -- Last month generated 'YYYY-MM' (nullable)
-);
-```
-
-### 2.5 Multi-Tenant Architecture & Users
-
-#### `users`
-Stores user authentication records.
-```sql
-CREATE TABLE users (
-  id TEXT PRIMARY KEY,           -- User ID / username
-  username TEXT NOT NULL UNIQUE, -- Normalized username (lowercase, 3-30 chars)
-  password_hash TEXT NOT NULL,   -- PBKDF2-SHA256 hex digest (100,000 iterations)
-  salt TEXT NOT NULL,            -- 16-byte random cryptographic salt (hex)
-  name TEXT NOT NULL,            -- User display name
-  created_at TEXT NOT NULL       -- ISO-8601 registration timestamp
-);
-```
-
-#### Multi-Tenant Data Isolation
-Each transactional and configuration table (`expenses`, `income`, `accounts`, `transfers`, `adjustments`, `recurring`, `budgets`, `custom_categories`, `goals`, `bills`) includes a `user_id TEXT NOT NULL DEFAULT 'admin'` column.
-
-- **Request Context**: `getAuthenticatedUser(request)` extracts the authenticated username from the HMAC-signed `pocket_session` cookie (or defaults to `'admin'` for unauthenticated or legacy local tests).
-- **Tenant Scoping**: All SQL reads and writes filter strictly by `WHERE user_id = ?`.
-- **Budgets and Category Namespacing**: Non-admin users have their category names and budget keys prefixed with `${userId}:` at the database primary key level to avoid SQLite primary key collisions across tenants, while seamlessly presenting clean display names to the client.
 
 ---
 
-## 3. Data Integrity & Business Invariants
+## 4. Financial Calculations & Business Invariants
 
-### 3.1 Integer Cents (Never Floating Point)
+### 4.1 Integer Cents (Never Floating Point)
 All monetary values are strictly represented as **integer cents**:
 - User input (e.g. `"150.50"`) is validated via regex `^\d{1,9}(\.\d{1,2})?$` and converted: `Math.round(amount * 100)`.
 - UI formatting uses `money(cents)` via `Intl.NumberFormat('en-BD', { style: 'currency', currency: 'BDT' })`.
 - Floating point calculations are prohibited in storage and business logic to prevent rounding drift.
 
-### 3.2 Category Display Name Cascades
-The system stores category **display names** (not synthetic IDs or keys) across `expenses`, `budgets`, `bills`, and `recurring`.
-- When a category is renamed: Every occurrence across all 4 tables must be updated in a single atomic `db.batch(...)` statement.
-- When two categories are merged: All expenses and rules are updated to the target category, and the source is deleted in a single batch.
-- Category deletion rule: A category that contains expenses or is referenced by a recurring rule **cannot be deleted** (returns HTTP 409 Conflict).
-
-### 3.3 Dynamic Balance Calculation (`values()` vs `shown()`)
+### 4.2 Dynamic Balance Computation
 Account balances are **computed on the fly**, never stored as static balance columns:
+
 $$\text{Balance} = \pm \text{opening} + \text{income} - \text{expenses} + \text{transfers}_{\text{in}} - \text{transfers}_{\text{out}} + \text{adjustments}$$
+
+$$\text{Net Worth} = \sum \text{Asset Balances} - \sum \text{Liability Balances}$$
 
 - **`values(accounts, income, expenses, transfers, adjustments)`**: Internal calculation for net worth. Debts (`loan_taken`, `credit_card`) are computed as negative numbers.
 - **`shown(type, balance)`**: User-facing balance. Debts are inverted and displayed as a positive "Amount Owed".
-- **Delete Protection**: Accounts with any linked historical transaction cannot be deleted (returns HTTP 409 Conflict). They can only be closed via `closed = 1`.
-
-### 3.4 Deterministic Lazy Recurring Generation
-Recurring rule execution is lazy and non-blocking:
-1. `GET /api/expenses`, `GET /api/income`, and `GET /api/accounts` call `applyRecurring()` before fetching data.
-2. Missing months between `start_month` and today (in `Asia/Dhaka`) are computed.
-3. Generated records have deterministic IDs: `rec-<ruleId>-<YYYY-MM>`.
-4. Inserting uses `ON CONFLICT DO NOTHING` to guarantee idempotency.
-5. `recurring.last_month` is advanced. If a user deletes a generated transaction, it is not recreated because `last_month` already includes that period.
-
----
-
-## 4. D1 Execution Constraints & Bulk Writes
-
-Cloudflare D1 enforces strict resource limits:
-- **Parameter Bound Limit**: Maximum 100 bound parameters per query.
-- **Query Execution Limit**: Maximum 50 queries per request on free tier.
-
-**Pattern for Bulk Inserts (e.g. Database Restore)**:
-Do not execute 5,000 separate `INSERT` statements. Use `json_each(?)` with JSON payload chunks:
-```typescript
-const stmt = db.prepare(`
-  INSERT INTO expenses (id, category, cents, date, note, method, account)
-  SELECT value->>'id', value->>'category', CAST(value->>'cents' AS INTEGER),
-         value->>'date', value->>'note', value->>'method', value->>'account'
-  FROM json_each(?)
-`);
-```
-See [lib/database.ts](file:///d:/Practice/Projects/Financial/pocket/lib/database.ts) `jsonChunks()` for implementation.
+- **Delete Protection**: Accounts with linked transactions cannot be deleted (returns HTTP 409 Conflict); they can only be closed (`closed = 1`).
 
 ---
 
 ## 5. Safe Schema Migration Playbook
 
 > [!CAUTION]
-> **CRITICAL DATABASE SAFETY DIRECTIVE**:
-> The local `.wrangler/state` SQLite file holds the developer's live financial data. Never wipe, drop, or run unverified destructive statements against it.
+> **DATABASE SAFETY GUARD**:
+> `.wrangler/state` contains real personal financial data in local development. Never delete, wipe, or drop tables without an external backup.
 
-Follow this exact 5-step sequence whenever changing the database schema:
-
-### Step 1: Create an External Backup
-Always copy the entire state directory to `pocket-db-backups/` outside the repository:
-```powershell
-$timestamp = Get-Date -Format "yyyyMMdd-HHmmss"
-$backupDir = "..\pocket-db-backups\$timestamp-before-schema-change"
-New-Item -ItemType Directory -Path $backupDir -Force
-Copy-Item -Path ".wrangler\state" -Destination $backupDir -Recurse
+```mermaid
+flowchart TD
+    B["1️⃣ Backup .wrangler/state"] --> S["2️⃣ Edit db/schema.ts"]
+    S --> G["3️⃣ npm run db:generate"]
+    G --> A["4️⃣ Apply locally with Wrangler"]
+    A --> Q["5️⃣ Update SQL in app/api/ & lib/"]
+    Q --> V["6️⃣ npm run typecheck && npm run test:unit"]
 ```
 
-### Step 2: Edit Schema Definition
-Modify table schemas in [db/schema.ts](file:///d:/Practice/Projects/Financial/pocket/db/schema.ts).
+### Migration Steps:
 
-### Step 3: Generate Migration SQL
-Run Drizzle Kit to create the next migration script:
-```powershell
-npm run db:generate
-```
-This produces `drizzle/000N_<name>.sql` and updates `drizzle/meta/`.
-
-### Step 4: Apply Migration Locally
-Execute the migration against the local D1 emulator using the local runtime configuration:
-```powershell
-npx wrangler d1 execute DB --local --persist-to .wrangler/state --file drizzle/000N_<name>.sql --config .sites-runtime/local.json
-```
-
-### Step 5: Update Raw Queries and Types
-1. Update raw SQL strings in route handlers (`app/api/*/route.ts`) and server helpers (`lib/account-db.ts`).
-2. Update TypeScript interfaces and validation functions in `lib/`.
-3. Verify with `npm run typecheck` and `npm run test:unit`.
+1. **Create External Backup**:
+   ```powershell
+   $timestamp = Get-Date -Format "yyyyMMdd-HHmmss"
+   Copy-Item -Path ".wrangler\state" -Destination "..\pocket-db-backups\$timestamp-pre-migration" -Recurse
+   ```
+2. **Edit Schema**: Modify [db/schema.ts](file:///d:/Projects/Github/akazad13/pocket/pocket/db/schema.ts).
+3. **Generate Migration**: Run `npm run db:generate` to produce `drizzle/000N_name.sql`.
+4. **Apply Locally**:
+   ```bash
+   npx wrangler d1 execute DB --local --persist-to .wrangler/state --file drizzle/000N_name.sql --config .sites-runtime/local.json
+   ```
+5. **Update Route Queries & Types**: Keep TypeScript interfaces and raw SQL strings synchronized.
+6. **Verify Clean Pipeline**: Ensure `npm run typecheck` and `npm run test:unit` pass cleanly.

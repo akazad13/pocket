@@ -1,211 +1,175 @@
-# Pocket Architecture
+# 🏛️ Pocket System Architecture & Technical Specifications
 
-System architecture and topology documentation for Pocket, designed for human developers and autonomous AI agents.
-
----
-
-## 1. System Overview
-
-Pocket is a single-user, mobile-first personal financial management application designed for Bangladesh (BDT currency, `Asia/Dhaka` timezone). It does not connect to external bank APIs; all financial entries, accounts, and budgets are entered manually or generated via deterministic recurring rules.
-
-```
-+-----------------------------------------------------------------------+
-|                             Client Layer                              |
-|   React 19 (App Router) + Radix UI / shadcn + Sonner + Lucide Icons   |
-|   Single State Root (`tracker.tsx`) + Optimistic Mutation Updates     |
-|   CSS Design Tokens (`pocket.css`) + Dark Mode (`pocket-dark.css`)    |
-+-----------------------------------------------------------------------+
-                                   |
-                   JSON API Requests (/api/*) [with Origin Check]
-                                   v
-+-----------------------------------------------------------------------+
-|                          Server Runtime Layer                         |
-|   Vinext (Vite-based Next runtime) on Cloudflare Workers              |
-|   Edge API Route Handlers (`app/api/*/route.ts`)                      |
-+-----------------------------------------------------------------------+
-                                   |
-            Raw Prepared Statements (`lib/database.ts`) with ? binds
-                                   v
-+-----------------------------------------------------------------------+
-|                           Persistence Layer                           |
-|   Cloudflare D1 (SQLite)                                              |
-|   Local Dev: Persisted SQLite in `.wrangler/state`                    |
-|   Schema Migrations: Drizzle ORM (`db/schema.ts`, `drizzle/*.sql`)     |
-+-----------------------------------------------------------------------+
-```
+> Deep-dive architectural specification for Pocket: edge runtime execution, component boundaries, multi-tenant authentication, and persistence models.
 
 ---
 
-## 2. Technology Stack
+## 1. High-Level Architecture Topology
 
-| Layer | Technology | Version | Purpose / Notes |
+Pocket is compiled as an edge-native application running on **Cloudflare Workers** with **Cloudflare D1** SQLite. It does not rely on traditional Node.js persistent servers or third-party banking connectors; all state changes flow through authenticated edge route handlers.
+
+```mermaid
+flowchart TD
+    subgraph Client ["Client Presentation Tier (React 19 SSR / CSR)"]
+        Tracker["Root State Controller (app/tracker.tsx)"]
+        VirtualDOM["Windowed Virtualizer (app/virtual-list.tsx)"]
+        Modals["Dynamic Keyed Dialogs (key={id ?? 'new'})"]
+        PrivacyEngine["Privacy Masking Engine (app/privacy.tsx)"]
+    end
+
+    subgraph Security ["Edge Security & Authentication Gate"]
+        OriginCheck["CSRF Origin Verification"]
+        CookieParser["Signed Cookie Parser (pocket_session)"]
+        AuthService["PBKDF2 SHA-256 Crypto Engine (lib/auth.ts)"]
+    end
+
+    subgraph EdgeRuntime ["Server Runtime Layer (Vinext on Cloudflare Workers)"]
+        Router["Next.js App Router (app/api/*/route.ts)"]
+        RecurringWorker["Deterministic Lazy Generator (lib/recurring.ts)"]
+        RawDB["Parameterized D1 Client (lib/database.ts)"]
+    end
+
+    subgraph Database ["Persistence Tier (Cloudflare D1 SQLite)"]
+        D1Instance[("Cloudflare D1 Instance (pocket-db)")]
+        TenantIsolation["Multi-Tenant Isolation (WHERE user_id = ?)"]
+    end
+
+    Tracker --> OriginCheck
+    OriginCheck --> CookieParser
+    CookieParser --> AuthService
+    AuthService --> Router
+    Router --> RecurringWorker
+    RecurringWorker --> RawDB
+    RawDB --> D1Instance
+    D1Instance --- TenantIsolation
+```
+
+---
+
+## 2. Technology Stack & Edge Capabilities
+
+| Architectural Layer | Technology | Version | Purpose & Invariants |
 |---|---|---|---|
-| **Runtime** | Node.js | `>=22.13` (tested on v22.13.1) | Required for `--experimental-strip-types` and package compat |
-| **Framework** | Next.js (App Router) | `16.3.4` | App routing & React 19 SSR |
-| **Dev / Build Engine** | Vinext + Vite | `1.0.0-beta.5` / `8.0.13` | Vite-based Next runtime compiling to Cloudflare Worker |
-| **Hosting Target** | Cloudflare Workers | Edge runtime | Production deployment on Cloudflare Workers with D1 and Assets (see [docs/DEPLOYMENT.md](DEPLOYMENT.md)) |
-| **Database** | Cloudflare D1 (SQLite) | Edge SQLite | Local development persists to `.wrangler/state` |
-| **ORM / Migration** | Drizzle ORM + Drizzle Kit | `0.45.2` / `0.31.10` | Schema definitions (`db/schema.ts`) and migration generation |
-| **UI Components** | Radix UI / shadcn | React 19 compatible | Headless primitives with custom classes in `components/ui` |
-| **CSS & Design System** | Tailwind v4 + Custom CSS | `@tailwindcss/postcss 4.2.1` | Design tokens in `pocket.css` & `pocket-dark.css` (plain classes) |
-| **Testing** | Node test runner (`node:test`) | Native Node | Pure unit tests in `tests/unit/*.test.ts` (~1s) |
-| **API Verification** | Custom Node Fetch Script | `tests/smoke.mjs` | Comprehensive 164-step API smoke test suite |
+| **Runtime Environment** | Node.js / Cloudflare Workers | `>=22.13.0` | Native `--experimental-strip-types` and Cloudflare `nodejs_compat` runtime. |
+| **Framework** | Next.js (App Router) | `16.3.4` | Server-Side Rendering (SSR) and Edge API route handlers. |
+| **Compilation Engine** | Vinext + Vite | `1.0.0-beta.5` | Vite-based bundler producing standalone Cloudflare Worker bundles. |
+| **Edge Hosting Target** | Cloudflare Workers | `2026-05-15` | Edge execution with global CDN asset delivery. |
+| **Database** | Cloudflare D1 (SQLite) | Edge SQLite | Serverless relational database with bound queries (`env.DB`). |
+| **Schema & Migrations** | Drizzle ORM / Drizzle Kit | `0.45.2` | Schema definitions (`db/schema.ts`) and SQL generation only. |
+| **Component Primitives** | Radix UI + shadcn | React 19 | Accessible, headless UI primitives with custom plain CSS styling. |
+| **Styling & Theme** | Tailwind CSS v4 + Custom Tokens | `4.2.1` | Dual-theme design tokens (`pocket.css`, `pocket-dark.css`). |
+| **Unit Verification** | Node.js Test Runner | Native `node:test` | Ultra-fast unit testing (~1s for 137 assertions). |
+| **API Smoke Tests** | Custom Fetch Test Suite | `tests/smoke.mjs` | 164 automated API integration checks against running server. |
 
 ---
 
 ## 3. Directory Structure & Module Boundaries
 
-The project strictly separates **application logic** (safe for agents to edit) from **starter plumbing** (do not edit).
-
-### 3.1 Application Code (Safe to Edit)
-
-Agents may read and modify these files to implement features or fix bugs:
+Pocket enforces strict architectural boundaries to separate client components, server route handlers, and shared business logic:
 
 ```
 pocket/
-├── app/
-│   ├── page.tsx               # Re-exports tracker
-│   ├── layout.tsx             # Root HTML layout, metadata, styles
-│   ├── tracker.tsx            # Main state container, tabs, modals, quick-actions
-│   ├── accounts.tsx           # Accounts tab: list, net worth, detail dialogs
-│   ├── activity.tsx           # Transactions tab: unified spending, income & transfers
-│   ├── backup.tsx             # Backup & restore dialog (JSON / CSV)
-│   ├── bills.tsx              # Monthly recurring bills panel
-│   ├── budgets.tsx            # Budgets panel & category limits
-│   ├── category-icon.tsx      # Lucide icon mapping for categories
-│   ├── comparison.tsx         # Month-over-month comparison card & panel
-│   ├── goals.tsx              # Savings goals panel and progress
-│   ├── income.tsx             # Income panel and entry dialog
-│   ├── networth.tsx           # Net worth over time SVG chart and table
-│   ├── privacy.tsx            # Privacy masking toggle (`pocket-private`)
-│   ├── recurring.tsx          # Monthly recurring rules dialog (expense/income/transfer)
-│   ├── taxyear.tsx            # Bangladesh tax year (July-June) reports
-│   ├── theme.tsx              # Dark/light theme toggle
-│   ├── upcoming.tsx           # Next 30 days financial forecast panel
-│   ├── yearly.tsx             # Year-in-review summary panels
-│   ├── zakat.tsx              # Zakat calculation dialog (nisab, gold/silver)
-│   ├── pocket.css             # Main styling, responsive breakpoints, light tokens
-│   ├── pocket-dark.css        # Complete dark mode CSS overrides
-│   └── api/                   # Edge route handlers (GET, POST, PUT, DELETE)
-│       ├── accounts/          # Account CRUD, transfers, and balance adjustments
-│       ├── backup/            # Full JSON backup & merge-restore
-│       ├── bills/             # Bills tracking and payments
-│       ├── budgets/           # Monthly category budgets
-│       ├── categories/        # Category management, styles, and merging
-│       ├── expenses/          # Expense CRUD
-│       ├── goals/             # Savings goals CRUD
-│       ├── income/            # Income CRUD
-│       └── recurring/         # Recurring rules CRUD
-├── lib/                       # Business logic and server helpers
-│   ├── database.ts            # Server-only: raw D1 database access (`database()`)
-│   ├── account-db.ts          # Server-only: Account SQL queries & existence checks
-│   ├── recurring.ts           # Server-only: Recurring generator (`applyRecurring()`)
-│   ├── format.ts              # BDT currency formatter (`money()`) with privacy masking
-│   ├── expenses.ts            # Pure validation, types, default categories
-│   ├── accounts.ts            # Pure: balance calculations (`values()`, `shown()`)
-│   ├── activity.ts            # Pure: merge & sort expenses, income, transfers
-│   ├── bills.ts               # Pure: bill status & sorting
-│   ├── compare.ts             # Pure: month-over-month calculation
-│   ├── forecast.ts            # Pure: 30-day projection
-│   ├── goals.ts               # Pure: goal progress against linked accounts
-│   ├── months.ts              # Pure: month rolling and date clamping
-│   ├── networth.ts            # Pure: historical net worth time-series
-│   ├── quick.ts               # Pure: quick-add suggestions by frequency
-│   ├── rules.ts               # Pure: recurring rules scheduling logic
-│   ├── taxyear.ts             # Pure: Bangladesh tax year calculations
-│   ├── terms.ts               # Pure: DPS/FD/Sanchayapatra maturity, EMI splits
-│   └── zakat.ts               # Pure: Zakat calculator logic
+├── app/                               # UI components & Edge API route handlers
+│   ├── page.tsx                       # Root page (re-exports Tracker)
+│   ├── layout.tsx                     # Global HTML layout, font preloads, theme scripts
+│   ├── tracker.tsx                    # Central state manager, bottom nav, dialog coordinator
+│   ├── accounts.tsx                   # Net worth calculation, accounts list, balance updates
+│   ├── activity.tsx                   # Unified transaction ledger (expenses, income, transfers)
+│   ├── virtual-list.tsx               # High-performance windowed DOM virtualization
+│   ├── split-dialog.tsx               # Atomic receipt splitting dialog
+│   ├── velocity.tsx                   # Spending pace & month-end forecast panel
+│   ├── health-score.tsx               # Financial Wellness Index (0-100) panel & gauge
+│   ├── portfolio.tsx                  # DSE stock portfolio tracker & equity valuation
+│   ├── tags-report.tsx                # #hashtag aggregation and category distribution
+│   ├── pocket.css                     # Primary styling, mobile breakpoints, light theme tokens
+│   ├── pocket-dark.css                # Dark theme overrides (html[data-theme=dark])
+│   └── api/                           # Edge route handlers (GET, POST, PUT, DELETE)
+│       ├── auth/                      # Login, registration, profile, logout handlers
+│       ├── expenses/                  # Expense CRUD & atomic split endpoints
+│       ├── accounts/                  # Account operations, transfers, adjustments
+│       ├── categories/                # Category management, styling, and atomic merge
+│       ├── budgets/                   # Monthly category limits
+│       └── backup/                    # JSON backup export and merge-only restore
+├── lib/                               # Pure business logic and server utilities
+│   ├── database.ts                    # 🔒 SERVER-ONLY: env.DB accessor and jsonChunks()
+│   ├── account-db.ts                  # 🔒 SERVER-ONLY: Raw D1 queries for accounts
+│   ├── recurring.ts                   # 🔒 SERVER-ONLY: Lazy recurring occurrence generator
+│   ├── auth.ts                        # ⚡ PURE: PBKDF2 hashing, salts, HMAC session tokens
+│   ├── format.ts                      # ⚡ PURE: BDT currency formatter (money()) & privacy mask
+│   ├── velocity.ts                    # ⚡ PURE: Burn rate, leap-year days, projections
+│   ├── wellness.ts                    # ⚡ PURE: Financial Health 0-100 scoring algorithm
+│   ├── splits.ts                      # ⚡ PURE: Receipt splitting validators and allocations
+│   ├── tags.ts                        # ⚡ PURE: Regex hashtag parser (Bengali & English)
+│   ├── portfolio.ts                   # ⚡ PURE: Equity portfolio gains and allocation weights
+│   └── terms.ts                       # ⚡ PURE: DPS compounding, FD simple interest, EMI splits
 ├── db/
-│   └── schema.ts              # Drizzle ORM table definitions (source of truth for migrations)
-├── drizzle/                   # Generated SQL migrations (0000_*.sql, meta)
-├── tests/
-│   ├── smoke.mjs              # 164-test API smoke suite against running dev server
-│   └── unit/                  # Node unit tests for pure lib/ modules
-└── docs/                      # Architectural, feature, data, and agent docs
+│   └── schema.ts                      # Drizzle ORM schema (source of truth for migrations)
+├── drizzle/                           # Versioned migrations (0000..0014) + consolidated schema.sql
+├── tests/                             # Unit and integration test suites
+│   ├── unit/*.test.ts                 # 137 unit tests for pure lib/ modules
+│   ├── smoke.mjs                      # 164 API checks against dev server
+│   └── multi-user-smoke.mjs           # Multi-tenant registration & isolation tests
+└── wrangler.json                      # Cloudflare Workers & D1 deployment configuration
 ```
-
-### 3.2 Starter Plumbing (DO NOT TOUCH)
-
-Agents **MUST NOT** edit these files unless specifically instructed:
-- `build/`
-- `scripts/` (except when reviewing environment setup)
-- `vendor/`
-- `lib/connector*`
-- `app/chatgpt-auth.ts` (unused scaffold)
-- `db/index.ts` (unused Drizzle client scaffold)
-- `examples/`
-- `components/ui/*` (vendored shadcn primitives; re-generate if needed)
-- `.openai/hosting.json` (contains private project ID)
-- `vite.config.ts`
-
-### 3.3 Generated & Transient Directories (NEVER EDIT OR SEARCH)
-
-- `dist/`
-- `.next/`
-- `.vinext/`
-- `.wrangler/`
-- `.sites-runtime/`
-- `node_modules/`
-- `package-lock.json`
 
 ---
 
 ## 4. Key Architectural Patterns
 
-### 4.1 Client-Safe vs Server-Only Isolation
+### 4.1 Client-Safe vs. Server-Only Isolation
+To maintain portability across the Cloudflare edge runtime and local Node.js test runners:
+- **Server-Only Modules**: Modules importing `cloudflare:workers` (`lib/database.ts`, `lib/account-db.ts`, `lib/recurring.ts`) must never be imported into client components (`"use client"`).
+- **Client-Safe Modules**: Helpers in `lib/*.ts` are purely functional and dependency-free. They are bundled safely into React client components and executed in `node:test`.
+- **Type Isolation**: If a client component requires server types, use `import type { ... }` exclusively.
 
-- **Server-Only Modules**: `lib/database.ts`, `lib/account-db.ts`, and `lib/recurring.ts` import from `cloudflare:workers` or access `env.DB`. They must never be imported into client components (`"use client"`).
-- **Client-Safe Modules**: Pure helpers in `lib/*.ts` (such as `lib/months.ts`, `lib/format.ts`, `lib/accounts.ts`) must remain dependency-free so they can be bundled into client components and executed in Node unit tests.
-- **Rule**: If a client component needs types from a server module, use `import type { ... }` exclusively.
+### 4.2 Raw Parameterized D1 Database Access
+Pocket uses Drizzle strictly for schema generation. At runtime, performance and zero-cold-start execution are prioritized using **raw prepared statements**:
 
-### 4.2 Data Access: Raw D1 Prepared Statements
-
-Pocket does **not** use Drizzle's runtime query builder. It uses Drizzle solely for schema definitions (`db/schema.ts`) and migration generation (`drizzle-kit generate`).
-
-At runtime, all database queries use raw D1 prepared statements:
 ```typescript
+// Example: Authenticated transaction read
 const db = database();
-const stmt = db.prepare('SELECT id, category, cents, date, note FROM expenses WHERE date LIKE ? ORDER BY date DESC').bind(`${month}-%`);
+const stmt = db.prepare(`
+  SELECT id, category, cents, date, note, method, account
+  FROM expenses
+  WHERE user_id = ? AND date LIKE ?
+  ORDER BY date DESC
+`).bind(userId, `${month}-%`);
+
 const { results } = await stmt.all<ExpenseRow>();
 ```
-- **Invariants**:
-  1. Always use `?` placeholders with `.bind(...)`. Never interpolate strings into SQL.
-  2. For bulk inserts, use `json_each(?)` with chunks of ~500KB to stay within D1's 100-parameter and 50-query execution limits.
 
-### 4.3 State Management & Optimistic Updates
-
-1. **Central State Container**: `app/tracker.tsx` maintains state for all active tabs, current viewed month, active filters, and open dialogs.
-2. **Dialog Mounting Keys**: Dialogs such as `IncomeDialog` and `TransferDialog` are remounted with a fresh `key` whenever opened (`key={editId ?? 'new'}`). This allows form inputs to initialize cleanly from props without synchronization `useEffect`s.
-3. **Optimistic Updates**: API responses return the modified/created entity. The client updates local React state immediately using the API response rather than refetching the entire dataset.
-
-### 4.4 Styling and Design Tokens
-
-Pocket uses a tailored design system:
-- **Plain CSS Classes**: Styling is organized in `app/pocket.css` rather than inline utility classes.
-- **Dark Mode Mirroring**: Every new class that introduces a `background`, `color`, or `border` must have a corresponding rule inside `app/pocket-dark.css` targeting `html[data-theme=dark]`.
-- **CSS Variables (2026 Refresh Layer)**:
-  - `--ink`, `--ink-2`, `--ink-3`: Text hierarchy.
-  - `--paper`, `--card`: Backgrounds.
-  - `--line`: Borders and dividers.
-  - `--green` (`#006a4e`), `--green-deep`, `--mint`: Positive flows and brand identity.
-  - `--red` (`#d63a44`): Overdue bills and debts only.
-  - `--display`: Bricolage Grotesque (headings, card titles, monetary numbers).
-  - `--text`: Hind Siliguri (body copy).
-- **Tabular Numerics**: All monetary displays use `font-family: var(--display); font-variant-numeric: tabular-nums;`.
-
-### 4.5 Privacy Mode Architecture
-
-Pocket includes a privacy shield for public spaces:
-- Managed via `app/privacy.tsx` (`usePrivacy()` hook backed by `localStorage.getItem('pocket-private')`).
-- Masks all outputs from `money()` in `lib/format.ts` with asterisks (`***`).
-- Sets `html[data-private]` attribute on the root element.
-- Any unformatted numeric elements must be styled with CSS blur under `html[data-private]`.
+> [!IMPORTANT]
+> **Parameter Binding Limit**: Cloudflare D1 enforces a limit of 100 bound parameters per query. Bulk inserts (such as JSON restore) use `json_each(?)` with 500KB chunking implemented in `lib/database.ts`.
 
 ---
 
-## 5. Security & Isolation Invariants
+## 5. Security & Multi-Tenant Authentication Architecture
 
-1. **Multi-User Authentication & Tenant Data Isolation**: Multi-user registration and authentication is enforced at the edge. Users are authenticated via PBKDF2 SHA-256 password hashing with individual salts and signed session cookies (`pocket_session`). All SQL transactions and reads are strictly scoped to the authenticated tenant (`WHERE user_id = ?`).
-2. **Cross-Origin Request Forgery Protection**: Every mutation route handler (`POST`, `PUT`, `DELETE`) verifies the `Origin` header. If the origin does not match the request URL, the server responds immediately with `403 Forbidden`.
-3. **Database Protection**: Local development uses `.wrangler/state`. Because this database contains the owner's live personal financial records, destructive resets are strictly prohibited without an external backup.
-4. **Production Deployment**: Cloudflare Workers with Cloudflare D1 and Cloudflare Assets. See [docs/DEPLOYMENT.md](DEPLOYMENT.md) for full runbook.
+```mermaid
+sequenceDiagram
+    autonumber
+    actor User as User Browser
+    participant API as Edge API (/api/auth/login)
+    participant Crypto as WebCrypto (PBKDF2)
+    participant D1 as D1 Database
+    participant Session as Cookie Engine
+
+    User->>API: POST { username, password }
+    API->>D1: SELECT password_hash, salt FROM users WHERE username = ?
+    D1-->>API: Stored Hash & Salt
+    API->>Crypto: PBKDF2-SHA256(password, salt, 100000)
+    Crypto-->>API: Computed Hash
+    alt Password Matches
+        API->>Session: createSessionToken(username)
+        Session-->>API: Signed Token (username.expiry.hmac)
+        API-->>User: Set-Cookie: pocket_session (HttpOnly, SameSite=Lax)
+    else Invalid Credentials
+        API-->>User: 401 Unauthorized
+    end
+```
+
+### Authentication Invariants:
+1. **Password Security**: Passwords are never stored in plaintext. They are salted with 128-bit random salts and hashed using PBKDF2 SHA-256 with 100,000 iterations.
+2. **Session Cookies**: The `pocket_session` cookie contains a payload of `${username}.${expiresAt}` signed with an HMAC derived from `POCKET_AUTH_SECRET`.
+3. **Tenant Scoping**: All queries across `expenses`, `income`, `accounts`, `budgets`, `bills`, and `recurring` require an authenticated `user_id`. Non-admin custom category keys and budgets are namespaced (`${userId}:${categoryName}`) to prevent primary key collision.
+4. **CSRF Protection**: All mutation endpoints (`POST`, `PUT`, `DELETE`) inspect the `Origin` header. Mismatches are rejected with HTTP 403 Forbidden.
